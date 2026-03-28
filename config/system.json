@@ -1,0 +1,1240 @@
+{
+  "_comment": "Stellar — Canonical System Configuration. All orbital mechanics, ship classes, routes, and pricing derive from this file. Change a value here and it ripples through the entire system.",
+
+  "epoch": {
+    "_comment": "Day 0 of the simulation. All orbital positions are calculated relative to this date.",
+    "date": "2800-01-01",
+    "dayNumber": 0
+  },
+
+  "simulation": {
+    "_comment": "Controls how the orbital simulation behaves across frontend and backend.",
+    "auToKm": 149597870.7,
+    "defaultTimeStepDays": 1,
+    "orbitRefinementPasses": 2,
+    "_orbitRefinementPasses_comment": "Number of iteration passes when refining voyage duration calculations. 2 is sufficient for booking accuracy.",
+    "scatterInnerRadiusAU": 1.8,
+    "scatterOuterRadiusAU": 2.6
+  },
+
+  "stars": [
+    {
+      "id": "solara_prime",
+      "name": "Solara Prime",
+      "type": "G",
+      "description": "The primary star of the system. A G-type main sequence star with a warm golden-white light. Fixed at the system barycentre for simulation purposes.",
+      "orbitalRadius": 0,
+      "period": null,
+      "startPhase": 0,
+      "renderColor": "#FFF4C2",
+      "renderRadius": 0.12
+    },
+    {
+      "id": "solara_minor",
+      "name": "Solara Minor",
+      "type": "K",
+      "description": "A K-type orange dwarf orbiting Solara Prime at close range. From any planet in the system both stars are visible, creating double shadows and amber-tinted twilights.",
+      "parent": "solara_prime",
+      "orbitalRadius": 0.08,
+      "period": 18,
+      "eccentricity": 0.01,
+      "startPhase": 0,
+      "renderColor": "#FFB347",
+      "renderRadius": 0.08
+    }
+  ],
+
+  "lagrangeStations": [
+    {
+      "id": "l4_station",
+      "name": "L4 Lagrange Station",
+      "description": "A permanent deep-space installation at the gravitational equilibrium point 60 degrees ahead of Solara Minor on its orbital path. Used as a refuelling depot, navigation waypoint, and emergency shelter.",
+      "lagrangePoint": "L4",
+      "referenceBody": "solara_minor",
+      "angularOffsetDegrees": 60,
+      "visitable": true,
+      "spaceports": ["l4_dock"],
+      "renderColor": "#A8D8EA",
+      "renderRadius": 0.005
+    },
+    {
+      "id": "l5_station",
+      "name": "L5 Lagrange Station",
+      "description": "A permanent deep-space installation at the gravitational equilibrium point 60 degrees behind Solara Minor. Mirror installation to L4.",
+      "lagrangePoint": "L5",
+      "referenceBody": "solara_minor",
+      "angularOffsetDegrees": -60,
+      "visitable": true,
+      "spaceports": ["l5_dock"],
+      "renderColor": "#A8D8EA",
+      "renderRadius": 0.005
+    }
+  ],
+
+  "bodies": [
+    {
+      "id": "serrath",
+      "name": "Serrath",
+      "type": "rocky_planet",
+      "parent": "solara_prime",
+      "description": "An uninhabitable rocky planet between Aethon and the inner system. Near-zero rotation, collapsed magnetosphere, and a violent terminator line between its permanently molten and permanently frozen hemispheres. A Scenic Voyage waypoint — not a destination.",
+      "orbitalRadius": 0.6,
+      "period": 145,
+      "eccentricity": 0.09,
+      "axialTilt": 2,
+      "rotationPeriod": 4200,
+      "_rotationPeriod_comment": "Days per full self-rotation. Very slow — effectively tidally locked.",
+      "startPhase": 47,
+      "visitable": false,
+      "spaceports": [],
+      "moons": [],
+      "renderColor": "#8B6355",
+      "renderRadius": 0.018,
+      "renderFeatures": ["terminator_line", "lava_hemisphere", "ice_hemisphere"]
+    },
+    {
+      "id": "aethon",
+      "name": "Aethon",
+      "type": "super_earth",
+      "parent": "solara_prime",
+      "description": "The political and commercial heart of the Solara system. A super-Earth with stronger gravity, thicker atmosphere, and deep blue skies that shift to purple at sunset. The most densely urbanised world in the system and the hub of interplanetary governance.",
+      "orbitalRadius": 1.1,
+      "period": 380,
+      "eccentricity": 0.03,
+      "axialTilt": 23,
+      "rotationPeriod": 1.1,
+      "startPhase": 163,
+      "visitable": true,
+      "spaceports": [
+        "aethon_orbital_ring",
+        "caelum_platform",
+        "port_ashara",
+        "meridian_base",
+        "eastgate_terminal",
+        "seren_relay"
+      ],
+      "moons": ["kael", "seren", "veth"],
+      "renderColor": "#4A90D9",
+      "renderRadius": 0.032,
+      "renderFeatures": ["orbital_ring", "atmosphere", "clouds"]
+    },
+    {
+      "id": "kael",
+      "name": "Kael",
+      "type": "moon",
+      "parent": "aethon",
+      "description": "The innermost moon of Aethon. Geologically scarred from an ancient active volcanic period. Uncolonised.",
+      "orbitalRadius": 0.0025,
+      "period": 8,
+      "eccentricity": 0.01,
+      "axialTilt": 1,
+      "rotationPeriod": 8,
+      "_rotationPeriod_comment": "Tidally locked — rotation period equals orbital period.",
+      "startPhase": 40,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#7D6B5E",
+      "renderRadius": 0.007
+    },
+    {
+      "id": "seren",
+      "name": "Seren",
+      "type": "moon",
+      "parent": "aethon",
+      "description": "A quiet, ice-dusted moon tidally locked to Aethon. Always shows the same pale face. Uncolonised.",
+      "orbitalRadius": 0.004,
+      "period": 14,
+      "eccentricity": 0.01,
+      "axialTilt": 0,
+      "rotationPeriod": 14,
+      "startPhase": 130,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#C8C8C8",
+      "renderRadius": 0.006
+    },
+    {
+      "id": "veth",
+      "name": "Veth",
+      "type": "moon",
+      "parent": "aethon",
+      "description": "The smallest and outermost of Aethon's three moons. Dark and unremarkable, discovered later than the other two. Uncolonised.",
+      "orbitalRadius": 0.006,
+      "period": 22,
+      "eccentricity": 0.0,
+      "axialTilt": 3,
+      "rotationPeriod": 22,
+      "startPhase": 220,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#5C5C5C",
+      "renderRadius": 0.004
+    },
+    {
+      "id": "vareth",
+      "name": "Vareth",
+      "type": "gas_giant",
+      "parent": "solara_prime",
+      "description": "A gas giant with atmospheric composition combining Jupiter's scale and Venus's violence. Vivid storm bands of crimson, amber, violet, and yellow-green. A permanent hyperstorm at the southern pole. The planet itself is unvisitable — atmospheric pressure and temperature would destroy any vessel.",
+      "orbitalRadius": 3.2,
+      "period": 890,
+      "eccentricity": 0.05,
+      "axialTilt": 6,
+      "rotationPeriod": 0.42,
+      "startPhase": 251,
+      "visitable": false,
+      "spaceports": [],
+      "moons": [
+        "kalos",
+        "thal",
+        "mira",
+        "vareth_moon_4",
+        "vareth_moon_5",
+        "vareth_moon_6",
+        "vareth_moon_7",
+        "vareth_moon_8",
+        "vareth_moon_9",
+        "vareth_moon_10",
+        "vareth_moon_11",
+        "vareth_moon_12"
+      ],
+      "renderColor": "#C2410C",
+      "renderRadius": 0.055,
+      "renderFeatures": ["storm_bands", "southern_hyperstorm", "faint_rings"]
+    },
+    {
+      "id": "kalos",
+      "name": "Kalos",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "The largest and most developed moon in the Vareth system. A thin but workable atmosphere, deep-core mining operations, and the largest refinery complex in the mid-system. Industrial in character, frontier in energy.",
+      "orbitalRadius": 0.008,
+      "period": 6,
+      "eccentricity": 0.01,
+      "axialTilt": 2,
+      "rotationPeriod": 6,
+      "startPhase": 15,
+      "visitable": true,
+      "spaceports": ["kalos_deep_port"],
+      "renderColor": "#9B7653",
+      "renderRadius": 0.013
+    },
+    {
+      "id": "thal",
+      "name": "Thal",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "A tidally heated moon kept geologically active by Vareth's gravitational flexing. Geothermal vent fields across the surface, harnessed for energy production. A scientific and engineering colony with a growing volcanic tourism trade.",
+      "orbitalRadius": 0.013,
+      "period": 11,
+      "eccentricity": 0.02,
+      "axialTilt": 4,
+      "rotationPeriod": 11,
+      "startPhase": 90,
+      "visitable": true,
+      "spaceports": ["thal_thermal_station"],
+      "renderColor": "#B45309",
+      "renderRadius": 0.01,
+      "renderFeatures": ["volcanic_vents"]
+    },
+    {
+      "id": "mira",
+      "name": "Mira",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An ice moon with a confirmed subsurface ocean and native microbial life. The most scientifically significant body in the system. Access is strictly controlled by interplanetary treaty — passengers require a permit in addition to a ticket. Orbital spaceport only, no surface landings.",
+      "orbitalRadius": 0.02,
+      "period": 19,
+      "eccentricity": 0.0,
+      "axialTilt": 1,
+      "rotationPeriod": 19,
+      "startPhase": 200,
+      "visitable": true,
+      "visitRestricted": true,
+      "visitPermitRequired": true,
+      "spaceports": ["mira_access_point"],
+      "renderColor": "#BAE6FD",
+      "renderRadius": 0.009,
+      "renderFeatures": ["ice_surface", "subsurface_glow"]
+    },
+    {
+      "id": "vareth_moon_4",
+      "name": "Vareth IV",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body in the outer Vareth moon family. Uncolonised.",
+      "orbitalRadius": 0.031,
+      "period": 29,
+      "eccentricity": 0.06,
+      "axialTilt": 12,
+      "rotationPeriod": 29,
+      "startPhase": 55,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#6B6B6B",
+      "renderRadius": 0.004
+    },
+    {
+      "id": "vareth_moon_5",
+      "name": "Vareth V",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.044,
+      "period": 42,
+      "eccentricity": 0.08,
+      "axialTilt": 18,
+      "rotationPeriod": 42,
+      "startPhase": 170,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#5A5A5A",
+      "renderRadius": 0.003
+    },
+    {
+      "id": "vareth_moon_6",
+      "name": "Vareth VI",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.058,
+      "period": 58,
+      "eccentricity": 0.1,
+      "axialTilt": 25,
+      "rotationPeriod": 58,
+      "startPhase": 310,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#4A4A4A",
+      "renderRadius": 0.003
+    },
+    {
+      "id": "vareth_moon_7",
+      "name": "Vareth VII",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.072,
+      "period": 75,
+      "eccentricity": 0.07,
+      "axialTilt": 8,
+      "rotationPeriod": 75,
+      "startPhase": 85,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#636363",
+      "renderRadius": 0.003
+    },
+    {
+      "id": "vareth_moon_8",
+      "name": "Vareth VIII",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.089,
+      "period": 96,
+      "eccentricity": 0.09,
+      "axialTilt": 31,
+      "rotationPeriod": 96,
+      "startPhase": 240,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#595959",
+      "renderRadius": 0.002
+    },
+    {
+      "id": "vareth_moon_9",
+      "name": "Vareth IX",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.107,
+      "period": 118,
+      "eccentricity": 0.11,
+      "axialTilt": 14,
+      "rotationPeriod": 118,
+      "startPhase": 155,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#4E4E4E",
+      "renderRadius": 0.002
+    },
+    {
+      "id": "vareth_moon_10",
+      "name": "Vareth X",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.128,
+      "period": 143,
+      "eccentricity": 0.13,
+      "axialTilt": 42,
+      "rotationPeriod": 143,
+      "startPhase": 330,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#555555",
+      "renderRadius": 0.002
+    },
+    {
+      "id": "vareth_moon_11",
+      "name": "Vareth XI",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "An irregular captured body. Uncolonised.",
+      "orbitalRadius": 0.15,
+      "period": 170,
+      "eccentricity": 0.08,
+      "axialTilt": 6,
+      "rotationPeriod": 170,
+      "startPhase": 70,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#4B4B4B",
+      "renderRadius": 0.002
+    },
+    {
+      "id": "vareth_moon_12",
+      "name": "Vareth XII",
+      "type": "moon",
+      "parent": "vareth",
+      "description": "The outermost and most irregular of Vareth's captured moons. Uncolonised.",
+      "orbitalRadius": 0.175,
+      "period": 200,
+      "eccentricity": 0.15,
+      "axialTilt": 55,
+      "rotationPeriod": 200,
+      "startPhase": 195,
+      "visitable": false,
+      "spaceports": [],
+      "renderColor": "#424242",
+      "renderRadius": 0.002
+    },
+    {
+      "id": "calyx",
+      "name": "Calyx",
+      "type": "ice_planet",
+      "parent": "solara_prime",
+      "description": "A small, dense ice planet in the outer system beyond the Scatter. Extraordinarily cold and mineral-rich. Colonists live almost entirely underground or in pressurised surface domes. Underground city grids are visible as geometric light patterns through the ice sheet at night.",
+      "orbitalRadius": 5.8,
+      "period": 2400,
+      "eccentricity": 0.07,
+      "axialTilt": 28,
+      "rotationPeriod": 0.9,
+      "startPhase": 318,
+      "visitable": true,
+      "spaceports": [
+        "calyx_port_north",
+        "calyx_port_equatorial",
+        "calyx_port_deep"
+      ],
+      "moons": ["lun", "vael"],
+      "renderColor": "#BAE6FD",
+      "renderRadius": 0.022,
+      "renderFeatures": ["ice_surface", "underground_city_glow", "dust_halo"]
+    },
+    {
+      "id": "lun",
+      "name": "Lun",
+      "type": "moon",
+      "parent": "calyx",
+      "description": "The larger of Calyx's two moons. A dark rocky body with subsurface liquid water pockets. Colonised primarily for its strategic orbital position — ideal for deep-outer-system observation and relay communications.",
+      "orbitalRadius": 0.006,
+      "period": 9,
+      "eccentricity": 0.01,
+      "axialTilt": 5,
+      "rotationPeriod": 9,
+      "startPhase": 100,
+      "visitable": true,
+      "spaceports": ["lun_station"],
+      "renderColor": "#78716C",
+      "renderRadius": 0.008
+    },
+    {
+      "id": "vael",
+      "name": "Vael",
+      "type": "moon",
+      "parent": "calyx",
+      "description": "The coldest inhabited body in the system. A high-albedo ice moon that reflects distant binary light more efficiently than Calyx itself. Its colony exists to mine a rare mineral in its upper crust with critical applications in cryo-hibernation technology.",
+      "orbitalRadius": 0.01,
+      "period": 17,
+      "eccentricity": 0.01,
+      "axialTilt": 2,
+      "rotationPeriod": 17,
+      "startPhase": 275,
+      "visitable": true,
+      "spaceports": ["vael_station"],
+      "renderColor": "#E2E8F0",
+      "renderRadius": 0.006
+    },
+    {
+      "id": "drath",
+      "name": "Drath",
+      "type": "gas_giant",
+      "parent": "solara_prime",
+      "description": "A cold, muted blue-grey gas giant at the outer edge of the system. Its erratic, periodically reversing magnetosphere makes all nearby bodies lethally irradiated during polarity events. No habitation has ever been sanctioned. Visible in the star map as a slow, brooding presence at the system's edge.",
+      "orbitalRadius": 9.4,
+      "period": 6100,
+      "eccentricity": 0.04,
+      "axialTilt": 11,
+      "rotationPeriod": 0.55,
+      "startPhase": 94,
+      "visitable": false,
+      "spaceports": [],
+      "moons": [],
+      "renderColor": "#94A3B8",
+      "renderRadius": 0.042,
+      "renderFeatures": ["aurora_curtains", "faint_banding"]
+    }
+  ],
+
+  "spaceports": [
+    {
+      "id": "aethon_orbital_ring",
+      "name": "Aethon Orbital Ring",
+      "body": "aethon",
+      "type": "orbital",
+      "description": "The primary deep-system terminal. A permanent structure in low orbit and the busiest port in the system."
+    },
+    {
+      "id": "caelum_platform",
+      "name": "Caelum Platform",
+      "body": "aethon",
+      "type": "atmospheric",
+      "description": "A mid-atmosphere floating station above the equatorial zone for atmospheric entry and exit without full surface descent."
+    },
+    {
+      "id": "port_ashara",
+      "name": "Port Ashara",
+      "body": "aethon",
+      "type": "surface",
+      "description": "The oldest surface spaceport on Aethon. Historically significant, northern continent."
+    },
+    {
+      "id": "meridian_base",
+      "name": "Meridian Base",
+      "body": "aethon",
+      "type": "surface",
+      "description": "Southern hemisphere, more utilitarian and cargo-focused."
+    },
+    {
+      "id": "eastgate_terminal",
+      "name": "Eastgate Terminal",
+      "body": "aethon",
+      "type": "surface",
+      "description": "High-capacity commercial hub, eastern seaboard. The newest and most modern surface port."
+    },
+    {
+      "id": "seren_relay",
+      "name": "Seren Relay Station",
+      "body": "aethon",
+      "type": "orbital",
+      "description": "A small departure staging installation in Seren's orbital path, used as a jump-off point for outer-system routes."
+    },
+    {
+      "id": "kalos_deep_port",
+      "name": "Kalos Deep Port",
+      "body": "kalos",
+      "type": "surface",
+      "description": "The main arrival and departure hub for the Vareth system. Heavy industrial character."
+    },
+    {
+      "id": "thal_thermal_station",
+      "name": "Thal Thermal Station",
+      "body": "thal",
+      "type": "surface",
+      "description": "Built on a geologically stable plateau above the vent fields."
+    },
+    {
+      "id": "mira_access_point",
+      "name": "Mira Access Point",
+      "body": "mira",
+      "type": "orbital",
+      "description": "A strictly controlled orbital station. Permit required. No surface landings except research vessels."
+    },
+    {
+      "id": "calyx_port_north",
+      "name": "Calyx North Port",
+      "body": "calyx",
+      "type": "surface",
+      "description": "The primary northern hemisphere surface port on Calyx."
+    },
+    {
+      "id": "calyx_port_equatorial",
+      "name": "Calyx Equatorial Port",
+      "body": "calyx",
+      "type": "surface",
+      "description": "Mid-latitude surface port, highest traffic volume on Calyx."
+    },
+    {
+      "id": "calyx_port_deep",
+      "name": "Calyx Deep Station",
+      "body": "calyx",
+      "type": "surface",
+      "description": "A deep-ice port integrated into the underground city network."
+    },
+    {
+      "id": "lun_station",
+      "name": "Lun Station",
+      "body": "lun",
+      "type": "surface",
+      "description": "Primary and only port on Lun. Mixed scientific and civilian use."
+    },
+    {
+      "id": "vael_station",
+      "name": "Vael Station",
+      "body": "vael",
+      "type": "surface",
+      "description": "Small, functional mining colony port. The coldest staffed spaceport in the system."
+    },
+    {
+      "id": "l4_dock",
+      "name": "L4 Docking Station",
+      "body": "l4_station",
+      "type": "deep_space",
+      "description": "Compact docking installation at the L4 gravitational equilibrium point."
+    },
+    {
+      "id": "l5_dock",
+      "name": "L5 Docking Station",
+      "body": "l5_station",
+      "type": "deep_space",
+      "description": "Compact docking installation at the L5 gravitational equilibrium point."
+    }
+  ],
+
+  "shipClasses": [
+    {
+      "id": "helion",
+      "name": "Helion-class",
+      "description": "A small, fast regional vessel designed for short to medium routes and direct transfers. No cryo decks — journeys are short enough not to need them. Minimal amenity spaces, premium on efficiency.",
+      "speedAUPerDay": 0.1,
+      "maxPassengers": 120,
+      "hasCryo": false,
+      "cryoOptions": [],
+      "cabinClasses": ["drift", "orbit"],
+      "availableRouteTypes": ["direct"],
+      "spacewalkCapable": false,
+      "renderScale": 0.6
+    },
+    {
+      "id": "tethys",
+      "name": "Tethys-class",
+      "description": "The mid-range workhorse of the fleet. The most common ship class, running medium routes and connecting the moon systems. Reliable, comfortable, high frequency.",
+      "speedAUPerDay": 0.055,
+      "maxPassengers": 300,
+      "hasCryo": true,
+      "cryoOptions": ["conscious", "full_cryo", "cryo_intervals"],
+      "cabinClasses": ["drift", "orbit", "apex"],
+      "availableRouteTypes": ["direct", "gravity_assist", "multi_stop"],
+      "spacewalkCapable": true,
+      "renderScale": 1.0
+    },
+    {
+      "id": "lunara",
+      "name": "Lunara-class",
+      "description": "The scenic specialist. Lower capacity than the Tethys, with maximised viewport ratios, an expanded observatory deck, and premium lounge spaces. Deliberately unhurried. The ship where the journey is the point.",
+      "speedAUPerDay": 0.042,
+      "maxPassengers": 220,
+      "hasCryo": true,
+      "cryoOptions": ["conscious", "cryo_intervals"],
+      "_cryoOptions_comment": "No full cryo on Lunara — the scenic experience is the product.",
+      "cabinClasses": ["orbit", "apex", "helix"],
+      "availableRouteTypes": ["scenic", "gravity_assist"],
+      "spacewalkCapable": true,
+      "renderScale": 1.1
+    },
+    {
+      "id": "solaris",
+      "name": "Solaris-class",
+      "description": "The flagship class of the fleet. Built for the longest routes. Massive cylindrical spine design with rotating habitat rings for artificial gravity. Forward observation dome. Two cryo decks, three waking class decks. Supremely comfortable.",
+      "speedAUPerDay": 0.025,
+      "maxPassengers": 600,
+      "hasCryo": true,
+      "cryoOptions": ["conscious", "full_cryo", "cryo_intervals"],
+      "cabinClasses": ["drift", "orbit", "apex", "helix"],
+      "availableRouteTypes": [
+        "direct",
+        "gravity_assist",
+        "multi_stop",
+        "scenic"
+      ],
+      "spacewalkCapable": true,
+      "renderScale": 1.8
+    }
+  ],
+
+  "cabinClasses": [
+    {
+      "id": "drift",
+      "name": "Drift Class",
+      "_name_comment": "Placeholder name — to be renamed during world-building.",
+      "description": "The budget tier. Shared sleeping quarters, bunk-style berths, communal lounges and dining. For passengers who need to get somewhere.",
+      "priceMultiplier": 1.0,
+      "privatecabin": false,
+      "viewportAccess": false,
+      "diningTier": "communal",
+      "compatibleCryoOptions": ["conscious", "full_cryo", "cryo_intervals"]
+    },
+    {
+      "id": "orbit",
+      "name": "Orbit Class",
+      "_name_comment": "Placeholder name — to be renamed during world-building.",
+      "description": "A private cabin, modest but comfortable. A bed, a viewport screen, personal storage, mid-tier dining and recreation access.",
+      "priceMultiplier": 1.8,
+      "privatecabin": true,
+      "viewportAccess": "screen",
+      "diningTier": "standard",
+      "compatibleCryoOptions": ["conscious", "full_cryo", "cryo_intervals"]
+    },
+    {
+      "id": "apex",
+      "name": "Apex Class",
+      "_name_comment": "Placeholder name — to be renamed during world-building.",
+      "description": "A premium suite. Larger space, real hull viewports, dedicated dining, priority boarding at waypoints, exclusive lounge access.",
+      "priceMultiplier": 3.2,
+      "privatecabin": true,
+      "viewportAccess": "real_viewport",
+      "diningTier": "premium",
+      "compatibleCryoOptions": ["conscious", "full_cryo", "cryo_intervals"]
+    },
+    {
+      "id": "helix",
+      "name": "Helix Class",
+      "_name_comment": "Placeholder name — to be renamed during world-building.",
+      "description": "The top tier. Full suite, personalised steward service, private observation bubble off the hull with 270-degree stellar views, captain's table access, complimentary add-on packages. Conscious voyage only.",
+      "priceMultiplier": 6.0,
+      "privatecabin": true,
+      "viewportAccess": "observation_bubble",
+      "diningTier": "exclusive",
+      "compatibleCryoOptions": ["conscious"],
+      "_compatibleCryoOptions_comment": "Helix is conscious-voyage only. The experience is the product."
+    }
+  ],
+
+  "cryoOptions": [
+    {
+      "id": "conscious",
+      "name": "Conscious Voyage",
+      "description": "No cryostasis. Full waking experience for the entire journey. All amenities, dining, and entertainment accessible. The cheapest cryo option.",
+      "priceMultiplier": 1.0,
+      "amenitiesEnabled": true,
+      "minIntervals": null,
+      "maxIntervals": null
+    },
+    {
+      "id": "full_cryo",
+      "name": "Full Cryo",
+      "description": "The passenger is placed under for the entire voyage, waking on arrival. No amenity access. Dramatically cheaper for long journeys.",
+      "priceMultiplier": 0.55,
+      "amenitiesEnabled": false,
+      "minIntervals": null,
+      "maxIntervals": null
+    },
+    {
+      "id": "cryo_intervals",
+      "name": "Cryo Intervals",
+      "description": "The passenger alternates between cryosleep and conscious waking periods. The number of intervals scales with journey length. The most expensive option.",
+      "priceMultiplier": 1.35,
+      "amenitiesEnabled": true,
+      "_amenitiesEnabled_comment": "Amenities enabled during conscious intervals only. Logic enforced in UI.",
+      "minIntervalsPerDays": 10,
+      "_minIntervalsPerDays_comment": "Minimum 1 interval per this many days of journey duration.",
+      "maxIntervalsPerDays": 30,
+      "_maxIntervalsPerDays_comment": "Maximum 1 interval per this many days of journey duration.",
+      "absoluteMinIntervals": 1,
+      "absoluteMaxIntervals": 12
+    }
+  ],
+
+  "routeTypes": [
+    {
+      "id": "direct",
+      "name": "Direct Transfer",
+      "description": "The fastest available route, flying point to point with no intermediate stops or trajectory assistance.",
+      "speedMultiplier": 1.0,
+      "priceMultiplier": 1.3,
+      "crossesScatterRisk": "standard"
+    },
+    {
+      "id": "gravity_assist",
+      "name": "Gravity Assist Route",
+      "description": "A fuel-efficient trajectory using the gravitational pull of intermediate planetary bodies to accelerate the ship. Slower than direct but cheaper and elegant.",
+      "speedMultiplier": 0.72,
+      "_speedMultiplier_comment": "Effective speed reduction — the route is longer but fuel-efficient, reflected in lower price.",
+      "priceMultiplier": 0.85,
+      "crossesScatterRisk": "reduced"
+    },
+    {
+      "id": "multi_stop",
+      "name": "Multi-Stop Voyage",
+      "description": "The ship calls at multiple ports across the journey for resupply, passenger exchange, or because no direct service exists. The cheapest option for long-haul travel.",
+      "speedMultiplier": 0.6,
+      "priceMultiplier": 0.7,
+      "crossesScatterRisk": "standard"
+    },
+    {
+      "id": "scenic",
+      "name": "Scenic Voyage",
+      "description": "A premium, deliberately extended route that deviates to pass notable astrophysical phenomena. The most expensive option. Sold as an experience, not just transport.",
+      "speedMultiplier": 0.5,
+      "priceMultiplier": 1.65,
+      "crossesScatterRisk": "minimal",
+      "_crossesScatterRisk_comment": "Scenic routes thread the safe, spectacular outer edge of the Scatter."
+    }
+  ],
+
+  "routes": [
+    {
+      "_comment": "--- HUB ROUTES: AETHON TO VARETH SYSTEM ---",
+      "id": "aethon_kalos",
+      "origin": "aethon",
+      "destination": "kalos",
+      "shipClass": "tethys",
+      "frequencyDays": 5,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist", "scenic"],
+      "basePriceCredits": 1200,
+      "notes": "The busiest long route in the system. Commercial backbone."
+    },
+    {
+      "id": "aethon_thal",
+      "origin": "aethon",
+      "destination": "thal",
+      "shipClass": "tethys",
+      "frequencyDays": 8,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist"],
+      "basePriceCredits": 1400,
+      "notes": "Secondary mid-system workhorse route."
+    },
+    {
+      "id": "aethon_mira",
+      "origin": "aethon",
+      "destination": "mira",
+      "shipClass": "solaris",
+      "frequencyDays": 14,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist"],
+      "basePriceCredits": 2800,
+      "permitRequired": true,
+      "notes": "Permit-required destination. Lower frequency due to access controls."
+    },
+    {
+      "id": "aethon_vareth_scenic",
+      "origin": "aethon",
+      "destination": "kalos",
+      "shipClass": "lunara",
+      "frequencyDays": 21,
+      "crossesScatter": true,
+      "availableRouteTypes": ["scenic"],
+      "basePriceCredits": 3500,
+      "notes": "Scenic routing through Scatter edge and Vareth storm approach. Lunara-class only."
+    },
+
+    {
+      "_comment": "--- HUB ROUTES: AETHON TO CALYX SYSTEM ---",
+      "id": "aethon_calyx",
+      "origin": "aethon",
+      "destination": "calyx",
+      "shipClass": "solaris",
+      "frequencyDays": 14,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist", "multi_stop"],
+      "basePriceCredits": 3200,
+      "notes": "Longest and most significant passenger route in the system."
+    },
+    {
+      "id": "aethon_lun",
+      "origin": "aethon",
+      "destination": "lun",
+      "shipClass": "solaris",
+      "frequencyDays": 14,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist", "multi_stop"],
+      "basePriceCredits": 3400,
+      "notes": "Shares departure schedule cadence with the Aethon-Calyx route."
+    },
+    {
+      "id": "aethon_vael",
+      "origin": "aethon",
+      "destination": "vael",
+      "shipClass": "solaris",
+      "frequencyDays": 21,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist"],
+      "basePriceCredits": 3600,
+      "notes": "Lower frequency — Vael's small population limits demand."
+    },
+    {
+      "id": "aethon_calyx_scenic",
+      "origin": "aethon",
+      "destination": "calyx",
+      "shipClass": "lunara",
+      "frequencyDays": 28,
+      "crossesScatter": true,
+      "availableRouteTypes": ["scenic"],
+      "basePriceCredits": 5500,
+      "notes": "Rarest scheduled service. Maximum journey duration. The definitive Stellar voyage."
+    },
+
+    {
+      "_comment": "--- INNER SYSTEM ROUTES ---",
+      "id": "aethon_serrath_scenic",
+      "origin": "aethon",
+      "destination": "serrath",
+      "shipClass": "lunara",
+      "frequencyDays": 30,
+      "crossesScatter": false,
+      "availableRouteTypes": ["scenic"],
+      "basePriceCredits": 1800,
+      "destinationLandable": false,
+      "notes": "Not a landing — a close-approach scenic flyby of Serrath's terminator line only."
+    },
+    {
+      "id": "aethon_l4",
+      "origin": "aethon",
+      "destination": "l4_station",
+      "shipClass": "helion",
+      "frequencyDays": 3,
+      "crossesScatter": false,
+      "availableRouteTypes": ["direct"],
+      "basePriceCredits": 180,
+      "notes": "Short fast transfer. Mostly crew rotation and cargo. Helion-class only."
+    },
+    {
+      "id": "aethon_l5",
+      "origin": "aethon",
+      "destination": "l5_station",
+      "shipClass": "helion",
+      "frequencyDays": 3,
+      "crossesScatter": false,
+      "availableRouteTypes": ["direct"],
+      "basePriceCredits": 180,
+      "notes": "Mirror of the L4 route."
+    },
+
+    {
+      "_comment": "--- CROSS-SYSTEM ROUTES: VARETH TO CALYX ---",
+      "id": "kalos_calyx",
+      "origin": "kalos",
+      "destination": "calyx",
+      "shipClass": "tethys",
+      "frequencyDays": 12,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist", "multi_stop"],
+      "basePriceCredits": 2200,
+      "notes": "Important freight and passenger link bypassing Aethon."
+    },
+    {
+      "id": "kalos_lun",
+      "origin": "kalos",
+      "destination": "lun",
+      "shipClass": "tethys",
+      "frequencyDays": 18,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist"],
+      "basePriceCredits": 2400,
+      "notes": "Outer system connection. Lower demand."
+    },
+    {
+      "id": "thal_calyx",
+      "origin": "thal",
+      "destination": "calyx",
+      "shipClass": "tethys",
+      "frequencyDays": 21,
+      "crossesScatter": true,
+      "availableRouteTypes": ["direct", "gravity_assist"],
+      "basePriceCredits": 2600,
+      "notes": "Scientific and industrial corridor."
+    },
+
+    {
+      "_comment": "--- INTRA-SYSTEM SHUTTLE ROUTES ---",
+      "id": "kalos_thal",
+      "origin": "kalos",
+      "destination": "thal",
+      "shipClass": "helion",
+      "frequencyDays": 3,
+      "crossesScatter": false,
+      "availableRouteTypes": ["direct"],
+      "basePriceCredits": 240,
+      "notes": "Short moon-to-moon shuttle within the Vareth system."
+    },
+    {
+      "id": "kalos_mira",
+      "origin": "kalos",
+      "destination": "mira",
+      "shipClass": "helion",
+      "frequencyDays": 5,
+      "crossesScatter": false,
+      "availableRouteTypes": ["direct"],
+      "basePriceCredits": 380,
+      "permitRequired": true,
+      "notes": "Permit checked at departure for Mira-bound passengers."
+    },
+    {
+      "id": "calyx_lun",
+      "origin": "calyx",
+      "destination": "lun",
+      "shipClass": "helion",
+      "frequencyDays": 4,
+      "crossesScatter": false,
+      "availableRouteTypes": ["direct"],
+      "basePriceCredits": 160,
+      "notes": "Short outer system shuttle."
+    },
+    {
+      "id": "calyx_vael",
+      "origin": "calyx",
+      "destination": "vael",
+      "shipClass": "helion",
+      "frequencyDays": 6,
+      "crossesScatter": false,
+      "availableRouteTypes": ["direct"],
+      "basePriceCredits": 200,
+      "notes": "The coldest short hop in the network."
+    }
+  ],
+
+  "pricing": {
+    "_comment": "All prices are in credits. Final price = basePriceCredits × orbitalWindowMultiplier × routeTypeMultiplier × cabinClassMultiplier × cryoOptionMultiplier × passengerCount (with child discount applied).",
+    "currency": "credits",
+    "currencySymbol": "₢",
+    "childAgeMax": 16,
+    "childDiscountMultiplier": 0.6,
+    "orbitalWindow": {
+      "_comment": "Multipliers applied based on the orbital window rating at departure date. Rating 1–5 calculated from normalised distance between origin and destination relative to their historical min/max separation.",
+      "rating5": 0.8,
+      "rating4": 0.92,
+      "rating3": 1.0,
+      "rating2": 1.14,
+      "rating1": 1.35
+    },
+    "voyageBondDepositFraction": 0.2,
+    "_voyageBondDepositFraction_comment": "Fraction of total fare required as deposit for Voyage Bond bookings. Remainder due 30 days before departure.",
+    "loyaltyPointsPerCredit": 1,
+    "loyaltyPointRedemptionRate": 0.01,
+    "_loyaltyPointRedemptionRate_comment": "Credits discount per point redeemed. 100 points = ₢1."
+  },
+
+  "orbitalWindowRating": {
+    "_comment": "The orbital window rating (1–5 stars) is calculated by comparing the current distance between origin and destination against the historical min and max separation for that route pair. Closer to minimum separation = higher rating.",
+    "thresholds": {
+      "rating5": 0.2,
+      "_rating5_comment": "Distance is within 20% above the historical minimum separation.",
+      "rating4": 0.4,
+      "rating3": 0.65,
+      "rating2": 0.85,
+      "rating1": 1.0
+    }
+  },
+
+  "addOns": {
+    "journeyProtection": [
+      {
+        "id": "radiation_shield",
+        "name": "Radiation Shield Insurance",
+        "description": "Covers medical costs from unexpected solar event exposure during the voyage.",
+        "priceCredits": 280,
+        "availableToAllCryo": true
+      },
+      {
+        "id": "asteroid_deviation",
+        "name": "Asteroid Deviation Coverage",
+        "description": "The ship reroutes around unexpected debris fields, adding time but guaranteeing a clear path.",
+        "priceCredits": 190,
+        "availableToAllCryo": true,
+        "relevantIfCrossesScatter": true
+      },
+      {
+        "id": "emergency_evacuation",
+        "name": "Emergency Evacuation Policy",
+        "description": "Covers the cost of an emergency transfer vessel if the voyage is interrupted.",
+        "priceCredits": 450,
+        "availableToAllCryo": true
+      },
+      {
+        "id": "journey_interruption",
+        "name": "Journey Interruption Protection",
+        "description": "Refunds and rebooking cover if the voyage is significantly delayed or cancelled due to orbital recalculation.",
+        "priceCredits": 220,
+        "availableToAllCryo": true
+      }
+    ],
+    "dining": [
+      {
+        "id": "chefs_table",
+        "name": "Chef's Table Access",
+        "description": "A premium rotating menu by the ship's head chef. Bookable per evening.",
+        "priceCreditsPerNight": 120,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["orbit", "apex", "helix"]
+      },
+      {
+        "id": "cultural_cuisine",
+        "name": "Cultural Cuisine Weeks",
+        "description": "Themed dining experiences representing the culinary traditions of the destination world, scheduled during the voyage.",
+        "priceCredits": 340,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"]
+      },
+      {
+        "id": "private_cabin_dining",
+        "name": "Private In-Cabin Dining",
+        "description": "Private dining service delivered to your suite.",
+        "priceCreditsPerMeal": 85,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["apex", "helix"]
+      }
+    ],
+    "recreation": [
+      {
+        "id": "zero_g_spa",
+        "name": "Zero-G Spa Access",
+        "description": "A dedicated wellness deck using the ship's variable gravity sections.",
+        "priceCredits": 480,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"]
+      },
+      {
+        "id": "observatory_sessions",
+        "name": "Stellar Observatory Sessions",
+        "description": "Reserved time in the ship's main observation dome with guided narration of the system as it appears en route.",
+        "priceCreditsPerSession": 95,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"]
+      },
+      {
+        "id": "fitness_suite",
+        "name": "Fitness & Training Suite",
+        "description": "A gravity-gym with equipment designed for long-voyage physical conditioning.",
+        "priceCredits": 220,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"]
+      }
+    ],
+    "entertainment": [
+      {
+        "id": "immersive_reality",
+        "name": "Immersive Reality Suite",
+        "description": "Bookable sessions in a full-environment simulation room.",
+        "priceCreditsPerSession": 150,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"]
+      },
+      {
+        "id": "ship_library",
+        "name": "Ship Library & Archive",
+        "description": "Access to an extensive digital archive of the star system's history, culture, and science.",
+        "priceCredits": 60,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"]
+      },
+      {
+        "id": "live_performance",
+        "name": "Live Performance Schedule",
+        "description": "Pre-bookable tickets for musicians, speakers, or theatrical performances hosted on select voyages.",
+        "priceCreditsPerEvent": 110,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "availableCabins": ["drift", "orbit", "apex", "helix"],
+        "voyageSpecific": true,
+        "_voyageSpecific_comment": "Only available on voyages that have a scheduled performance programme. Surfaced conditionally in the UI."
+      }
+    ],
+    "expeditionExtras": [
+      {
+        "id": "shore_excursion",
+        "name": "Shore Excursion",
+        "description": "Pre-booked surface or orbital excursions at the destination or at waypoints.",
+        "priceCredits": 380,
+        "availableToAllCryo": true,
+        "destinationSpecific": true
+      },
+      {
+        "id": "private_transfer",
+        "name": "Private Arrival Transfer",
+        "description": "Pre-arranged shuttle from the spaceport to the passenger's onward destination.",
+        "priceCredits": 210,
+        "availableToAllCryo": true
+      },
+      {
+        "id": "premium_cargo",
+        "name": "Premium Cargo Hold",
+        "description": "Additional cargo hold allocation beyond the standard luggage allowance.",
+        "priceCreditsPerUnit": 140,
+        "availableToAllCryo": true
+      },
+      {
+        "id": "spacewalk",
+        "name": "Spacewalk Experience",
+        "description": "Suit up and walk along the exterior of the ship under crew supervision. Available on select ships and only during safe voyage segments — not near high-radiation zones or active debris fields.",
+        "priceCredits": 890,
+        "availableToAllCryo": false,
+        "availableToCryo": ["conscious", "cryo_intervals"],
+        "shipClassRequired": ["tethys", "lunara", "solaris"],
+        "segmentRestricted": true,
+        "_segmentRestricted_comment": "Availability checked against current voyage segment at time of add-on selection. Disabled near Scatter, Vareth magnetosphere, and solar event zones."
+      }
+    ]
+  },
+
+  "loyaltyTiers": [
+    {
+      "id": "drifter",
+      "name": "Drifter",
+      "_name_comment": "Placeholder — to be renamed during world-building.",
+      "minPoints": 0,
+      "maxPoints": 4999,
+      "benefits": ["Standard booking access", "Points accumulation"]
+    },
+    {
+      "id": "navigator",
+      "name": "Navigator",
+      "_name_comment": "Placeholder.",
+      "minPoints": 5000,
+      "maxPoints": 19999,
+      "benefits": [
+        "Priority boarding",
+        "5% fare discount",
+        "Bonus points on scenic voyages"
+      ]
+    },
+    {
+      "id": "pathfinder",
+      "name": "Pathfinder",
+      "_name_comment": "Placeholder.",
+      "minPoints": 20000,
+      "maxPoints": 59999,
+      "benefits": [
+        "Priority boarding",
+        "10% fare discount",
+        "One complimentary cabin upgrade per year",
+        "Access to exclusive routes"
+      ]
+    },
+    {
+      "id": "stellar",
+      "name": "Stellar",
+      "_name_comment": "Placeholder.",
+      "minPoints": 60000,
+      "maxPoints": null,
+      "benefits": [
+        "Priority boarding",
+        "15% fare discount",
+        "Complimentary Helix upgrade when available",
+        "Dedicated concierge",
+        "Complimentary spacewalk per voyage"
+      ]
+    }
+  ],
+
+  "mock": {
+    "_comment": "Controls mock mode for the Vercel frontend-only deployment. When enabled, all API calls return fixture data. Orbital calculations, 3D rendering, and booking flow UI remain fully functional.",
+    "enabled": false,
+    "fixtureDataPath": "/src/mock/fixtures",
+    "disabledFeatures": ["ai_chatbot", "facial_recognition"],
+    "degradedFeatures": ["quantum_routing"],
+    "_degradedFeatures_comment": "Quantum routing falls back to the TypeScript orbital utility in mock mode rather than calling the Django service."
+  }
+}
