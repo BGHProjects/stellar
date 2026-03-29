@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 
 	"github.com/stellar/gateway/config"
@@ -422,6 +423,73 @@ func (s *VoyageService) dayFromDateStr(dateStr string) (float64, error) {
 		return 0, err
 	}
 	return orbital.DayFromDate(s.sysCfg.Epoch.Date, t)
+}
+
+// CurrentDayOrParam returns today's simulation day, or parses a provided
+// day string. Accepts either a float (simulation day) or an ISO date string.
+func (s *VoyageService) CurrentDayOrParam(param string) (float64, error) {
+	if param == "" {
+		return orbital.Today(s.sysCfg.Epoch.Date)
+	}
+	// Try parsing as a float first (simulation day number)
+	if day, err := strconv.ParseFloat(param, 64); err == nil {
+		return day, nil
+	}
+	// Fall back to date string
+	t, err := time.Parse("2006-01-02", param)
+	if err != nil {
+		return 0, err
+	}
+	return orbital.DayFromDate(s.sysCfg.Epoch.Date, t)
+}
+
+// AllBodyPositions returns the 2D orbital positions of all bodies at the given day.
+func (s *VoyageService) AllBodyPositions(day float64) map[string][2]float64 {
+	positions := make(map[string][2]float64, len(s.sysCfg.Bodies))
+	for _, body := range s.sysCfg.Bodies {
+		params := orbital.ParamsFromBody(body)
+		// For moons, add the parent body's position
+		if body.Parent != "" {
+			if parent, ok := s.bodyMap[body.Parent]; ok {
+				parentParams := orbital.ParamsFromBody(parent)
+				mx, my := orbital.MoonPosition(params, parentParams, day)
+				positions[body.ID] = [2]float64{mx, my}
+				continue
+			}
+		}
+		positions[body.ID] = orbital.PositionVec2(params, day)
+	}
+	return positions
+}
+
+// GetClosestApproach finds the closest approach between two bodies within a search window.
+func (s *VoyageService) GetClosestApproach(originID, destID, fromDateStr string, windowDays int) (map[string]interface{}, error) {
+	fromDay, err := s.dayFromDateStr(fromDateStr)
+	if err != nil {
+		return nil, err
+	}
+
+	originParams, err := s.bodyParams(originID)
+	if err != nil {
+		return nil, err
+	}
+	destParams, err := s.bodyParams(destID)
+	if err != nil {
+		return nil, err
+	}
+
+	day, distAU := orbital.ClosestApproach(originParams, destParams, fromDay, windowDays)
+	rating := orbital.WindowRating(originParams, destParams, day, s.sysCfg.OrbitalWindow.Thresholds)
+	date, _ := orbital.DateFromDay(s.sysCfg.Epoch.Date, day)
+
+	return map[string]interface{}{
+		"originId":      originID,
+		"destinationId": destID,
+		"day":           day,
+		"date":          date.Format("2006-01-02"),
+		"distanceAU":    math.Round(distAU*100) / 100,
+		"windowRating":  rating,
+	}, nil
 }
 
 // parseVoyageID splits a voyage ID of the form "routeId:departureDay".

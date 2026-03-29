@@ -162,6 +162,24 @@ func (s *AuthService) buildAuthResponse(user models.User) (*AuthResponse, error)
 	}, nil
 }
 
+// GetUserByID returns the full user record for the given ID.
+func (s *AuthService) GetUserByID(id string) (*models.User, error) {
+	return s.userRepo.GetByID(id)
+}
+
+// UpdateFaceVector stores the facial landmark vector for the given user.
+// Only the numeric vector is stored — no image data is ever accepted or retained.
+func (s *AuthService) UpdateFaceVector(userID string, vector []float64) error {
+	user, err := s.userRepo.GetByID(userID)
+	if err != nil {
+		return err
+	}
+	user.FaceVector = vector
+	user.FaceVectorEnrolled = true
+	user.UpdatedAt = time.Now().UTC()
+	return s.userRepo.Update(*user)
+}
+
 // issueToken creates a signed JWT for the given user with the given expiry.
 func (s *AuthService) issueToken(user models.User, expiry time.Duration) (string, error) {
 	claims := jwtClaims{

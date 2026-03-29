@@ -12,11 +12,16 @@ import (
 	"github.com/stellar/gateway/services"
 )
 
-// contextKey is an unexported type for context keys in this package.
+// contextKey is an unexported type for context keys set by this middleware.
 type contextKey string
 
-const UserIDKey contextKey = "userID"
-const UserEmailKey contextKey = "userEmail"
+const (
+	// UserIDKey is the context key for the authenticated user's ID.
+	// Exported so handlers in the handlers package can read it if needed,
+	// but handlers use the middleware_userID helper instead of this directly.
+	UserIDKey   contextKey = "userID"
+	UserEmailKey contextKey = "userEmail"
+)
 
 // -----------------------------------------------------------------
 // Auth middleware
@@ -41,8 +46,8 @@ func Authenticate(authService *services.AuthService) func(http.Handler) http.Han
 				return
 			}
 
-			ctx := context.WithValue(r.Context(), UserIDKey, userID)
-			ctx = context.WithValue(ctx, UserEmailKey, email)
+			ctx := context.WithValue(r.Context(), "userID", userID)
+			ctx = context.WithValue(ctx, "userEmail", email)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})
 	}
@@ -51,7 +56,7 @@ func Authenticate(authService *services.AuthService) func(http.Handler) http.Han
 // UserIDFromContext extracts the authenticated user ID from the request context.
 // Returns an empty string if not present.
 func UserIDFromContext(ctx context.Context) string {
-	id, _ := ctx.Value(UserIDKey).(string)
+	id, _ := ctx.Value("userID").(string)
 	return id
 }
 

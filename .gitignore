@@ -1,0 +1,133 @@
+# =============================================================================
+# Stellar — Root .gitignore
+# Covers all directories: frontend/, gateway/, services/, docs/, config/
+# =============================================================================
+
+# =============================================================================
+# Environment variables — never commit secrets
+# =============================================================================
+.env
+.env.local
+.env.*.local
+
+# =============================================================================
+# Gateway (Go)
+# =============================================================================
+
+# Built binary
+gateway/stellar-gateway
+gateway/*.exe
+
+# Swagger generated docs — rebuilt with `swag init`
+gateway/docs/
+
+# Go test cache and coverage output
+gateway/*.out
+gateway/coverage.html
+
+# =============================================================================
+# Frontend (Node / Vite / React)
+# =============================================================================
+
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
+# Local Vite environment files
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# TypeScript build info
+frontend/tsconfig.tsbuildinfo
+frontend/*.tsbuildinfo
+
+# =============================================================================
+# Services (Python)
+# =============================================================================
+
+# Virtual environments
+services/ai/.venv/
+services/ai/venv/
+services/vision/.venv/
+services/vision/venv/
+services/routing/.venv/
+services/routing/venv/
+
+# Python bytecode
+**/__pycache__/
+**/*.py[cod]
+**/*.pyo
+**/*.pyd
+**/.Python
+
+# Python packaging
+**/*.egg-info/
+**/dist/
+**/build/
+**/.eggs/
+
+# pytest
+**/.pytest_cache/
+**/htmlcov/
+**/.coverage
+**/*.cover
+
+# mypy / ruff / pyright
+**/.mypy_cache/
+**/.ruff_cache/
+**/.pyright/
+
+# =============================================================================
+# Docusaurus
+# =============================================================================
+
+docs/node_modules/
+docs/.docusaurus/
+docs/build/
+
+# =============================================================================
+# OS and editor artefacts
+# =============================================================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# JetBrains IDEs (GoLand, PyCharm, WebStorm)
+.idea/
+
+# VS Code — keep extensions.json and settings if you want to share them,
+# but exclude personal workspace files
+.vscode/launch.json
+.vscode/*.code-workspace
+.history/
+
+# Vim / Emacs swap files
+*.swp
+*.swo
+*~
+\#*\#
+.\#*
+
+# =============================================================================
+# Misc
+# =============================================================================
+
+# Dependency lock files for tools installed globally — not project deps
+.tool-versions
+
+# Playwright test results and reports
+test-results/
+playwright-report/
+playwright/.cache/

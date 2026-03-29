@@ -672,7 +672,7 @@
       "description": "The budget tier. Shared sleeping quarters, bunk-style berths, communal lounges and dining. For passengers who need to get somewhere.",
       "priceMultiplier": 1.0,
       "privatecabin": false,
-      "viewportAccess": false,
+      "viewportAccess": "none",
       "diningTier": "communal",
       "compatibleCryoOptions": ["conscious", "full_cryo", "cryo_intervals"]
     },
