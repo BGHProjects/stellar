@@ -1,4 +1,6 @@
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { cardHover, cardTap } from "@/lib/animations";
 import {
   type ButtonHTMLAttributes,
   type InputHTMLAttributes,
@@ -11,7 +13,7 @@ import {
 // -----------------------------------------------------------------
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "ghost" | "danger" | "accent";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
 }
@@ -29,24 +31,31 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref,
   ) => {
-    const base =
-      "inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-space-900 disabled:opacity-50 disabled:cursor-not-allowed";
+    const base = [
+      "inline-flex items-center justify-center font-sans font-bold rounded-xl",
+      "transition-all duration-200 focus-visible:outline-none",
+      "disabled:opacity-40 disabled:cursor-not-allowed",
+    ].join(" ");
 
     const variants = {
-      primary:
-        "bg-stellar-500 hover:bg-stellar-400 text-white focus:ring-stellar-500 shadow-glow-stellar hover:shadow-glow-stellar",
+      // White button — primary CTA against dark backgrounds
+      primary: "bg-white text-black hover:bg-white/90 active:bg-white/80",
+      // Dark indigo surface button — secondary action
       secondary:
-        "bg-space-700 hover:bg-space-600 text-white border border-white/10 hover:border-white/20 focus:ring-stellar-500",
-      ghost:
-        "bg-transparent hover:bg-white/5 text-white/70 hover:text-white focus:ring-white/20",
+        "bg-surface-800 hover:bg-surface-700 text-white border border-white/10 hover:border-white/20",
+      // Ghost — minimal, text only
+      ghost: "bg-transparent hover:bg-white/5 text-white/60 hover:text-white",
+      // Vivid accent — electric indigo
+      accent: "bg-accent-600 hover:bg-accent-500 text-white shadow-glow-accent",
+      // Danger
       danger:
-        "bg-danger/10 hover:bg-danger/20 text-danger border border-danger/30 focus:ring-danger",
+        "bg-danger/10 hover:bg-danger/20 text-danger border border-danger/30",
     };
 
     const sizes = {
-      sm: "px-3 py-1.5 text-sm gap-1.5",
-      md: "px-4 py-2.5 text-sm gap-2",
-      lg: "px-6 py-3 text-base gap-2",
+      sm: "px-3.5 py-2 text-sm gap-1.5 tracking-wide",
+      md: "px-5 py-2.5 text-sm gap-2 tracking-wide",
+      lg: "px-7 py-3.5 text-base gap-2 tracking-wide",
     };
 
     return (
@@ -57,7 +66,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {loading && (
-          <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <svg
+            className="animate-spin h-4 w-4 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+          >
             <circle
               className="opacity-25"
               cx="12"
@@ -87,11 +100,12 @@ Button.displayName = "Button";
 interface BadgeProps {
   variant?:
     | "default"
-    | "stellar"
+    | "accent"
     | "success"
     | "warning"
     | "danger"
-    | "outline";
+    | "outline"
+    | "surface";
   size?: "sm" | "md";
   className?: string;
   children: React.ReactNode;
@@ -104,12 +118,13 @@ export function Badge({
   children,
 }: BadgeProps) {
   const variants = {
-    default: "bg-white/10 text-white/80",
-    stellar: "bg-stellar-500/20 text-stellar-300 border border-stellar-500/30",
-    success: "bg-success/10 text-success border border-success/30",
-    warning: "bg-warning/10 text-warning border border-warning/30",
-    danger: "bg-danger/10 text-danger border border-danger/30",
-    outline: "border border-white/20 text-white/70",
+    default: "bg-white/8 text-white/70",
+    accent: "bg-accent-600/20 text-accent-300 border border-accent-600/30",
+    surface: "bg-surface-800 text-white/60 border border-white/8",
+    success: "bg-success/10 text-success border border-success/25",
+    warning: "bg-warning/10 text-warning border border-warning/25",
+    danger: "bg-danger/10 text-danger border border-danger/25",
+    outline: "border border-white/15 text-white/60",
   };
   const sizes = {
     sm: "px-2 py-0.5 text-xs",
@@ -118,7 +133,8 @@ export function Badge({
   return (
     <span
       className={cn(
-        "inline-flex items-center font-medium rounded-full",
+        "inline-flex items-center font-sans font-bold rounded-full tracking-wide uppercase",
+        "text-[10px]",
         variants[variant],
         sizes[size],
         className,
@@ -136,20 +152,40 @@ export function Badge({
 interface CardProps {
   className?: string;
   hover?: boolean;
+  accent?: boolean;
   children: React.ReactNode;
   onClick?: () => void;
 }
 
-export function Card({ className, hover, children, onClick }: CardProps) {
+export function Card({
+  className,
+  hover,
+  accent,
+  children,
+  onClick,
+}: CardProps) {
+  if (hover || onClick) {
+    return (
+      <motion.div
+        whileHover={cardHover}
+        whileTap={onClick ? cardTap : undefined}
+        onClick={onClick}
+        className={cn(
+          "glass-card rounded-2xl overflow-hidden cursor-pointer",
+          accent && "border-accent",
+          className,
+        )}
+      >
+        {children}
+      </motion.div>
+    );
+  }
+
   return (
     <div
-      onClick={onClick}
       className={cn(
-        "bg-gradient-card border border-white/8 rounded-2xl backdrop-blur-sm",
-        hover &&
-          "transition-all duration-300 hover:border-white/15 hover:shadow-card-hover cursor-pointer",
-        onClick && "cursor-pointer",
-        "shadow-card",
+        "glass-card rounded-2xl overflow-hidden",
+        accent && "border-accent",
         className,
       )}
     >
@@ -169,26 +205,40 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, className, ...props }, ref) => (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label className="text-sm font-medium text-white/70">{label}</label>
-      )}
-      <input
-        ref={ref}
-        className={cn(
-          "w-full px-4 py-2.5 rounded-xl bg-space-800 border text-white placeholder-white/30",
-          "focus:outline-none focus:ring-2 focus:ring-stellar-500/50 focus:border-stellar-500/50",
-          "transition-colors duration-200",
-          error ? "border-danger/50" : "border-white/10 hover:border-white/20",
-          className,
+  ({ label, error, hint, className, id, ...props }, ref) => {
+    const inputId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    return (
+      <div className="flex flex-col gap-1.5">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="font-sans text-sm font-bold text-white/50 tracking-wide uppercase text-[11px]"
+          >
+            {label}
+          </label>
         )}
-        {...props}
-      />
-      {error && <p className="text-xs text-danger">{error}</p>}
-      {hint && !error && <p className="text-xs text-white/40">{hint}</p>}
-    </div>
-  ),
+        <input
+          ref={ref}
+          id={inputId}
+          className={cn(
+            "w-full px-4 py-3 rounded-xl font-sans text-sm",
+            "bg-surface-900 border text-white placeholder-white/25",
+            "focus:outline-none focus:ring-2 focus:ring-accent-600/40 focus:border-accent-600/40",
+            "transition-all duration-200",
+            error
+              ? "border-danger/50 focus:ring-danger/30"
+              : "border-white/8 hover:border-white/15",
+            className,
+          )}
+          {...props}
+        />
+        {error && <p className="font-sans text-xs text-danger">{error}</p>}
+        {hint && !error && (
+          <p className="font-sans text-xs text-white/35">{hint}</p>
+        )}
+      </div>
+    );
+  },
 );
 Input.displayName = "Input";
 
@@ -203,36 +253,46 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
-  ({ label, error, options, className, ...props }, ref) => (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label className="text-sm font-medium text-white/70">{label}</label>
-      )}
-      <select
-        ref={ref}
-        className={cn(
-          "w-full px-4 py-2.5 rounded-xl bg-space-800 border text-white",
-          "focus:outline-none focus:ring-2 focus:ring-stellar-500/50 focus:border-stellar-500/50",
-          "transition-colors duration-200",
-          error ? "border-danger/50" : "border-white/10 hover:border-white/20",
-          className,
-        )}
-        {...props}
-      >
-        {options.map((opt) => (
-          <option
-            key={opt.value}
-            value={opt.value}
-            disabled={opt.disabled}
-            className="bg-space-800"
+  ({ label, error, options, className, id, ...props }, ref) => {
+    const selectId = id ?? label?.toLowerCase().replace(/\s+/g, "-");
+    return (
+      <div className="flex flex-col gap-1.5">
+        {label && (
+          <label
+            htmlFor={selectId}
+            className="font-sans text-sm font-bold text-white/50 tracking-wide uppercase text-[11px]"
           >
-            {opt.label}
-          </option>
-        ))}
-      </select>
-      {error && <p className="text-xs text-danger">{error}</p>}
-    </div>
-  ),
+            {label}
+          </label>
+        )}
+        <select
+          ref={ref}
+          id={selectId}
+          className={cn(
+            "w-full px-4 py-3 rounded-xl font-sans text-sm",
+            "bg-surface-900 border text-white",
+            "focus:outline-none focus:ring-2 focus:ring-accent-600/40 focus:border-accent-600/40",
+            "transition-all duration-200",
+            error ? "border-danger/50" : "border-white/8 hover:border-white/15",
+            className,
+          )}
+          {...props}
+        >
+          {options.map((opt) => (
+            <option
+              key={opt.value}
+              value={opt.value}
+              disabled={opt.disabled}
+              className="bg-surface-900 text-white"
+            >
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        {error && <p className="font-sans text-xs text-danger">{error}</p>}
+      </div>
+    );
+  },
 );
 Select.displayName = "Select";
 
@@ -240,23 +300,30 @@ Select.displayName = "Select";
 // Spinner
 // -----------------------------------------------------------------
 
-export function Spinner({ className }: { className?: string }) {
+export function Spinner({
+  className,
+  size = "md",
+}: {
+  className?: string;
+  size?: "sm" | "md" | "lg";
+}) {
+  const sizes = { sm: "h-4 w-4", md: "h-6 w-6", lg: "h-10 w-10" };
   return (
     <svg
-      className={cn("animate-spin text-stellar-400", className ?? "h-6 w-6")}
+      className={cn("animate-spin text-accent-400", sizes[size], className)}
       viewBox="0 0 24 24"
       fill="none"
     >
       <circle
-        className="opacity-25"
+        className="opacity-20"
         cx="12"
         cy="12"
         r="10"
         stroke="currentColor"
-        strokeWidth="4"
+        strokeWidth="3"
       />
       <path
-        className="opacity-75"
+        className="opacity-80"
         fill="currentColor"
         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
       />
@@ -265,26 +332,34 @@ export function Spinner({ className }: { className?: string }) {
 }
 
 // -----------------------------------------------------------------
-// OrbitalWindowStars — 1–5 star rating display
+// OrbitalWindowStars — 1–5 rating display
 // -----------------------------------------------------------------
 
 export function OrbitalWindowStars({
   rating,
   showLabel = false,
+  size = "sm",
 }: {
   rating: number;
   showLabel?: boolean;
+  size?: "sm" | "md";
 }) {
-  const colors = [
-    "",
-    "text-rating1",
-    "text-rating2",
-    "text-rating3",
-    "text-rating4",
-    "text-rating5",
-  ];
-  const labels = ["", "Unfavourable", "Poor", "Average", "Good", "Excellent"];
-  const color = colors[rating] ?? "text-white/40";
+  const colors: Record<number, string> = {
+    1: "text-[#ef4444]",
+    2: "text-[#f97316]",
+    3: "text-[#f59e0b]",
+    4: "text-[#84cc16]",
+    5: "text-[#22c55e]",
+  };
+  const labels: Record<number, string> = {
+    1: "Unfavourable",
+    2: "Poor",
+    3: "Average",
+    4: "Good",
+    5: "Excellent",
+  };
+  const color = colors[rating] ?? "text-white/20";
+  const starSize = size === "sm" ? "h-3 w-3" : "h-4 w-4";
 
   return (
     <div className="flex items-center gap-1.5">
@@ -292,10 +367,7 @@ export function OrbitalWindowStars({
         {[1, 2, 3, 4, 5].map((i) => (
           <svg
             key={i}
-            className={cn(
-              "h-3.5 w-3.5 transition-colors",
-              i <= rating ? color : "text-white/15",
-            )}
+            className={cn(starSize, i <= rating ? color : "text-white/12")}
             viewBox="0 0 20 20"
             fill="currentColor"
           >
@@ -304,10 +376,18 @@ export function OrbitalWindowStars({
         ))}
       </div>
       {showLabel && (
-        <span className={cn("text-xs font-medium", color)}>
-          {labels[rating]}
+        <span className={cn("font-sans text-xs font-bold", color)}>
+          {labels[rating] ?? "Unknown"}
         </span>
       )}
     </div>
   );
+}
+
+// -----------------------------------------------------------------
+// Divider
+// -----------------------------------------------------------------
+
+export function Divider({ className }: { className?: string }) {
+  return <div className={cn("divider", className)} />;
 }
