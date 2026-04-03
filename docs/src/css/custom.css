@@ -1,0 +1,98 @@
+/* Stellar Docs — custom theme
+   Mirrors the app's colour palette: void black, white text, indigo accents */
+
+:root {
+  --ifm-color-primary: #7c3aed;
+  --ifm-color-primary-dark: #6d28d9;
+  --ifm-color-primary-darker: #5b21b6;
+  --ifm-color-primary-darkest: #4c1d95;
+  --ifm-color-primary-light: #8b5cf6;
+  --ifm-color-primary-lighter: #a78bfa;
+  --ifm-color-primary-lightest: #c4b5fd;
+
+  --ifm-background-color: #000000;
+  --ifm-background-surface-color: #0a0820;
+  --ifm-navbar-background-color: #000000;
+  --ifm-footer-background-color: #05040f;
+
+  --ifm-font-family-base: "Lato", system-ui, sans-serif;
+  --ifm-heading-font-family: "Lexend Giga", system-ui, sans-serif;
+
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(124, 58, 237, 0.15);
+}
+
+[data-theme="dark"] {
+  --ifm-color-primary: #a78bfa;
+  --ifm-background-color: #000000;
+  --ifm-background-surface-color: #0a0820;
+  --ifm-navbar-background-color: rgba(0, 0, 0, 0.85);
+  --ifm-footer-background-color: #05040f;
+  --ifm-toc-border-color: rgba(255, 255, 255, 0.08);
+  --ifm-hr-border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Navbar */
+.navbar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.navbar__title {
+  font-family: "Lexend Giga", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+/* Sidebar */
+.menu__link {
+  font-size: 0.875rem;
+}
+
+/* Code blocks */
+.prism-code {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Headings use display font */
+h1,
+h2,
+h3 {
+  font-family: "Lexend Giga", system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+h4,
+h5,
+h6 {
+  font-family: "Lato", system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Tables */
+table {
+  border-collapse: collapse;
+}
+
+th {
+  font-family: "Lato", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Admonitions */
+.alert {
+  border-radius: 0.75rem;
+  border-left-width: 3px;
+}
+
+/* Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Lexend+Giga:wght@300;400;500&family=Lato:wght@300;400;700&display=swap");
