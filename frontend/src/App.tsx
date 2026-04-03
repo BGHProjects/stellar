@@ -3,6 +3,7 @@ import { AnimatePresence } from "framer-motion";
 import { Navbar } from "@/components/layout";
 import { Suspense, lazy } from "react";
 import { Spinner } from "@/components/ui";
+import ChatWidget from "@/components/common/ChatWidget";
 
 // Lazy-load pages for code splitting
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
@@ -62,6 +63,8 @@ export default function App() {
             </Routes>
           </AnimatePresence>
         </Suspense>
+        {/* Global floating chatbot — available on all pages */}
+        <ChatWidget />
       </div>
     </BrowserRouter>
   );

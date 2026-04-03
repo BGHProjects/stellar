@@ -10,12 +10,13 @@ import {
 import { fadeUp } from "@/lib/animations";
 import { createBooking } from "@/lib/api";
 import { cn, formatCredits, formatDate, formatDuration } from "@/lib/utils";
+import { useAuthStore } from "@/store/authStore";
 import { useBookingStore } from "@/store/bookingStore";
 import { useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { AlertTriangle, ChevronRight, Shield } from "lucide-react";
+import { AlertTriangle, ChevronRight, LogIn, Shield } from "lucide-react";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const BODY_NAMES: Record<string, string> = {
   aethon: "Aethon",
@@ -42,6 +43,7 @@ const CABIN_NAMES: Record<string, string> = {
 
 export default function ReviewPaymentPage() {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuthStore();
   const {
     legs,
     passengers,
@@ -59,6 +61,51 @@ export default function ReviewPaymentPage() {
   useEffect(() => {
     setCurrentStep("review");
   }, []);
+
+  // ── AUTH GUARD ──────────────────────────────────────────────────
+  // Booking requires authentication — show a prompt if not logged in
+  if (!isAuthenticated) {
+    return (
+      <PageTransition>
+        <div className="min-h-screen bg-void pt-16">
+          <div className="border-b border-white/5 bg-black/70 backdrop-blur-md sticky top-16 z-30">
+            <div className="max-w-5xl mx-auto px-4 py-4">
+              <BookingStepIndicator currentStep="review" />
+            </div>
+          </div>
+          <div className="max-w-md mx-auto px-4 py-24 flex flex-col items-center text-center gap-8">
+            <div className="w-16 h-16 rounded-full bg-surface-800 border border-white/10 flex items-center justify-center">
+              <Shield className="w-7 h-7 text-white/30" />
+            </div>
+            <div className="flex flex-col gap-3">
+              <h2 className="font-display text-display-md text-white">
+                Sign in to complete your booking
+              </h2>
+              <p className="font-sans text-sm text-white/50 leading-relaxed">
+                You need a Stellar account to confirm your voyage and receive
+                your boarding pass. Your booking selections have been saved and
+                will be waiting when you return.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3 w-full max-w-xs">
+              <Link to="/login" state={{ from: "/review" }}>
+                <Button size="lg" className="w-full">
+                  <LogIn className="w-4 h-4" />
+                  Sign in
+                </Button>
+              </Link>
+              <Link to="/register" state={{ from: "/review" }}>
+                <Button variant="secondary" size="lg" className="w-full">
+                  Create an account
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </PageTransition>
+    );
+  }
+  // ── END AUTH GUARD ──────────────────────────────────────────────
 
   // Calculate estimated total from legs
   const estimatedTotal =

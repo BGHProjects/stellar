@@ -42,7 +42,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       primary: "bg-white text-black hover:bg-white/90 active:bg-white/80",
       // Dark indigo surface button — secondary action
       secondary:
-        "bg-surface-800 hover:bg-surface-700 text-white border border-white/10 hover:border-white/20",
+        "bg-surface-800 hover:bg-surface-700 text-white border border-white/10 hover:border-accent-600/50",
       // Ghost — minimal, text only
       ghost: "bg-transparent hover:bg-white/5 text-white/60 hover:text-white",
       // Vivid accent — electric indigo
@@ -227,7 +227,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             "transition-all duration-200",
             error
               ? "border-danger/50 focus:ring-danger/30"
-              : "border-white/8 hover:border-white/15",
+              : "border-white/8 hover:border-accent-600/40",
             className,
           )}
           {...props}
@@ -273,7 +273,9 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             "bg-surface-900 border text-white",
             "focus:outline-none focus:ring-2 focus:ring-accent-600/40 focus:border-accent-600/40",
             "transition-all duration-200",
-            error ? "border-danger/50" : "border-white/8 hover:border-white/15",
+            error
+              ? "border-danger/50"
+              : "border-white/8 hover:border-accent-600/40",
             className,
           )}
           {...props}
