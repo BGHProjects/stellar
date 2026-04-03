@@ -2,7 +2,7 @@ import { PageTransition } from "@/components/common";
 import { BookingStepIndicator } from "@/components/layout";
 import { Badge, Button, Card, Input } from "@/components/ui";
 import { fadeUp, staggerContainer, staggerItem } from "@/lib/animations";
-import { formatCredits } from "@/lib/utils";
+import { cn, formatCredits } from "@/lib/utils";
 import { useAuthStore } from "@/store/authStore";
 import { useBookingStore } from "@/store/bookingStore";
 import type { PassengerRequest } from "@/types/voyage";
@@ -21,6 +21,108 @@ function emptyPassenger(): PassengerRequest {
   };
 }
 
+// ─────────────────────────────────────────────────────────────────
+// Seat/Cabin map data
+// Each deck has rows of seats. Some are unavailable (pre-booked).
+// ─────────────────────────────────────────────────────────────────
+
+interface Seat {
+  id: string;
+  row: number;
+  col: number;
+  available: boolean;
+  type: "window" | "middle" | "aisle";
+}
+
+function generateDeck(
+  deckName: string,
+  rows: number,
+  cols: number,
+  unavailableIds: string[],
+): { name: string; seats: Seat[] } {
+  const seats: Seat[] = [];
+  const typeMap: Record<number, Seat["type"]> = {
+    0: "window",
+    [cols - 1]: "window",
+    1: "aisle",
+    [cols - 2]: "aisle",
+  };
+  for (let r = 1; r <= rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const id = `${deckName}-${r}${String.fromCharCode(65 + c)}`;
+      seats.push({
+        id,
+        row: r,
+        col: c,
+        available: !unavailableIds.includes(id),
+        type: typeMap[c] ?? "middle",
+      });
+    }
+  }
+  return { name: deckName, seats };
+}
+
+// Generate ship layout based on cabin class
+function getShipLayout(cabinClassId: string) {
+  if (cabinClassId === "drift") {
+    // Shared berths — 8 across, 12 rows, 2 decks
+    return {
+      label: "Shared Berths",
+      cols: 8,
+      decks: [
+        generateDeck("Deck 3", 12, 8, [
+          "Deck 3-2B",
+          "Deck 3-4E",
+          "Deck 3-7A",
+          "Deck 3-9C",
+          "Deck 3-11F",
+        ]),
+        generateDeck("Deck 4", 12, 8, [
+          "Deck 4-1D",
+          "Deck 4-3G",
+          "Deck 4-6B",
+          "Deck 4-10H",
+          "Deck 4-12A",
+        ]),
+      ],
+    };
+  }
+  if (cabinClassId === "orbit") {
+    // Private cabins — 4 per row, 10 rows, 2 decks
+    return {
+      label: "Private Cabins",
+      cols: 4,
+      decks: [
+        generateDeck("Deck 5", 10, 4, [
+          "Deck 5-1A",
+          "Deck 5-3D",
+          "Deck 5-7B",
+          "Deck 5-9C",
+        ]),
+        generateDeck("Deck 6", 10, 4, ["Deck 6-2A", "Deck 6-4C", "Deck 6-8D"]),
+      ],
+    };
+  }
+  if (cabinClassId === "apex") {
+    // Premium suites — 3 per row, 8 rows, 1 deck
+    return {
+      label: "Apex Suites",
+      cols: 3,
+      decks: [
+        generateDeck("Deck 9", 8, 3, ["Deck 9-2B", "Deck 9-5A", "Deck 9-7C"]),
+      ],
+    };
+  }
+  // Helix — individual observation suites
+  return {
+    label: "Helix Observation Suites",
+    cols: 2,
+    decks: [
+      generateDeck("Upper Deck", 6, 2, ["Upper Deck-3B", "Upper Deck-5A"]),
+    ],
+  };
+}
+
 export default function PassengerDetailsPage() {
   const navigate = useNavigate();
   const {
@@ -36,21 +138,27 @@ export default function PassengerDetailsPage() {
 
   const totalPassengers =
     (searchParams?.adults ?? 1) + (searchParams?.children ?? 0);
+  const currentLeg = legs[legs.length - 1];
+  const cabinClassId = currentLeg?.cabinClassId ?? "orbit";
 
-  // Initialise passenger list to match passenger count
   const [localPassengers, setLocalPassengers] = useState<PassengerRequest[]>(
-    () => {
-      if (passengers.length > 0) return passengers;
-      return Array.from({ length: totalPassengers }, emptyPassenger);
-    },
+    () =>
+      passengers.length > 0
+        ? passengers
+        : Array.from({ length: totalPassengers }, emptyPassenger),
   );
-
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pointsInput, setPointsInput] = useState(loyaltyPointsToRedeem);
+  const [activeDeck, setActiveDeck] = useState(0);
+  const [selectedSeats, setSelectedSeats] = useState<string[]>(() =>
+    localPassengers.map((p) => p.cabinBerth ?? "").filter(Boolean),
+  );
 
   useEffect(() => {
     setCurrentStep("passengers");
   }, []);
+
+  const layout = getShipLayout(cabinClassId);
 
   function updatePassenger(
     index: number,
@@ -65,6 +173,23 @@ export default function PassengerDetailsPage() {
       delete next[`${index}.${field}`];
       return next;
     });
+  }
+
+  function handleSeatSelect(seatId: string, passengerIndex: number) {
+    setSelectedSeats((prev) => {
+      const next = [...prev];
+      // Remove this seat from any other passenger
+      const existing = next.indexOf(seatId);
+      if (existing !== -1 && existing !== passengerIndex) next[existing] = "";
+      // Assign to this passenger
+      next[passengerIndex] = next[passengerIndex] === seatId ? "" : seatId;
+      return next;
+    });
+    updatePassenger(
+      passengerIndex,
+      "cabinBerth",
+      localPassengers[passengerIndex]?.cabinBerth === seatId ? "" : seatId,
+    );
   }
 
   function validate(): boolean {
@@ -86,7 +211,8 @@ export default function PassengerDetailsPage() {
   }
 
   const maxPoints = user?.loyaltyPoints ?? 0;
-  const pointsDiscount = pointsInput * 0.01; // ₢1 per 100 points
+  const pointsDiscount = pointsInput * 0.01;
+  const currentDeck = layout.decks[activeDeck];
 
   return (
     <PageTransition>
@@ -110,7 +236,184 @@ export default function PassengerDetailsPage() {
             </p>
           </motion.div>
 
-          {/* Passenger forms */}
+          {/* ── SEAT / CABIN SELECTION ───────────────────────────── */}
+          <motion.div variants={fadeUp} initial="hidden" animate="visible">
+            <Card className="overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/6 flex items-center justify-between">
+                <div>
+                  <span className="label">Seat Selection</span>
+                  <h2 className="font-display text-display-sm text-white mt-0.5">
+                    {layout.label}
+                  </h2>
+                </div>
+                <p className="font-sans text-xs text-white/35">
+                  Select {totalPassengers} seat{totalPassengers > 1 ? "s" : ""}
+                </p>
+              </div>
+
+              <div className="p-6 flex flex-col gap-5">
+                {/* Deck tabs */}
+                {layout.decks.length > 1 && (
+                  <div className="flex gap-2">
+                    {layout.decks.map((deck, i) => (
+                      <button
+                        key={deck.name}
+                        onClick={() => setActiveDeck(i)}
+                        className={cn(
+                          "px-4 py-2 rounded-xl font-sans text-sm font-bold transition-all",
+                          activeDeck === i
+                            ? "bg-white text-black"
+                            : "text-white/40 hover:text-white/70 bg-surface-800 border border-white/8",
+                        )}
+                      >
+                        {deck.name}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Legend */}
+                <div className="flex items-center gap-5 flex-wrap">
+                  {[
+                    {
+                      color: "bg-surface-700 border-white/15",
+                      label: "Available",
+                    },
+                    {
+                      color: "bg-accent-600/30 border-accent-500/60",
+                      label: "Your selection",
+                    },
+                    {
+                      color: "bg-surface-900 border-white/5 opacity-40",
+                      label: "Unavailable",
+                    },
+                  ].map((l) => (
+                    <div key={l.label} className="flex items-center gap-2">
+                      <div className={cn("w-4 h-4 rounded border", l.color)} />
+                      <span className="font-sans text-xs text-white/40">
+                        {l.label}
+                      </span>
+                    </div>
+                  ))}
+                  {/* Type legend */}
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded bg-surface-700 border border-accent-300/20" />
+                    <span className="font-sans text-xs text-white/40">
+                      Window
+                    </span>
+                  </div>
+                </div>
+
+                {/* Seat grid */}
+                <div className="overflow-x-auto">
+                  <div className="inline-block min-w-full">
+                    {/* Column headers */}
+                    <div className="flex gap-1.5 mb-2 pl-10">
+                      {Array.from({ length: layout.cols }).map((_, c) => (
+                        <div
+                          key={c}
+                          className="w-9 text-center font-sans text-xs text-white/20 font-bold"
+                        >
+                          {String.fromCharCode(65 + c)}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Rows */}
+                    {Array.from(
+                      new Set(currentDeck.seats.map((s) => s.row)),
+                    ).map((row) => (
+                      <div
+                        key={row}
+                        className="flex items-center gap-1.5 mb-1.5"
+                      >
+                        {/* Row number */}
+                        <div className="w-8 text-right font-sans text-xs text-white/20 shrink-0">
+                          {row}
+                        </div>
+
+                        {currentDeck.seats
+                          .filter((s) => s.row === row)
+                          .map((seat) => {
+                            const paxIndex = selectedSeats.indexOf(seat.id);
+                            const isSelected = paxIndex !== -1;
+                            const isWindow =
+                              seat.col === 0 || seat.col === layout.cols - 1;
+
+                            return (
+                              <motion.button
+                                key={seat.id}
+                                onClick={() => {
+                                  if (!seat.available) return;
+                                  // For single passenger, always assign to pax 0
+                                  // For multi-pax, assign to first unassigned
+                                  const targetPax =
+                                    totalPassengers === 1
+                                      ? 0
+                                      : isSelected
+                                        ? paxIndex
+                                        : selectedSeats.findIndex((s) => !s);
+                                  if (targetPax === -1) return; // All seats assigned
+                                  handleSeatSelect(seat.id, targetPax);
+                                }}
+                                disabled={!seat.available}
+                                whileHover={
+                                  seat.available ? { scale: 1.12 } : undefined
+                                }
+                                whileTap={
+                                  seat.available ? { scale: 0.9 } : undefined
+                                }
+                                title={seat.id}
+                                className={cn(
+                                  "w-9 h-8 rounded-lg border text-xs font-bold transition-all duration-150 relative",
+                                  !seat.available &&
+                                    "opacity-30 cursor-not-allowed bg-surface-900 border-white/5",
+                                  seat.available &&
+                                    !isSelected &&
+                                    cn(
+                                      "bg-surface-700 border-white/15 hover:border-accent-400/50 hover:bg-surface-600",
+                                      isWindow && "border-accent-300/20",
+                                    ),
+                                  isSelected &&
+                                    "bg-accent-600/30 border-accent-500/60 shadow-glow-accent text-accent-200",
+                                )}
+                              >
+                                {isSelected && totalPassengers > 1 && (
+                                  <span className="font-sans text-[10px]">
+                                    {paxIndex + 1}
+                                  </span>
+                                )}
+                                {isSelected && totalPassengers === 1 && (
+                                  <span>✓</span>
+                                )}
+                              </motion.button>
+                            );
+                          })}
+
+                        {/* Aisle gap — visual separation in the middle */}
+                        {layout.cols > 4 && <div className="w-3" />}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Selected seats summary */}
+                {selectedSeats.some(Boolean) && (
+                  <div className="flex flex-wrap gap-2 pt-2 border-t border-white/6">
+                    {selectedSeats.map((seatId, i) =>
+                      seatId ? (
+                        <Badge key={i} variant="accent" size="md">
+                          Pax {i + 1}: {seatId}
+                        </Badge>
+                      ) : null,
+                    )}
+                  </div>
+                )}
+              </div>
+            </Card>
+          </motion.div>
+
+          {/* ── PASSENGER FORMS ──────────────────────────────────── */}
           <motion.div
             variants={staggerContainer}
             initial="hidden"
@@ -123,7 +426,6 @@ export default function PassengerDetailsPage() {
               return (
                 <motion.div key={index} variants={staggerItem}>
                   <Card className="overflow-hidden">
-                    {/* Passenger header */}
                     <div className="flex items-center justify-between px-6 py-4 border-b border-white/6">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-full bg-surface-700 border border-white/8 flex items-center justify-center">
@@ -142,12 +444,16 @@ export default function PassengerDetailsPage() {
                             {index === 0 && (
                               <Badge variant="accent">Lead passenger</Badge>
                             )}
+                            {selectedSeats[index] && (
+                              <Badge variant="surface">
+                                {selectedSeats[index]}
+                              </Badge>
+                            )}
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    {/* Form fields */}
                     <div className="p-6 grid grid-cols-1 sm:grid-cols-2 gap-5">
                       <Input
                         label="First Name"
@@ -179,15 +485,6 @@ export default function PassengerDetailsPage() {
                         error={errors[`${index}.dateOfBirth`]}
                         className="[color-scheme:dark]"
                       />
-                      <Input
-                        label="Preferred Berth (optional)"
-                        value={passenger.cabinBerth ?? ""}
-                        onChange={(e) =>
-                          updatePassenger(index, "cabinBerth", e.target.value)
-                        }
-                        placeholder="e.g. D-14, window-side"
-                        hint="Leave blank for automatic assignment"
-                      />
                       <div className="sm:col-span-2">
                         <Input
                           label="Special Requests (optional)"
@@ -209,7 +506,7 @@ export default function PassengerDetailsPage() {
             })}
           </motion.div>
 
-          {/* Loyalty points section */}
+          {/* ── LOYALTY POINTS ───────────────────────────────────── */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -247,7 +544,6 @@ export default function PassengerDetailsPage() {
                     </div>
                     <Badge variant="accent">{user.loyaltyTier}</Badge>
                   </div>
-
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between">
                       <span className="label">Points to redeem</span>
@@ -271,7 +567,6 @@ export default function PassengerDetailsPage() {
                       <span>{maxPoints.toLocaleString()} pts</span>
                     </div>
                   </div>
-
                   {pointsInput > 0 && (
                     <div className="flex items-center justify-between px-4 py-3 bg-accent-600/10 border border-accent-500/20 rounded-xl">
                       <span className="font-sans text-sm text-white/60">
@@ -285,14 +580,13 @@ export default function PassengerDetailsPage() {
                 </div>
               ) : (
                 <p className="font-sans text-sm text-white/30">
-                  Sign in to access your loyalty points balance and apply a
-                  discount to this booking.
+                  Sign in to access your loyalty points balance.
                 </p>
               )}
             </Card>
           </motion.div>
 
-          {/* Continue CTA */}
+          {/* ── NAVIGATION ───────────────────────────────────────── */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -300,15 +594,11 @@ export default function PassengerDetailsPage() {
             viewport={{ once: true }}
             className="flex items-center justify-between pt-4 border-t border-white/5"
           >
-            <button
-              onClick={() => navigate(-1)}
-              className="font-sans text-sm text-white/30 hover:text-white/60 transition-colors"
-            >
-              ← Back
-            </button>
+            <Button variant="secondary" size="md" onClick={() => navigate(-1)}>
+              ← Back to Packages
+            </Button>
             <Button onClick={handleContinue} size="lg">
-              Review Booking
-              <ChevronRight className="w-4 h-4" />
+              Review Booking <ChevronRight className="w-4 h-4" />
             </Button>
           </motion.div>
         </div>

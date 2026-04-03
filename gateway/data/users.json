@@ -1,1 +1,15 @@
-[]
+[
+  {
+    "id": "1a66de14-869f-4764-a950-acaa6f874927",
+    "email": "test@test.com",
+    "passwordHash": "$2a$10$4F8Q7ziO6RzdANFlHeCwjeLNsA3oQK5GxFKEZBIWt2Z.xMt/UhqKi",
+    "firstName": "Test",
+    "lastName": "Test",
+    "dateOfBirth": "2026-04-11",
+    "loyaltyPoints": 0,
+    "loyaltyTier": "drifter",
+    "faceVectorEnrolled": false,
+    "createdAt": "2026-04-03T08:00:51.1240836Z",
+    "updatedAt": "2026-04-03T08:00:51.1240836Z"
+  }
+]

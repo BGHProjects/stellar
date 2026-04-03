@@ -1,9 +1,11 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { ArrowRight, Globe, Zap, Star, ChevronDown } from "lucide-react";
 import {
-  loomUp,
+  heroLoom,
+  heroSubtitle,
+  heroFadeUp,
   fadeUp,
   staggerContainer,
   staggerItem,
@@ -19,7 +21,6 @@ import {
 import { Button, Badge, Card } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
-// Quick search form state
 interface SearchState {
   originId: string;
   destinationId: string;
@@ -28,8 +29,6 @@ interface SearchState {
   children: number;
 }
 
-// Destinations for the quick search dropdowns
-// These IDs map to system.json body IDs
 const VISITABLE_BODIES = [
   { id: "aethon", label: "Aethon", sub: "Inner System" },
   { id: "kalos", label: "Kalos", sub: "Vareth System" },
@@ -40,47 +39,48 @@ const VISITABLE_BODIES = [
   { id: "vael", label: "Vael", sub: "Calyx System" },
 ];
 
-// Featured route cards on the landing page
 const FEATURED_ROUTES = [
   {
     id: "aethon_kalos",
     from: "Aethon",
     to: "Kalos",
+    originId: "aethon",
+    destinationId: "kalos",
     duration: "40–88 days",
     fromPrice: "₢1,200",
     tag: "Most Popular",
     tagVariant: "accent" as const,
     description:
       "The commercial backbone of the system. Direct and Gravity Assist routes available.",
-    bodyId: "kalos",
   },
   {
     id: "aethon_calyx",
     from: "Aethon",
     to: "Calyx",
+    originId: "aethon",
+    destinationId: "calyx",
     duration: "87–192 days",
     fromPrice: "₢3,200",
     tag: "Deep Voyage",
     tagVariant: "surface" as const,
     description:
       "The longest and most significant passenger route. Solaris-class only.",
-    bodyId: "calyx",
   },
   {
     id: "aethon_vareth_scenic",
     from: "Aethon",
     to: "Kalos via Vareth",
+    originId: "aethon",
+    destinationId: "kalos",
     duration: "52–120 days",
     fromPrice: "₢3,500",
     tag: "Scenic",
     tagVariant: "warning" as const,
     description:
       "Passes through the Scatter and approaches Vareth's storm system. Lunara-class.",
-    bodyId: "vareth",
   },
 ];
 
-// Stats on the landing page
 const STATS = [
   { value: "16", label: "Scheduled Routes" },
   { value: "10", label: "Destinations" },
@@ -91,6 +91,8 @@ const STATS = [
 export default function LandingPage() {
   const navigate = useNavigate();
   const heroRef = useRef<HTMLDivElement>(null);
+  const searchRef = useRef<HTMLDivElement>(null);
+
   const [mode, setMode] = useState<"search" | "explore">("search");
   const [search, setSearch] = useState<SearchState>({
     originId: "",
@@ -100,7 +102,6 @@ export default function LandingPage() {
     children: 0,
   });
 
-  // Parallax for hero section
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -121,82 +122,79 @@ export default function LandingPage() {
     navigate(`/search?${params}`);
   }
 
-  function handleExplore() {
-    navigate("/explore");
+  // Scroll to the search form at the top of the page
+  function scrollToSearch() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setTimeout(() => searchRef.current?.querySelector("select")?.focus(), 600);
   }
 
   return (
     <div className="min-h-screen bg-void">
-      {/* ================================================================
-          HERO SECTION
-          ================================================================ */}
+      {/* ── HERO ─────────────────────────────────────────────────── */}
       <section
         ref={heroRef}
         className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden"
       >
-        {/* Background — deep space gradient with star field */}
+        {/* Background */}
         <motion.div
           style={{ y: heroY, opacity: heroOpacity }}
           className="absolute inset-0 pointer-events-none"
         >
-          {/* Radial glow behind the title */}
           <div className="absolute inset-0 bg-gradient-radial from-surface-800/40 via-surface-950/20 to-void" />
-          {/* Subtle accent glow */}
-          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-accent-600/5 blur-[120px]" />
-          {/* Star field dots — more of them in hero */}
-          <div className="absolute inset-0 star-field opacity-60" />
+          <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full bg-accent-600/6 blur-[140px]" />
+          <div className="absolute inset-0 star-field opacity-50" />
         </motion.div>
 
         {/* Hero content */}
         <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-5xl mx-auto pt-24 pb-16">
-          {/* System label */}
+          {/* Badge — fades in first, quietly */}
           <motion.div
             variants={fadeIn}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.2 }}
           >
-            <Badge variant="surface" size="md" className="mb-8 tracking-widest">
+            <Badge
+              variant="surface"
+              size="md"
+              className="mb-10 tracking-widest"
+            >
               ✦ The Solara System
             </Badge>
           </motion.div>
 
-          {/* Main headline — Lexend Giga, loom animation */}
+          {/* Main headline — heroLoom: slow, cinematic, arrives from deep */}
           <motion.div
-            variants={loomUp}
+            variants={heroLoom}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.2 }}
-            className="mb-4"
+            className="mb-6"
           >
-            <h1 className="font-display text-display-2xl md:text-[6rem] lg:text-[7.5rem] text-white leading-none tracking-tight text-balance">
-              Voyage
-              <br />
-              <span className="text-gradient">Between Worlds</span>
+            <h1 className="font-display text-display-2xl md:text-[6.5rem] lg:text-[8rem] text-white leading-[0.95] tracking-tight text-balance text-gradient">
+              STELLAR
             </h1>
           </motion.div>
 
-          {/* Subheading — Lato, delayed slide up */}
+          {/* Subtitle — rises after headline */}
           <motion.p
-            variants={fadeUp}
+            variants={heroSubtitle}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.5 }}
-            className="font-sans text-lg md:text-xl text-white/50 max-w-xl leading-relaxed mb-12"
+            className="font-sans text-lg md:text-xl text-white/45 max-w-xl leading-relaxed mb-14"
           >
             Book interplanetary voyages across the Solara system. From the inner
             worlds to the frozen outer reaches.
           </motion.p>
 
-          {/* Mode toggle — Search / Explore */}
+          {/* Search / explore toggle */}
           <motion.div
-            variants={fadeUp}
+            variants={heroFadeUp}
             initial="hidden"
             animate="visible"
-            transition={{ delay: 0.65 }}
+            transition={{ delay: 0.85 }}
             className="flex flex-col items-center gap-6 w-full max-w-2xl"
           >
-            {/* Toggle */}
+            {/* Mode toggle */}
             <div className="flex items-center gap-1 bg-surface-900/80 border border-white/8 rounded-2xl p-1 backdrop-blur-sm">
               <button
                 onClick={() => setMode("search")}
@@ -225,13 +223,14 @@ export default function LandingPage() {
             {/* Quick Search form */}
             {mode === "search" && (
               <motion.form
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
+                ref={searchRef as React.RefObject<HTMLFormElement>}
+                key="search-form"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
                 onSubmit={handleSearch}
                 className="w-full glass-card rounded-2xl p-4 flex flex-col md:flex-row gap-3 items-end"
               >
-                {/* Origin */}
                 <div className="flex-1 flex flex-col gap-1.5">
                   <label className="label px-1">From</label>
                   <select
@@ -256,12 +255,10 @@ export default function LandingPage() {
                   </select>
                 </div>
 
-                {/* Swap arrow */}
-                <div className="flex items-end pb-3 shrink-0">
-                  <div className="text-white/20">→</div>
+                <div className="flex items-end pb-3 shrink-0 text-white/20">
+                  →
                 </div>
 
-                {/* Destination */}
                 <div className="flex-1 flex flex-col gap-1.5">
                   <label className="label px-1">To</label>
                   <select
@@ -291,7 +288,6 @@ export default function LandingPage() {
                   </select>
                 </div>
 
-                {/* Departure date */}
                 <div className="flex-1 flex flex-col gap-1.5">
                   <label className="label px-1">Departs</label>
                   <input
@@ -307,7 +303,6 @@ export default function LandingPage() {
                   />
                 </div>
 
-                {/* Passengers */}
                 <div className="flex flex-col gap-1.5 w-24">
                   <label className="label px-1">Adults</label>
                   <input
@@ -325,24 +320,23 @@ export default function LandingPage() {
                   />
                 </div>
 
-                {/* Search button */}
                 <Button
                   type="submit"
                   size="lg"
                   className="shrink-0 md:self-end"
                 >
-                  Search
-                  <ArrowRight className="w-4 h-4" />
+                  Search <ArrowRight className="w-4 h-4" />
                 </Button>
               </motion.form>
             )}
 
-            {/* Explore mode CTA */}
+            {/* Explore mode */}
             {mode === "explore" && (
               <motion.div
-                variants={fadeUp}
-                initial="hidden"
-                animate="visible"
+                key="explore-panel"
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
                 className="w-full flex flex-col items-center gap-4"
               >
                 <p className="font-sans text-sm text-white/40 text-center max-w-md">
@@ -350,7 +344,7 @@ export default function LandingPage() {
                   see routes, distances, and available voyages.
                 </p>
                 <div className="flex gap-3">
-                  <Button size="lg" onClick={handleExplore}>
+                  <Button size="lg" onClick={() => navigate("/explore")}>
                     <Globe className="w-4 h-4" />
                     Open Star Map
                   </Button>
@@ -372,7 +366,7 @@ export default function LandingPage() {
           variants={fadeIn}
           initial="hidden"
           animate="visible"
-          transition={{ delay: 1.2 }}
+          transition={{ delay: 1.6 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/20"
         >
           <span className="label">Scroll to discover</span>
@@ -385,9 +379,7 @@ export default function LandingPage() {
         </motion.div>
       </section>
 
-      {/* ================================================================
-          STATS BAR
-          ================================================================ */}
+      {/* ── STATS ────────────────────────────────────────────────── */}
       <section className="border-y border-white/5 py-8">
         <div className="max-w-5xl mx-auto px-4">
           <motion.div
@@ -413,9 +405,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================================================================
-          FEATURED ROUTES
-          ================================================================ */}
+      {/* ── FEATURED ROUTES ──────────────────────────────────────── */}
       <section className="py-32 px-4">
         <div className="max-w-7xl mx-auto">
           <SectionReveal className="mb-16">
@@ -426,8 +416,6 @@ export default function LandingPage() {
               </h2>
               <p className="font-sans text-white/40 max-w-lg">
                 Scheduled voyages across the system, priced by orbital window.
-                The closer the planets, the shorter the journey, the lower the
-                fare.
               </p>
             </div>
           </SectionReveal>
@@ -445,19 +433,17 @@ export default function LandingPage() {
                   hover
                   onClick={() =>
                     navigate(
-                      `/search?originId=${route.id.split("_")[0]}&destinationId=${route.id.split("_")[1]}`,
+                      `/search?originId=${route.originId}&destinationId=${route.destinationId}&adults=1&children=0`,
                     )
                   }
                   className="flex flex-col overflow-hidden h-full"
                 >
-                  {/* Route image placeholder */}
                   <ImagePlaceholder
                     aspectRatio="16/9"
                     label={`${route.from} → ${route.to} route imagery`}
                     rounded="rounded-none"
                     className="shrink-0"
                   />
-
                   <div className="flex flex-col gap-4 p-6 flex-1">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex flex-col gap-1">
@@ -468,13 +454,10 @@ export default function LandingPage() {
                       </div>
                       <Badge variant={route.tagVariant}>{route.tag}</Badge>
                     </div>
-
                     <p className="font-sans text-sm text-white/50 leading-relaxed flex-1">
                       {route.description}
                     </p>
-
                     <div className="divider" />
-
                     <div className="flex items-end justify-between">
                       <div className="flex flex-col gap-0.5">
                         <span className="label">Duration</span>
@@ -497,9 +480,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================================================================
-          DESTINATIONS OVERVIEW
-          ================================================================ */}
+      {/* ── DESTINATIONS ─────────────────────────────────────────── */}
       <section className="py-32 px-4 border-t border-white/5">
         <div className="max-w-7xl mx-auto">
           <SectionReveal className="mb-16">
@@ -512,7 +493,6 @@ export default function LandingPage() {
           </SectionReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Aethon */}
             <motion.div
               variants={fadeUp}
               initial="hidden"
@@ -548,7 +528,6 @@ export default function LandingPage() {
               </Card>
             </motion.div>
 
-            {/* Vareth moons stack */}
             <div className="flex flex-col gap-4">
               {[
                 {
@@ -598,7 +577,6 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* View all destinations */}
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -618,9 +596,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================================================================
-          WHY STELLAR — Features section
-          ================================================================ */}
+      {/* ── WHY STELLAR ──────────────────────────────────────────── */}
       <section className="py-32 px-4 border-t border-white/5">
         <div className="max-w-5xl mx-auto">
           <SectionReveal className="mb-20 text-center">
@@ -679,13 +655,9 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================================================================
-          CTA SECTION
-          ================================================================ */}
+      {/* ── CTA ──────────────────────────────────────────────────── */}
       <section className="py-40 px-4 border-t border-white/5 relative overflow-hidden">
-        {/* Background glow */}
         <div className="absolute inset-0 bg-gradient-radial from-accent-600/8 via-transparent to-transparent pointer-events-none" />
-
         <div className="max-w-3xl mx-auto text-center relative z-10 flex flex-col items-center gap-8">
           <AnimatedText
             text="Your voyage begins here."
@@ -710,7 +682,8 @@ export default function LandingPage() {
             viewport={viewportOnce}
             className="flex flex-col sm:flex-row gap-3"
           >
-            <Button size="lg" onClick={() => navigate("/search")}>
+            {/* Scroll back to the search form at the top instead of navigating to /search with no params */}
+            <Button size="lg" onClick={scrollToSearch}>
               Search Voyages
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -726,9 +699,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================================================================
-          FOOTER
-          ================================================================ */}
+      {/* ── FOOTER ───────────────────────────────────────────────── */}
       <footer className="border-t border-white/5 py-12 px-4">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2">
@@ -741,15 +712,32 @@ export default function LandingPage() {
             Interplanetary voyage booking for the Solara system. All journeys
             subject to orbital window availability.
           </p>
+          {/* Fixed footer links — now actually navigate */}
           <div className="flex gap-6">
-            {["Routes", "Fleet", "System", "Contact"].map((link) => (
-              <button
-                key={link}
-                className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors"
-              >
-                {link}
-              </button>
-            ))}
+            <Link
+              to="/search?adults=1&children=0"
+              className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors"
+            >
+              Routes
+            </Link>
+            <Link
+              to="/fleet"
+              className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors"
+            >
+              Fleet
+            </Link>
+            <Link
+              to="/explore"
+              className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors"
+            >
+              System
+            </Link>
+            <Link
+              to="/profile"
+              className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors"
+            >
+              Account
+            </Link>
           </div>
         </div>
       </footer>
