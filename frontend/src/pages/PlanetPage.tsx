@@ -371,14 +371,10 @@ export default function PlanetPage() {
                   {data.spaceports.map((port, i) => (
                     <motion.div key={port.id} variants={staggerItem}>
                       <Card className="overflow-hidden">
-                        <ImagePlaceholder
-                          aspectRatio="16/9"
-                          label={
-                            i === 0
-                              ? data.imageSlots.spaceport
-                              : `${port.name} — spaceport exterior`
-                          }
-                          rounded="rounded-none"
+                        <img
+                          src={`/images/planet/${data.id}/spaceports/${port.id}.jpg`}
+                          alt={port.description}
+                          className="w-full h-full"
                         />
                         <div className="p-5 flex flex-col gap-3">
                           <div className="flex items-start justify-between gap-3">
