@@ -76,10 +76,9 @@ export default function PlanetPage() {
         >
           {/* Hero image — parallax */}
           <motion.div style={{ y: heroY }} className="absolute inset-0">
-            <ImagePlaceholder
-              aspectRatio="21/9"
-              label={data.imageSlots.hero}
-              rounded="rounded-none"
+            <img
+              src={`/images/planet/${data.id}/hero.jpg`}
+              alt={data.imageSlots.hero}
               className="w-full h-full"
             />
             {/* Gradient overlay — bottom fade to void */}
@@ -216,10 +215,10 @@ export default function PlanetPage() {
                   whileInView="visible"
                   viewport={viewportOnce}
                 >
-                  <ImagePlaceholder
-                    aspectRatio="16/9"
-                    label={data.imageSlots.surface}
-                    className="w-full"
+                  <img
+                    src={`/images/planet/${data.id}/surface.jpg`}
+                    alt={data.imageSlots.surface}
+                    className="w-full h-full"
                   />
                 </motion.div>
               </section>
@@ -260,9 +259,10 @@ export default function PlanetPage() {
                     whileInView="visible"
                     viewport={viewportOnce}
                   >
-                    <ImagePlaceholder
-                      aspectRatio="16/9"
-                      label={data.imageSlots.extra}
+                    <img
+                      src={`/images/planet/${data.id}/extra.jpg`}
+                      alt={data.imageSlots.extra}
+                      className="w-full h-full"
                     />
                   </motion.div>
                 )}
