@@ -1,28 +1,22 @@
-import { ImagePlaceholder, PageTransition } from "@/components/common";
+import { ImagePlaceholder, Modal, PageTransition } from "@/components/common";
 import { BookingStepIndicator } from "@/components/layout";
 import { Badge, Button, Divider } from "@/components/ui";
-import {
-  fadeUp,
-  modalContent,
-  modalExpand,
-  modalOverlay,
-  staggerItem,
-} from "@/lib/animations";
+import { fadeUp, staggerItem } from "@/lib/animations";
 import { getSystemConfig } from "@/lib/api";
 import { cn, formatCredits } from "@/lib/utils";
 import { useBookingStore } from "@/store/bookingStore";
 import type { AddOnItem } from "@/types/system";
 import { useQuery } from "@tanstack/react-query";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Check,
   ChevronRight,
   Compass,
   Info,
+  Lock,
   Music,
   Shield,
   Utensils,
-  X,
   Zap,
 } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -59,11 +53,8 @@ const CATEGORY_META: Record<
   },
 };
 
-// Items included by default (pre-selected, cannot be deselected)
-const INCLUDED_BY_DEFAULT = new Set<string>([
-  // Nothing is forcibly included — this set is here so you can add items
-  // e.g. 'ship_library' if you want it always included
-]);
+// Items pre-selected and locked — cannot be deselected by the user
+const ALWAYS_INCLUDED = new Set<string>(["ship_library"]);
 
 export default function PackagesPage() {
   const navigate = useNavigate();
@@ -74,17 +65,16 @@ export default function PackagesPage() {
   const cryoId = currentLeg?.cryoOptionId ?? "conscious";
   const isFullCryo = cryoId === "full_cryo";
 
+  // Initialise with always-included items pre-selected
   const [selected, setSelected] = useState<Set<string>>(() => {
     const base = new Set(currentLeg?.addOnIds ?? []);
-    INCLUDED_BY_DEFAULT.forEach((id) => base.add(id));
+    ALWAYS_INCLUDED.forEach((id) => base.add(id));
     return base;
   });
 
   // Info modal state
-  const [modalItem, setModalItem] = useState<{
-    item: AddOnItem;
-    price: number;
-  } | null>(null);
+  const [modalItem, setModalItem] = useState<AddOnItem | null>(null);
+  const [modalCategory, setModalCategory] = useState("");
 
   useEffect(() => {
     setCurrentStep("packages");
@@ -97,7 +87,7 @@ export default function PackagesPage() {
   });
 
   function toggle(id: string) {
-    if (INCLUDED_BY_DEFAULT.has(id)) return; // Cannot deselect included items
+    if (ALWAYS_INCLUDED.has(id)) return; // cannot deselect
     setSelected((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
@@ -122,14 +112,6 @@ export default function PackagesPage() {
     );
   }
 
-  function isAvailable(item: AddOnItem, category: string): boolean {
-    const meta = CATEGORY_META[category];
-    if (!meta.amenityOnly) return true;
-    if (isFullCryo) return false;
-    if (item.availableToCryo) return item.availableToCryo.includes(cryoId);
-    return true;
-  }
-
   const addOnsTotal = systemConfig
     ? [...selected].reduce((sum, id) => {
         const allItems = Object.values(
@@ -140,14 +122,20 @@ export default function PackagesPage() {
       }, 0)
     : 0;
 
+  function isAvailable(item: AddOnItem, category: string): boolean {
+    const meta = CATEGORY_META[category];
+    if (!meta) return true;
+    if (!meta.amenityOnly) return true;
+    if (isFullCryo) return false;
+    if (item.availableToCryo) return item.availableToCryo.includes(cryoId);
+    return true;
+  }
+
   if (isLoading || !systemConfig) {
     return (
       <PageTransition>
         <div className="min-h-screen bg-void pt-16 flex items-center justify-center">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-8 h-8 rounded-full border-2 border-accent-500 border-t-transparent animate-spin" />
-            <p className="font-sans text-sm text-white/30">Loading packages…</p>
-          </div>
+          <div className="w-8 h-8 rounded-full border-2 border-accent-500 border-t-transparent animate-spin" />
         </div>
       </PageTransition>
     );
@@ -193,12 +181,11 @@ export default function PackagesPage() {
                 const meta = CATEGORY_META[categoryId];
                 if (!meta) return null;
 
-                const available = items.filter((item) =>
-                  isAvailable(item, categoryId),
-                );
-                const locked = items.filter(
-                  (item) => !isAvailable(item, categoryId),
-                );
+                const visibleItems = items.filter((item) => {
+                  // Show all for journey protection and expedition extras
+                  // For amenity categories: show available + show locked-out items greyed
+                  return true;
+                });
 
                 return (
                   <motion.section
@@ -218,120 +205,50 @@ export default function PackagesPage() {
                         {meta.label}
                       </h2>
                       {isFullCryo && meta.amenityOnly && (
-                        <Badge variant="outline">Cryo only</Badge>
+                        <Badge variant="outline" size="sm">
+                          Cryo only
+                        </Badge>
                       )}
                     </div>
 
-                    {/* Available items — vertical list */}
+                    {/* Vertical list of add-on rows */}
                     <div className="flex flex-col gap-2">
-                      {available.map((item) => {
-                        const price = getPrice(item);
+                      {visibleItems.map((item) => {
+                        const available = isAvailable(item, categoryId);
+                        const isLocked = ALWAYS_INCLUDED.has(item.id);
                         const isSelected = selected.has(item.id);
-                        const isIncluded = INCLUDED_BY_DEFAULT.has(item.id);
+                        const price = getPrice(item);
 
                         return (
-                          <motion.div
+                          <AddOnRow
                             key={item.id}
-                            variants={staggerItem}
-                            className={cn(
-                              "flex items-center gap-4 px-5 py-4 rounded-xl border transition-all duration-200",
-                              isSelected
-                                ? "bg-surface-800 border-accent-500/40"
-                                : "bg-surface-950/40 border-white/8 hover:border-white/18",
-                            )}
-                          >
-                            {/* Checkbox / check */}
-                            <button
-                              onClick={() => toggle(item.id)}
-                              disabled={isIncluded}
-                              className={cn(
-                                "w-6 h-6 rounded-lg border-2 flex items-center justify-center shrink-0 transition-all",
-                                isSelected
-                                  ? "bg-accent-500 border-accent-500"
-                                  : "border-white/25 hover:border-white/50",
-                                isIncluded && "cursor-default",
-                              )}
-                            >
-                              {isSelected && (
-                                <Check className="w-3.5 h-3.5 text-white" />
-                              )}
-                            </button>
-
-                            {/* Name + tags */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-display text-display-sm text-white">
-                                  {item.name}
-                                </span>
-                                {isIncluded && (
-                                  <Badge variant="success" size="sm">
-                                    Included
-                                  </Badge>
-                                )}
-                                {item.segmentRestricted && (
-                                  <Badge variant="warning" size="sm">
-                                    Segment-restricted
-                                  </Badge>
-                                )}
-                                {item.voyageSpecific && (
-                                  <Badge variant="outline" size="sm">
-                                    Select voyages
-                                  </Badge>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Price */}
-                            <span className="font-display text-display-sm text-white shrink-0">
-                              {isIncluded ? (
-                                <span className="text-success text-sm font-sans font-bold">
-                                  Included
-                                </span>
-                              ) : price > 0 ? (
-                                formatCredits(price)
-                              ) : (
-                                "—"
-                              )}
-                            </span>
-
-                            {/* Info button — opens modal */}
-                            <button
-                              onClick={() => setModalItem({ item, price })}
-                              className="text-white/25 hover:text-white/70 transition-colors shrink-0"
-                              title="More information"
-                            >
-                              <Info className="w-4 h-4" />
-                            </button>
-                          </motion.div>
+                            item={item}
+                            price={price}
+                            selected={isSelected}
+                            locked={isLocked}
+                            available={available}
+                            onToggle={() => toggle(item.id)}
+                            onInfo={() => {
+                              setModalItem(item);
+                              setModalCategory(categoryId);
+                            }}
+                          />
                         );
                       })}
-
-                      {/* Locked items */}
-                      {locked.length > 0 && (
-                        <div className="flex flex-col gap-2 opacity-30 pointer-events-none">
-                          {locked.map((item) => (
-                            <div
-                              key={item.id}
-                              className="flex items-center gap-4 px-5 py-4 rounded-xl border border-white/5"
-                            >
-                              <div className="w-6 h-6 rounded-lg border-2 border-white/20 flex items-center justify-center shrink-0" />
-                              <div className="flex-1">
-                                <span className="font-display text-display-sm text-white/50">
-                                  {item.name}
-                                </span>
-                              </div>
-                              <span className="font-sans text-sm text-white/30">
-                                {formatCredits(getPrice(item))}
-                              </span>
-                              <Info className="w-4 h-4 text-white/20" />
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </motion.section>
                 );
               })}
+
+              {/* Back nav */}
+              <div className="pt-4 border-t border-white/5">
+                <button
+                  onClick={() => navigate(-1)}
+                  className="font-sans text-sm text-white/30 hover:text-white/60 transition-colors"
+                >
+                  ← Back to voyage details
+                </button>
+              </div>
             </div>
 
             {/* Sticky sidebar */}
@@ -339,6 +256,7 @@ export default function PackagesPage() {
               <div className="lg:sticky lg:top-32 flex flex-col gap-4">
                 <div className="glass-card rounded-2xl p-5 flex flex-col gap-4">
                   <span className="label">Selected Add-Ons</span>
+
                   {selected.size === 0 ? (
                     <p className="font-sans text-sm text-white/30">
                       None selected
@@ -351,26 +269,31 @@ export default function PackagesPage() {
                         ).flat() as AddOnItem[];
                         const item = allItems.find((a) => a.id === id);
                         if (!item) return null;
+                        const isLocked = ALWAYS_INCLUDED.has(id);
                         return (
                           <div
                             key={id}
                             className="flex items-center justify-between gap-2"
                           >
-                            <span className="font-sans text-xs text-white/60 truncate">
-                              {item.name}
-                            </span>
-                            <span className="font-sans text-xs text-white/40 shrink-0">
-                              {INCLUDED_BY_DEFAULT.has(id) ? (
-                                <span className="text-success">Incl.</span>
-                              ) : (
-                                formatCredits(getPrice(item))
+                            <div className="flex items-center gap-1.5 min-w-0">
+                              {isLocked && (
+                                <Lock className="w-3 h-3 text-white/25 shrink-0" />
                               )}
+                              <span className="font-sans text-xs text-white/60 truncate">
+                                {item.name}
+                              </span>
+                            </div>
+                            <span className="font-sans text-xs text-white/40 shrink-0">
+                              {isLocked
+                                ? "Included"
+                                : formatCredits(getPrice(item))}
                             </span>
                           </div>
                         );
                       })}
                     </div>
                   )}
+
                   {addOnsTotal > 0 && (
                     <>
                       <Divider />
@@ -390,134 +313,254 @@ export default function PackagesPage() {
                   >
                     Continue <ChevronRight className="w-4 h-4" />
                   </Button>
+                  <p className="font-sans text-xs text-white/25 text-center">
+                    Continue without additional add-ons
+                  </p>
                 </div>
-
-                {/* Back link */}
-                <button
-                  onClick={() => navigate(-1)}
-                  className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors text-center"
-                >
-                  ← Back to Voyage Detail
-                </button>
               </div>
             </aside>
           </div>
         </div>
 
-        {/* ── ADD-ON INFO MODAL ──────────────────────────────────── */}
-        <AnimatePresence>
-          {modalItem && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-              <motion.div
-                variants={modalOverlay}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm"
-                onClick={() => setModalItem(null)}
-              />
-              <motion.div
-                variants={modalExpand}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                className="relative w-full max-w-lg glass-card overflow-hidden z-10"
-              >
-                <motion.div
-                  variants={modalContent}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                >
-                  {/* Image placeholder */}
-                  <ImagePlaceholder
-                    aspectRatio="16/9"
-                    label={`${modalItem.item.name} — package imagery`}
-                    rounded="rounded-none"
-                  />
-
-                  <div className="p-6 flex flex-col gap-4">
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <h3 className="font-display text-display-md text-white">
-                          {modalItem.item.name}
-                        </h3>
-                        <p className="font-sans text-sm text-white/50 mt-1 leading-relaxed">
-                          {modalItem.item.description}
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => setModalItem(null)}
-                        className="text-white/30 hover:text-white transition-colors shrink-0"
-                      >
-                        <X className="w-5 h-5" />
-                      </button>
-                    </div>
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2">
-                      {modalItem.item.segmentRestricted && (
-                        <Badge variant="warning">Segment-restricted</Badge>
-                      )}
-                      {modalItem.item.voyageSpecific && (
-                        <Badge variant="outline">Select voyages only</Badge>
-                      )}
-                      {modalItem.item.destinationSpecific && (
-                        <Badge variant="outline">Destination-specific</Badge>
-                      )}
-                      {modalItem.item.availableToCryo && (
-                        <Badge variant="surface">
-                          {modalItem.item.availableToCryo.join(" · ")}
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Price */}
-                    <div className="flex items-center justify-between px-4 py-3 bg-surface-900/60 rounded-xl border border-white/6">
-                      <span className="font-sans text-sm text-white/50">
-                        Price
-                      </span>
-                      <span className="font-display text-display-sm text-white">
-                        {INCLUDED_BY_DEFAULT.has(modalItem.item.id)
-                          ? "Included"
-                          : modalItem.price > 0
-                            ? formatCredits(modalItem.price)
-                            : "—"}
-                      </span>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-3">
-                      <Button
-                        variant="secondary"
-                        size="md"
-                        onClick={() => setModalItem(null)}
-                        className="flex-1"
-                      >
-                        Close
-                      </Button>
-                      <Button
-                        size="md"
-                        className="flex-1"
-                        onClick={() => {
-                          toggle(modalItem.item.id);
-                          setModalItem(null);
-                        }}
-                        disabled={INCLUDED_BY_DEFAULT.has(modalItem.item.id)}
-                      >
-                        {selected.has(modalItem.item.id)
-                          ? "Remove"
-                          : "Add to voyage"}
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+        {/* Info modal */}
+        <AddOnInfoModal
+          item={modalItem}
+          onClose={() => setModalItem(null)}
+          onAdd={() => {
+            if (modalItem) toggle(modalItem.id);
+            setModalItem(null);
+          }}
+          isSelected={modalItem ? selected.has(modalItem.id) : false}
+          isLocked={modalItem ? ALWAYS_INCLUDED.has(modalItem.id) : false}
+          price={modalItem ? getPrice(modalItem) : 0}
+        />
       </div>
     </PageTransition>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// AddOnRow — single horizontal list item
+// ─────────────────────────────────────────────────────────────────
+
+interface AddOnRowProps {
+  item: AddOnItem;
+  price: number;
+  selected: boolean;
+  locked: boolean;
+  available: boolean;
+  onToggle: () => void;
+  onInfo: () => void;
+}
+
+function AddOnRow({
+  item,
+  price,
+  selected,
+  locked,
+  available,
+  onToggle,
+  onInfo,
+}: AddOnRowProps) {
+  return (
+    <motion.div
+      variants={staggerItem}
+      className={cn(
+        "flex items-center gap-4 px-4 py-3 rounded-xl border transition-all duration-200",
+        !available && "opacity-30 pointer-events-none",
+        selected && available
+          ? "bg-surface-800/60 border-accent-600/30"
+          : "bg-surface-950/40 border-white/6 hover:border-white/12",
+      )}
+    >
+      {/* Checkbox / lock */}
+      <button
+        onClick={locked ? undefined : onToggle}
+        disabled={locked || !available}
+        className={cn(
+          "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
+          locked
+            ? "bg-surface-700 border-white/20 cursor-default"
+            : selected
+              ? "bg-accent-500 border-accent-500"
+              : "border-white/20 hover:border-accent-500/50",
+        )}
+      >
+        {locked ? (
+          <Lock className="w-2.5 h-2.5 text-white/40" />
+        ) : (
+          selected && <Check className="w-3 h-3 text-white" />
+        )}
+      </button>
+
+      {/* Name + tags */}
+      <div className="flex-1 min-w-0 flex flex-col gap-0.5">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="font-sans text-sm font-bold text-white">
+            {item.name}
+          </span>
+          {locked && (
+            <Badge variant="accent" size="sm">
+              Included
+            </Badge>
+          )}
+          {item.segmentRestricted && (
+            <Badge variant="warning" size="sm">
+              Segment-restricted
+            </Badge>
+          )}
+          {item.voyageSpecific && (
+            <Badge variant="outline" size="sm">
+              Select voyages
+            </Badge>
+          )}
+        </div>
+      </div>
+
+      {/* Price */}
+      <span className="font-display text-sm text-white/60 shrink-0">
+        {locked ? "—" : price > 0 ? formatCredits(price) : "Included"}
+      </span>
+
+      {/* Info button */}
+      <button
+        onClick={onInfo}
+        className="text-white/20 hover:text-accent-300 transition-colors shrink-0"
+        title={`More about ${item.name}`}
+      >
+        <Info className="w-4 h-4" />
+      </button>
+
+      {/* Select/deselect button */}
+      {!locked && available && (
+        <button
+          onClick={onToggle}
+          className={cn(
+            "font-sans text-xs font-bold px-3 py-1.5 rounded-lg border transition-all duration-200 shrink-0",
+            selected
+              ? "border-danger/30 text-danger/70 hover:bg-danger/10"
+              : "border-accent-600/40 text-accent-300 hover:bg-accent-600/10",
+          )}
+        >
+          {selected ? "Remove" : "Add"}
+        </button>
+      )}
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// AddOnInfoModal — circle-expand modal with image and description
+// ─────────────────────────────────────────────────────────────────
+
+interface AddOnInfoModalProps {
+  item: AddOnItem | null;
+  onClose: () => void;
+  onAdd: () => void;
+  isSelected: boolean;
+  isLocked: boolean;
+  price: number;
+}
+
+function AddOnInfoModal({
+  item,
+  onClose,
+  onAdd,
+  isSelected,
+  isLocked,
+  price,
+}: AddOnInfoModalProps) {
+  return (
+    <Modal isOpen={!!item} onClose={onClose} size="md">
+      {item && (
+        <div className="flex flex-col gap-0 pb-6">
+          {/* Large image placeholder */}
+          <ImagePlaceholder
+            aspectRatio="16/9"
+            label={`${item.name} — package imagery`}
+            rounded="rounded-none"
+          />
+
+          <div className="flex flex-col gap-4 px-6 pt-5">
+            {/* Name + price */}
+            <div className="flex items-start justify-between gap-4">
+              <h3 className="font-display text-display-md text-white">
+                {item.name}
+              </h3>
+              <div className="text-right shrink-0">
+                {isLocked ? (
+                  <Badge variant="accent">Included</Badge>
+                ) : price > 0 ? (
+                  <span className="font-display text-display-sm text-white">
+                    {formatCredits(price)}
+                  </span>
+                ) : (
+                  <span className="font-sans text-sm text-white/40">
+                    Included
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Description */}
+            <p className="font-sans text-sm text-white/60 leading-relaxed">
+              {item.description}
+            </p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              {item.segmentRestricted && (
+                <div className="flex items-center gap-1.5 font-sans text-xs text-warning/80">
+                  <span>⚠</span> Availability varies by voyage segment
+                </div>
+              )}
+              {item.voyageSpecific && (
+                <div className="flex items-center gap-1.5 font-sans text-xs text-white/40">
+                  <span>ℹ</span> Available on select voyages only
+                </div>
+              )}
+              {item.availableToCryo && !item.availableToAllCryo && (
+                <div className="font-sans text-xs text-white/40">
+                  Available to:{" "}
+                  {item.availableToCryo
+                    .map((c) => c.replace("_", " "))
+                    .join(", ")}{" "}
+                  passengers
+                </div>
+              )}
+            </div>
+
+            <Divider />
+
+            {/* Actions */}
+            {isLocked ? (
+              <div className="flex items-center justify-between">
+                <span className="font-sans text-sm text-white/50">
+                  This is included with your voyage
+                </span>
+                <Button variant="secondary" size="md" onClick={onClose}>
+                  Close
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-3">
+                <Button
+                  variant="secondary"
+                  size="md"
+                  onClick={onClose}
+                  className="flex-1"
+                >
+                  Close
+                </Button>
+                <Button size="md" onClick={onAdd} className="flex-1">
+                  {isSelected ? "Remove" : "Add to Voyage"}
+                  {!isSelected && <Check className="w-4 h-4" />}
+                </Button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </Modal>
   );
 }

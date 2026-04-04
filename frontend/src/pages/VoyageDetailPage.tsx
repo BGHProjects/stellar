@@ -548,19 +548,27 @@ export default function VoyageDetailPage() {
                 variants={fadeUp}
                 className="flex items-center justify-between pt-4 border-t border-white/5"
               >
-                <div className="flex flex-col gap-1">
-                  <span className="label">Selected</span>
-                  <p className="font-sans text-sm text-white/60">
-                    {selectedCryo ? (
-                      CRYO_OPTIONS.find((c) => c.id === selectedCryo)?.name
-                    ) : (
-                      <span className="text-white/25">No cryo option</span>
-                    )}
-                    {selectedCryo && selectedCabin && " · "}
-                    {selectedCabin
-                      ? `${CABIN_CLASSES.find((c) => c.id === selectedCabin)?.name} Class`
-                      : ""}
-                  </p>
+                <div className="flex items-center gap-4">
+                  <button
+                    onClick={() => navigate(-1)}
+                    className="font-sans text-sm text-white/30 hover:text-white/60 transition-colors"
+                  >
+                    ← Back to results
+                  </button>
+                  <div className="flex flex-col gap-0.5">
+                    <span className="label">Selected</span>
+                    <p className="font-sans text-sm text-white/60">
+                      {selectedCryo ? (
+                        CRYO_OPTIONS.find((c) => c.id === selectedCryo)?.name
+                      ) : (
+                        <span className="text-white/25">No cryo option</span>
+                      )}
+                      {selectedCryo && selectedCabin && " · "}
+                      {selectedCabin
+                        ? `${CABIN_CLASSES.find((c) => c.id === selectedCabin)?.name} Class`
+                        : ""}
+                    </p>
+                  </div>
                 </div>
                 <Button
                   onClick={handleContinue}

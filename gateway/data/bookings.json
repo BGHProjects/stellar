@@ -1,1 +1,120 @@
-[]
+[
+  {
+    "id": "4bf9e088-67fa-4aff-b886-73604f8e0b2f",
+    "userId": "1a66de14-869f-4764-a950-acaa6f874927",
+    "groupId": "e9172a72-9b13-4d65-87d5-90c8196fe9df",
+    "legNumber": 1,
+    "routeId": "aethon_mira",
+    "routeTypeId": "direct",
+    "shipClassId": "solaris",
+    "departureDay": -106722,
+    "arrivalDay": -106677.93604192584,
+    "departureDate": "2507-10-22T00:00:00Z",
+    "arrivalDate": "2507-12-05T02:00:00Z",
+    "originId": "aethon",
+    "destinationId": "mira",
+    "departurePortId": "",
+    "arrivalPortId": "",
+    "cryoOptionId": "cryo_intervals",
+    "cabinClassId": "apex",
+    "passengers": [
+      {
+        "id": "9c4eb3f0-aaca-40e8-9a1a-0176a2d4fe19",
+        "bookingId": "",
+        "firstName": "Test",
+        "lastName": "Test",
+        "dateOfBirth": "2020-03-04",
+        "isChild": true,
+        "cabinBerth": "E17"
+      }
+    ],
+    "addOns": [
+      {
+        "addOnId": "ship_library",
+        "category": "entertainment",
+        "quantity": 1,
+        "unitPrice": 60,
+        "totalPrice": 60
+      },
+      {
+        "addOnId": "observatory_sessions",
+        "category": "recreation",
+        "quantity": 1,
+        "unitPrice": 95,
+        "totalPrice": 95
+      },
+      {
+        "addOnId": "fitness_suite",
+        "category": "recreation",
+        "quantity": 1,
+        "unitPrice": 220,
+        "totalPrice": 220
+      },
+      {
+        "addOnId": "zero_g_spa",
+        "category": "recreation",
+        "quantity": 1,
+        "unitPrice": 480,
+        "totalPrice": 480
+      },
+      {
+        "addOnId": "journey_interruption",
+        "category": "journeyProtection",
+        "quantity": 1,
+        "unitPrice": 220,
+        "totalPrice": 220
+      },
+      {
+        "addOnId": "emergency_evacuation",
+        "category": "journeyProtection",
+        "quantity": 1,
+        "unitPrice": 450,
+        "totalPrice": 450
+      },
+      {
+        "addOnId": "radiation_shield",
+        "category": "journeyProtection",
+        "quantity": 1,
+        "unitPrice": 280,
+        "totalPrice": 280
+      },
+      {
+        "addOnId": "private_transfer",
+        "category": "expeditionExtras",
+        "quantity": 1,
+        "unitPrice": 210,
+        "totalPrice": 210
+      },
+      {
+        "addOnId": "live_performance",
+        "category": "entertainment",
+        "quantity": 1,
+        "unitPrice": 0,
+        "totalPrice": 0
+      }
+    ],
+    "priceBreakdown": {
+      "baseFare": 2800,
+      "routeTypeAdjustment": 840.0000000000001,
+      "cabinClassAdjustment": 6160.000000000001,
+      "cryoAdjustment": 980.0000000000002,
+      "orbitalWindowAdjustment": 0,
+      "addOnsTotal": 2015,
+      "childDiscounts": -4312,
+      "loyaltyDiscount": -0,
+      "portFees": 140,
+      "total": 8623
+    },
+    "totalPrice": 8623,
+    "loyaltyPointsApplied": 0,
+    "loyaltyPointsEarned": 8623,
+    "isVoyageBond": false,
+    "depositPaid": 0,
+    "balanceDue": 8623,
+    "status": "confirmed",
+    "orbitalWindowRating": 3,
+    "permitRequired": true,
+    "createdAt": "2026-04-04T07:42:04.7315874Z",
+    "updatedAt": "2026-04-04T07:42:04.7315874Z"
+  }
+]
