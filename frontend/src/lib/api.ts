@@ -20,7 +20,12 @@ import type {
   LoginRequest,
 } from "@/types/voyage";
 import type { SystemConfig } from "@/types/system";
-import { getMockData } from "@/mock";
+import {
+  MOCK_BOOKINGS,
+  MOCK_SYSTEM_CONFIG,
+  MOCK_USER,
+  MOCK_VOYAGES,
+} from "@/mock";
 
 const MOCK_MODE = import.meta.env.VITE_MOCK_MODE === "true";
 const BASE_URL = "/api";
@@ -76,7 +81,12 @@ export function clearStoredTokens(): void {
 // -----------------------------------------------------------------
 
 export async function register(req: RegisterRequest): Promise<AuthResponse> {
-  if (MOCK_MODE) return getMockData("auth.register") as AuthResponse;
+  if (MOCK_MODE)
+    return {
+      user: MOCK_USER,
+      accessToken: "mock-token",
+      refreshToken: "mock-refresh",
+    } as AuthResponse;
   return request<AuthResponse>("/auth/register", {
     method: "POST",
     body: JSON.stringify(req),
@@ -84,7 +94,12 @@ export async function register(req: RegisterRequest): Promise<AuthResponse> {
 }
 
 export async function login(req: LoginRequest): Promise<AuthResponse> {
-  if (MOCK_MODE) return getMockData("auth.login") as AuthResponse;
+  if (MOCK_MODE)
+    return {
+      user: MOCK_USER,
+      accessToken: "mock-token",
+      refreshToken: "mock-refresh",
+    } as AuthResponse;
   return request<AuthResponse>("/auth/login", {
     method: "POST",
     body: JSON.stringify(req),
@@ -101,12 +116,12 @@ export async function refreshTokens(
 }
 
 export async function getMe(): Promise<UserPublic> {
-  if (MOCK_MODE) return getMockData("auth.me") as UserPublic;
+  if (MOCK_MODE) return MOCK_USER as UserPublic;
   return request<UserPublic>("/auth/me");
 }
 
-export async function updateFaceVector(vector: number[]): Promise<void> {
-  if (MOCK_MODE) return;
+export async function updateFaceVector(vector: number[]): Promise<any> {
+  if (MOCK_MODE) return { success: true };
   return request<void>("/auth/face-vector", {
     method: "POST",
     body: JSON.stringify({ vector }),
@@ -118,7 +133,8 @@ export async function updateFaceVector(vector: number[]): Promise<void> {
 // -----------------------------------------------------------------
 
 export async function getSystemConfig(): Promise<SystemConfig> {
-  if (MOCK_MODE) return getMockData("system.config") as SystemConfig;
+  if (MOCK_MODE) return MOCK_SYSTEM_CONFIG;
+
   // Assemble from individual endpoints and combine into SystemConfig shape
   const [
     bodies,
@@ -169,7 +185,8 @@ export async function getSystemConfig(): Promise<SystemConfig> {
 export async function searchVoyages(
   params: VoyageSearchParams,
 ): Promise<Voyage[]> {
-  if (MOCK_MODE) return getMockData("voyages.search") as Voyage[];
+  if (MOCK_MODE)
+    return MOCK_VOYAGES(params.originId, params.destinationId) as Voyage[];
   const query = new URLSearchParams({
     originId: params.originId,
     destinationId: params.destinationId,
@@ -212,7 +229,12 @@ export async function getClosestApproach(
   windowDays?: number,
 ): Promise<ClosestApproachResult> {
   if (MOCK_MODE)
-    return getMockData("voyages.closestApproach") as ClosestApproachResult;
+    if (MOCK_MODE)
+      return {
+        date: "2801-06-15",
+        distanceAU: 2.1,
+        windowRating: 4,
+      } as ClosestApproachResult;
   const query = new URLSearchParams({ originId, destinationId });
   if (fromDate) query.set("fromDate", fromDate);
   if (windowDays) query.set("windowDays", String(windowDays));
@@ -242,7 +264,7 @@ export async function getSchedule(
 export async function createBooking(
   req: CreateBookingRequest,
 ): Promise<Booking> {
-  if (MOCK_MODE) return getMockData("bookings.create") as Booking;
+  if (MOCK_MODE) return MOCK_BOOKINGS[0] as Booking;
   return request<Booking>("/bookings", {
     method: "POST",
     body: JSON.stringify(req),
@@ -250,12 +272,12 @@ export async function createBooking(
 }
 
 export async function getBooking(id: string): Promise<Booking> {
-  if (MOCK_MODE) return getMockData("bookings.detail") as Booking;
+  if (MOCK_MODE) return MOCK_BOOKINGS[0] as Booking;
   return request<Booking>(`/bookings/${id}`);
 }
 
 export async function getUserBookings(): Promise<Booking[]> {
-  if (MOCK_MODE) return getMockData("bookings.list") as Booking[];
+  if (MOCK_MODE) return MOCK_BOOKINGS as Booking[];
   return request<Booking[]>("/bookings/me");
 }
 

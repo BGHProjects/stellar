@@ -542,6 +542,7 @@ function BodyMesh({
         >
           <div
             style={{
+              zIndex: 1,
               transform: "translateY(16px)",
               textAlign: "center",
               whiteSpace: "nowrap",

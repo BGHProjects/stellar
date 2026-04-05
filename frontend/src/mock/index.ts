@@ -1,16 +1,516 @@
-// Mock data module — returns fixture data when VITE_MOCK_MODE=true.
-// Fixture files are generated from real orbital calculations to ensure
-// realistic journey durations and pricing.
-// Full fixtures are populated during the mock deployment preparation step.
+export const MOCK_SYSTEM_CONFIG = {
+  epoch: { date: "2800-01-01" },
+  bodies: [
+    {
+      id: "serrath",
+      name: "Serrath",
+      type: "Rocky Planet",
+      orbitalRadius: 0.6,
+      period: 145,
+      eccentricity: 0.04,
+      startPhase: 45,
+      visitable: false,
+    },
+    {
+      id: "aethon",
+      name: "Aethon",
+      type: "Super-Earth",
+      orbitalRadius: 1.1,
+      period: 380,
+      eccentricity: 0.03,
+      startPhase: 163,
+      visitable: true,
+      spaceports: ["aethon_orbital_ring"],
+    },
+    {
+      id: "vareth",
+      name: "Vareth",
+      type: "Gas Giant",
+      orbitalRadius: 3.2,
+      period: 890,
+      eccentricity: 0.05,
+      startPhase: 290,
+      visitable: false,
+    },
+    {
+      id: "kalos",
+      name: "Kalos",
+      type: "Moon",
+      orbitalRadius: 0.03,
+      period: 6,
+      eccentricity: 0.01,
+      startPhase: 0,
+      visitable: true,
+      parent: "vareth",
+      spaceports: ["kalos_deep_port"],
+    },
+    {
+      id: "thal",
+      name: "Thal",
+      type: "Moon",
+      orbitalRadius: 0.05,
+      period: 11,
+      eccentricity: 0.02,
+      startPhase: 120,
+      visitable: true,
+      parent: "vareth",
+      spaceports: ["thal_thermal_station"],
+    },
+    {
+      id: "mira",
+      name: "Mira",
+      type: "Moon",
+      orbitalRadius: 0.08,
+      period: 19,
+      eccentricity: 0.0,
+      startPhase: 240,
+      visitable: true,
+      parent: "vareth",
+      spaceports: ["mira_access_point"],
+      visitPermitRequired: true,
+    },
+    {
+      id: "calyx",
+      name: "Calyx",
+      type: "Ice Planet",
+      orbitalRadius: 5.8,
+      period: 2400,
+      eccentricity: 0.07,
+      startPhase: 318,
+      visitable: true,
+      spaceports: ["calyx_port_north"],
+    },
+    {
+      id: "lun",
+      name: "Lun",
+      type: "Moon",
+      orbitalRadius: 0.025,
+      period: 9,
+      eccentricity: 0.01,
+      startPhase: 60,
+      visitable: true,
+      parent: "calyx",
+      spaceports: ["lun_station"],
+    },
+    {
+      id: "vael",
+      name: "Vael",
+      type: "Moon",
+      orbitalRadius: 0.04,
+      period: 17,
+      eccentricity: 0.0,
+      startPhase: 180,
+      visitable: true,
+      parent: "calyx",
+      spaceports: ["vael_station"],
+    },
+    {
+      id: "drath",
+      name: "Drath",
+      type: "Gas Giant",
+      orbitalRadius: 9.4,
+      period: 6100,
+      eccentricity: 0.09,
+      startPhase: 72,
+      visitable: false,
+    },
+  ],
+  shipClasses: [
+    {
+      id: "helion",
+      name: "Helion-class",
+      speedAUPerDay: 0.1,
+      maxPassengers: 120,
+      hasCryo: false,
+    },
+    {
+      id: "tethys",
+      name: "Tethys-class",
+      speedAUPerDay: 0.055,
+      maxPassengers: 300,
+      hasCryo: true,
+    },
+    {
+      id: "lunara",
+      name: "Lunara-class",
+      speedAUPerDay: 0.042,
+      maxPassengers: 220,
+      hasCryo: true,
+    },
+    {
+      id: "solaris",
+      name: "Solaris-class",
+      speedAUPerDay: 0.025,
+      maxPassengers: 600,
+      hasCryo: true,
+    },
+  ],
+  routes: [
+    {
+      id: "aethon_kalos",
+      origin: "aethon",
+      destination: "kalos",
+      shipClass: "tethys",
+      frequencyDays: 5,
+      basePriceCredits: 1200,
+      availableRouteTypes: ["direct", "gravity_assist"],
+      crossesScatter: true,
+    },
+    {
+      id: "aethon_thal",
+      origin: "aethon",
+      destination: "thal",
+      shipClass: "tethys",
+      frequencyDays: 8,
+      basePriceCredits: 1400,
+      availableRouteTypes: ["direct", "gravity_assist"],
+      crossesScatter: true,
+    },
+    {
+      id: "aethon_mira",
+      origin: "aethon",
+      destination: "mira",
+      shipClass: "solaris",
+      frequencyDays: 14,
+      basePriceCredits: 2200,
+      availableRouteTypes: ["direct"],
+      crossesScatter: true,
+      permitRequired: true,
+    },
+    {
+      id: "aethon_calyx",
+      origin: "aethon",
+      destination: "calyx",
+      shipClass: "solaris",
+      frequencyDays: 14,
+      basePriceCredits: 3200,
+      availableRouteTypes: ["direct", "gravity_assist"],
+      crossesScatter: true,
+    },
+    {
+      id: "aethon_lun",
+      origin: "aethon",
+      destination: "lun",
+      shipClass: "solaris",
+      frequencyDays: 14,
+      basePriceCredits: 3400,
+      availableRouteTypes: ["direct"],
+      crossesScatter: true,
+    },
+    {
+      id: "aethon_vael",
+      origin: "aethon",
+      destination: "vael",
+      shipClass: "solaris",
+      frequencyDays: 21,
+      basePriceCredits: 3600,
+      availableRouteTypes: ["direct"],
+      crossesScatter: true,
+    },
+    {
+      id: "kalos_thal",
+      origin: "kalos",
+      destination: "thal",
+      shipClass: "helion",
+      frequencyDays: 3,
+      basePriceCredits: 200,
+      availableRouteTypes: ["direct"],
+      crossesScatter: false,
+    },
+    {
+      id: "kalos_calyx",
+      origin: "kalos",
+      destination: "calyx",
+      shipClass: "tethys",
+      frequencyDays: 12,
+      basePriceCredits: 2100,
+      availableRouteTypes: ["direct", "gravity_assist"],
+      crossesScatter: true,
+    },
+    {
+      id: "calyx_lun",
+      origin: "calyx",
+      destination: "lun",
+      shipClass: "helion",
+      frequencyDays: 4,
+      basePriceCredits: 150,
+      availableRouteTypes: ["direct"],
+      crossesScatter: false,
+    },
+    {
+      id: "calyx_vael",
+      origin: "calyx",
+      destination: "vael",
+      shipClass: "helion",
+      frequencyDays: 6,
+      basePriceCredits: 180,
+      availableRouteTypes: ["direct"],
+      crossesScatter: false,
+    },
+  ],
+  addOns: {
+    journeyProtection: [
+      {
+        id: "radiation_shield",
+        name: "Radiation Shield Insurance",
+        description:
+          "Covers medical costs from unexpected solar event exposure.",
+        priceCredits: 180,
+      },
+      {
+        id: "asteroid_deviation",
+        name: "Asteroid Deviation Coverage",
+        description:
+          "Ship reroutes around unexpected debris. Essential for Scatter crossings.",
+        priceCredits: 240,
+        segmentRestricted: true,
+      },
+      {
+        id: "emergency_evac",
+        name: "Emergency Evacuation Policy",
+        description:
+          "Covers cost of emergency transfer vessel if voyage is interrupted.",
+        priceCredits: 320,
+      },
+      {
+        id: "journey_interrupt",
+        name: "Journey Interruption Protection",
+        description:
+          "Refunds and rebooking if voyage is significantly delayed.",
+        priceCredits: 160,
+      },
+    ],
+    dining: [
+      {
+        id: "chefs_table",
+        name: "Chef's Table Access",
+        description: "Premium rotating menu by the ship's head chef.",
+        priceCreditsPerNight: 85,
+        amenityOnly: true,
+      },
+      {
+        id: "cultural_cuisine",
+        name: "Cultural Cuisine Weeks",
+        description: "Themed dining representing destination world traditions.",
+        priceCreditsPerNight: 55,
+        amenityOnly: true,
+      },
+      {
+        id: "private_dining",
+        name: "Private In-Cabin Dining",
+        description: "Available to Apex and Helix Class passengers only.",
+        priceCreditsPerNight: 120,
+        amenityOnly: true,
+      },
+    ],
+    recreation: [
+      {
+        id: "zerog_spa",
+        name: "Zero-G Spa Access",
+        description:
+          "Wellness deck using the ship's variable gravity sections.",
+        priceCredits: 280,
+        amenityOnly: true,
+      },
+      {
+        id: "observatory",
+        name: "Stellar Observatory Sessions",
+        description:
+          "Reserved time in the main observation dome with guided narration.",
+        priceCredits: 180,
+        amenityOnly: true,
+      },
+      {
+        id: "fitness_suite",
+        name: "Fitness & Training Suite",
+        description:
+          "Gravity-gym designed for long-voyage physical conditioning.",
+        priceCredits: 120,
+        amenityOnly: true,
+      },
+    ],
+    entertainment: [
+      {
+        id: "immersive_reality",
+        name: "Immersive Reality Suite",
+        description: "Bookable sessions in a full-environment simulation room.",
+        priceCreditsPerSession: 220,
+        amenityOnly: true,
+      },
+      {
+        id: "ship_library",
+        name: "Ship Library & Archive",
+        description:
+          "Digital archive of Solara system history, culture and science.",
+        priceCredits: 0,
+        amenityOnly: true,
+      },
+      {
+        id: "live_performance",
+        name: "Live Performance Schedule",
+        description:
+          "Musicians, speakers, theatrical performances on select voyages.",
+        priceCredits: 150,
+        amenityOnly: true,
+        voyageSpecific: true,
+      },
+    ],
+    expeditionExtras: [
+      {
+        id: "shore_excursion",
+        name: "Shore Excursion",
+        description: "Pre-booked surface or orbital excursions at destination.",
+        priceCreditsPerUnit: 380,
+      },
+      {
+        id: "arrival_transfer",
+        name: "Private Arrival Transfer",
+        description:
+          "Pre-arranged shuttle from spaceport to onward destination.",
+        priceCreditsPerUnit: 180,
+      },
+      {
+        id: "premium_cargo",
+        name: "Premium Cargo Hold",
+        description:
+          "Additional hold allocation beyond standard luggage allowance.",
+        priceCreditsPerUnit: 120,
+      },
+      {
+        id: "spacewalk",
+        name: "Spacewalk Experience",
+        description: "Walk the ship's exterior under crew supervision.",
+        priceCredits: 850,
+        segmentRestricted: true,
+      },
+    ],
+  },
+  orbitalWindowRating: {
+    thresholds: {
+      rating5: 0.2,
+      rating4: 0.4,
+      rating3: 0.65,
+      rating2: 0.85,
+      rating1: 1.0,
+    },
+  },
+  pricing: {
+    currency: "credits",
+    currencySymbol: "₢",
+    orbitalWindowMultipliers: { 5: 0.8, 4: 0.92, 3: 1.0, 2: 1.14, 1: 1.35 },
+    portFeeRate: 0.05,
+    childDiscount: 0.3,
+  },
+  cabinClasses: [
+    { id: "drift", name: "Drift Class", priceMultiplier: 1.0 },
+    { id: "orbit", name: "Orbit Class", priceMultiplier: 1.8 },
+    { id: "apex", name: "Apex Class", priceMultiplier: 3.2 },
+    { id: "helix", name: "Helix Class", priceMultiplier: 6.0 },
+  ],
+  cryoOptions: [
+    { id: "conscious", name: "Conscious Voyage", priceMultiplier: 1.0 },
+    { id: "full_cryo", name: "Full Cryo", priceMultiplier: 0.55 },
+    { id: "cryo_intervals", name: "Cryo Intervals", priceMultiplier: 1.35 },
+  ],
+};
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const fixtures: Record<string, any> = {};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getMockData(key: string): any {
-  if (fixtures[key] !== undefined) return fixtures[key];
-  console.warn(
-    `[Mock] No fixture found for key: "${key}". Returning empty data.`,
+export const MOCK_VOYAGES = (originId: string, destinationId: string) => {
+  const route = MOCK_SYSTEM_CONFIG.routes.find(
+    (r) => r.origin === originId && r.destination === destinationId,
   );
-  return null;
-}
+  if (!route) return [];
+
+  const ship = MOCK_SYSTEM_CONFIG.shipClasses.find(
+    (s) => s.id === route.shipClass,
+  );
+  const speed = ship?.speedAUPerDay ?? 0.055;
+
+  return [1, 2, 3].map((offset, i) => ({
+    id: `mock-${originId}-${destinationId}-${i}`,
+    routeId: route.id,
+    originId,
+    destinationId,
+    shipClassId: route.shipClass,
+    routeTypeId: route.availableRouteTypes[0],
+    availableRouteTypes: route.availableRouteTypes,
+    departureDate: new Date(
+      Date.UTC(2801, 0, 1 + offset * route.frequencyDays),
+    ).toISOString(),
+    arrivalDate: new Date(
+      Date.UTC(
+        2801,
+        0,
+        1 + offset * route.frequencyDays + Math.round(2.2 / speed),
+      ),
+    ).toISOString(),
+    durationDays: Math.round(2.2 / speed),
+    distanceAU: 2.2,
+    orbitalWindowRating: [5, 4, 3][i],
+    lowestAvailablePrice: Math.round(
+      route.basePriceCredits * [0.8, 0.92, 1.0][i],
+    ),
+    availableBerths: Math.floor(Math.random() * 80) + 20,
+    crossesScatter: route.crossesScatter,
+    permitRequired: route.permitRequired ?? false,
+    departureDay: offset * route.frequencyDays,
+    priceBreakdown: {
+      baseFare: route.basePriceCredits,
+      routeTypeAdjustment: 0,
+      cabinClassAdjustment: 0,
+      orbitalWindowAdjustment: 0,
+      addOnsTotal: 0,
+      portFees: Math.round(route.basePriceCredits * 0.05),
+      loyaltyDiscount: 0,
+    },
+  }));
+};
+
+export const MOCK_USER = {
+  id: "mock-user-1",
+  email: "traveller@stellar.com",
+  firstName: "Alex",
+  lastName: "Voss",
+  loyaltyTier: "navigator",
+  loyaltyPoints: 8400,
+  faceVectorEnrolled: false,
+  createdAt: "2800-03-15T00:00:00Z",
+};
+
+export const MOCK_BOOKINGS = [
+  {
+    id: "mock-booking-1",
+    userId: "mock-user-1",
+    status: "confirmed",
+    originId: "aethon",
+    destinationId: "kalos",
+    shipClassId: "tethys",
+    routeTypeId: "gravity_assist",
+    cryoOptionId: "conscious",
+    cabinClassId: "orbit",
+    departureDate: "2801-02-14T00:00:00Z",
+    arrivalDate: "2801-03-26T00:00:00Z",
+    totalPrice: 1392,
+    isVoyageBond: false,
+    balanceDue: 0,
+    orbitalWindowRating: 4,
+    loyaltyPointsEarned: 1392,
+    passengers: [
+      {
+        firstName: "Alex",
+        lastName: "Voss",
+        isChild: false,
+        cabinBerth: "12B",
+      },
+    ],
+    addOnIds: ["radiation_shield"],
+    priceBreakdown: {
+      baseFare: 1200,
+      routeTypeAdjustment: -180,
+      cabinClassAdjustment: 0,
+      orbitalWindowAdjustment: 0,
+      addOnsTotal: 180,
+      portFees: 60,
+      loyaltyDiscount: 0,
+    },
+  },
+];

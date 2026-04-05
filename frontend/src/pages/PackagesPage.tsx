@@ -76,18 +76,30 @@ export default function PackagesPage() {
   const [modalItem, setModalItem] = useState<AddOnItem | null>(null);
   const [modalCategory, setModalCategory] = useState("");
 
-  useEffect(() => {
-    setCurrentStep("packages");
-  }, []);
-
   const { data: systemConfig, isLoading } = useQuery({
     queryKey: ["systemConfig"],
     queryFn: getSystemConfig,
     staleTime: Infinity,
   });
 
+  useEffect(() => {
+    if (!systemConfig) return;
+    const allItems = Object.values(systemConfig.addOns).flat() as AddOnItem[];
+    setSelected((prev) => {
+      const next = new Set(prev);
+      allItems.forEach((item) => {
+        if (getPrice(item) === 0) next.add(item.id);
+      });
+      return next;
+    });
+  }, [systemConfig]);
+
   function toggle(id: string) {
-    if (ALWAYS_INCLUDED.has(id)) return; // cannot deselect
+    const allItems = Object.values(
+      systemConfig?.addOns ?? {},
+    ).flat() as AddOnItem[];
+    const item = allItems.find((a) => a.id === id);
+    if (ALWAYS_INCLUDED.has(id) || getPrice(item!) === 0) return;
     setSelected((prev) => {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
@@ -148,7 +160,7 @@ export default function PackagesPage() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-void pt-16">
+      <div className="min-h-screen bg-void pt-16 relative">
         <div className="border-b border-white/5 bg-black/70 backdrop-blur-md sticky top-16 z-30">
           <div className="max-w-5xl mx-auto px-4 py-4">
             <BookingStepIndicator currentStep="packages" />
@@ -215,7 +227,8 @@ export default function PackagesPage() {
                     <div className="flex flex-col gap-2">
                       {visibleItems.map((item) => {
                         const available = isAvailable(item, categoryId);
-                        const isLocked = ALWAYS_INCLUDED.has(item.id);
+                        const isLocked =
+                          ALWAYS_INCLUDED.has(item.id) || getPrice(item) === 0;
                         const isSelected = selected.has(item.id);
                         const price = getPrice(item);
 
@@ -365,8 +378,10 @@ function AddOnRow({
   return (
     <motion.div
       variants={staggerItem}
+      onClick={available ? onInfo : undefined}
       className={cn(
         "flex items-center gap-4 px-4 py-3 rounded-xl border transition-all duration-200",
+        available && "cursor-pointer",
         !available && "opacity-30 pointer-events-none",
         selected && available
           ? "bg-surface-800/60 border-accent-600/30"
@@ -375,7 +390,10 @@ function AddOnRow({
     >
       {/* Checkbox / lock */}
       <button
-        onClick={locked ? undefined : onToggle}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!locked) onToggle();
+        }}
         disabled={locked || !available}
         className={cn(
           "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
@@ -434,7 +452,10 @@ function AddOnRow({
       {/* Select/deselect button */}
       {!locked && available && (
         <button
-          onClick={onToggle}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
           className={cn(
             "font-sans text-xs font-bold px-3 py-1.5 rounded-lg border transition-all duration-200 shrink-0",
             selected
