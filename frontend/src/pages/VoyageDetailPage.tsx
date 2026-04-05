@@ -205,10 +205,10 @@ export default function VoyageDetailPage() {
                 </div>
 
                 {/* Ship hero image */}
-                <ImagePlaceholder
-                  aspectRatio="21/9"
-                  label={`${voyage.shipClassId}-class vessel — exterior render`}
-                  className="w-full"
+                <img
+                  src={`/images/fleet/${voyage.shipClassId}/hero.jpg`}
+                  alt={voyage.shipClassId}
+                  className="w-full rounded-2xl"
                 />
 
                 {/* Quick stats */}

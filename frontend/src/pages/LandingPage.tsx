@@ -1,25 +1,21 @@
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { ArrowRight, Globe, Zap, Star, ChevronDown } from "lucide-react";
+import { AnimatedText, SectionReveal } from "@/components/common";
+import { Badge, Button, Card } from "@/components/ui";
 import {
+  fadeIn,
+  fadeUp,
+  heroFadeUp,
   heroLoom,
   heroSubtitle,
-  heroFadeUp,
-  fadeUp,
+  snapLeft,
   staggerContainer,
   staggerItem,
-  snapLeft,
-  fadeIn,
   viewportOnce,
 } from "@/lib/animations";
-import {
-  AnimatedText,
-  ImagePlaceholder,
-  SectionReveal,
-} from "@/components/common";
-import { Button, Badge, Card } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, ChevronDown, Globe, Star, Zap } from "lucide-react";
+import { useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface SearchState {
   originId: string;
@@ -507,10 +503,10 @@ export default function LandingPage() {
                 onClick={() => navigate("/planet/aethon")}
                 className="flex flex-col gap-0 h-full overflow-hidden"
               >
-                <ImagePlaceholder
-                  aspectRatio="21/9"
-                  label="Aethon — super-Earth city panorama"
-                  rounded="rounded-none"
+                <img
+                  src={`/images/planet/aethon/hero.jpg`}
+                  alt="Aethon — super-Earth city panorama"
+                  className="w-full h-full"
                 />
                 <div className="p-6 flex flex-col gap-3">
                   <div className="flex items-center justify-between">
@@ -559,10 +555,10 @@ export default function LandingPage() {
                     onClick={() => navigate(`/planet/${body.id}`)}
                     className="flex flex-col overflow-hidden h-full"
                   >
-                    <ImagePlaceholder
-                      aspectRatio="16/9"
-                      label={`${body.name} planetary surface imagery`}
-                      rounded="rounded-none"
+                    <img
+                      src={`/images/planet/${body.id}/hero.jpg`}
+                      alt={body.desc}
+                      className="w-full h-full"
                     />
                     <div className="p-4 flex flex-col gap-2">
                       <span className="label">{body.sub}</span>

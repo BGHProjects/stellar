@@ -64,6 +64,26 @@ const CABIN_LABELS: Record<string, string> = {
   helix: "Helix",
 };
 
+const ADDON_NAMES: Record<string, string> = {
+  radiation_shield: "Radiation Shield Insurance",
+  asteroid_deviation: "Asteroid Deviation Coverage",
+  emergency_evac: "Emergency Evacuation Policy",
+  journey_interrupt: "Journey Interruption Protection",
+  chefs_table: "Chef's Table Access",
+  cultural_cuisine: "Cultural Cuisine Weeks",
+  private_dining: "Private In-Cabin Dining",
+  zerog_spa: "Zero-G Spa Access",
+  observatory: "Stellar Observatory Sessions",
+  fitness_suite: "Fitness & Training Suite",
+  immersive_reality: "Immersive Reality Suite",
+  ship_library: "Ship Library & Archive",
+  live_performance: "Live Performance Schedule",
+  shore_excursion: "Shore Excursion",
+  arrival_transfer: "Private Arrival Transfer",
+  premium_cargo: "Premium Cargo Hold",
+  spacewalk: "Spacewalk Experience",
+};
+
 type FilterTab = "all" | "upcoming" | "completed" | "cancelled";
 
 export default function BookingsPage() {
@@ -636,6 +656,33 @@ function BookingDetailModal({
             ))}
           </div>
         </div>
+
+        <Divider />
+
+        {/* Add-ons */}
+        {booking.addOns && booking.addOns.length > 0 && (
+          <div className="flex flex-col gap-3">
+            <span className="label">Add-Ons</span>
+            <div className="flex flex-col gap-2">
+              {booking.addOns.map((addOn) => (
+                <div
+                  key={addOn.addOnId}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-surface-900/60 rounded-xl border border-white/6"
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
+                  <span className="font-sans text-sm text-white/70">
+                    {ADDON_NAMES[addOn.addOnId] ??
+                      addOn.addOnId
+                        .replace(/_/g, " ")
+                        .replace(/^\w/, (c) => c.toUpperCase())}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <Divider />
 
         {/* Price breakdown */}
         <div className="flex flex-col gap-3">

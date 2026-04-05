@@ -1190,11 +1190,12 @@ function PlanetSidePanel({
         {/* For visitable bodies — rich content */}
         {isVisitable && planetData && (
           <>
-            <ImagePlaceholder
-              aspectRatio="16/9"
-              label={planetData.imageSlots.hero}
-              rounded="rounded-none"
+            <img
+              src={`/images/planet/${planetData.id}/hero.jpg`}
+              alt={planetData.imageSlots.hero}
+              className="w-full"
             />
+
             <div className="p-5 flex flex-col gap-5">
               <p className="font-sans text-sm text-white/55 leading-relaxed">
                 {planetData.description}
