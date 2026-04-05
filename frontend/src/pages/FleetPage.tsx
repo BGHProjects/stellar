@@ -334,10 +334,10 @@ export default function FleetPage() {
                     }}
                     className="flex flex-col overflow-hidden h-full"
                   >
-                    <ImagePlaceholder
-                      aspectRatio="16/9"
-                      label={ship.imageSlots.exterior}
-                      rounded="rounded-none"
+                    <img
+                      src={`/images/fleet/${ship.id}/hero.jpg`}
+                      alt={ship.imageSlots.hero}
+                      className="w-full h-full"
                     />
                     <div className="p-5 flex flex-col gap-3 flex-1">
                       <div>
@@ -396,10 +396,9 @@ function ShipDetail({
         className="relative h-[55vh] min-h-[400px] overflow-hidden"
       >
         <motion.div style={{ y: heroY }} className="absolute inset-0">
-          <ImagePlaceholder
-            aspectRatio="21/9"
-            label={ship.imageSlots.hero}
-            rounded="rounded-none"
+          <img
+            src={`/images/fleet/${ship.id}/hero.jpg`}
+            alt={ship.imageSlots.hero}
             className="w-full h-full"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-void via-void/40 to-transparent" />
@@ -495,15 +494,17 @@ function ShipDetail({
               className="grid sm:grid-cols-2 gap-4"
             >
               <motion.div variants={staggerItem}>
-                <ImagePlaceholder
-                  aspectRatio="4/3"
-                  label={ship.imageSlots.interior}
+                <img
+                  src={`/images/fleet/${ship.id}/interior.jpg`}
+                  alt={ship.imageSlots.interior}
+                  className="w-full h-full rounded-2xl border border-white/25"
                 />
               </motion.div>
               <motion.div variants={staggerItem}>
-                <ImagePlaceholder
-                  aspectRatio="4/3"
-                  label={ship.imageSlots.detail}
+                <img
+                  src={`/images/fleet/${ship.id}/detail.jpg`}
+                  alt={ship.imageSlots.detail}
+                  className="w-full h-full rounded-2xl border border-white/25"
                 />
               </motion.div>
             </motion.div>

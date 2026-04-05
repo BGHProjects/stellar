@@ -385,7 +385,7 @@ function AddOnRow({
         !available && "opacity-30 pointer-events-none",
         selected && available
           ? "bg-surface-800/60 border-accent-600/30"
-          : "bg-surface-950/40 border-white/6 hover:border-white/12",
+          : "bg-surface-950/40 border-accent-600/15 hover:border-accent-600/40",
       )}
     >
       {/* Checkbox / lock */}
@@ -504,23 +504,22 @@ function AddOnInfoModal({
 
           <div className="flex flex-col gap-4 px-6 pt-5">
             {/* Name + price */}
-            <div className="flex items-start justify-between gap-4">
-              <h3 className="font-display text-display-md text-white">
-                {item.name}
-              </h3>
-              <div className="text-right shrink-0">
-                {isLocked ? (
-                  <Badge variant="accent">Included</Badge>
-                ) : price > 0 ? (
-                  <span className="font-display text-display-sm text-white">
-                    {formatCredits(price)}
-                  </span>
-                ) : (
-                  <span className="font-sans text-sm text-white/40">
-                    Included
-                  </span>
-                )}
-              </div>
+
+            <h3 className="font-display text-display-sm text-white">
+              {item.name}
+            </h3>
+            <div className="text-left shrink-0">
+              {isLocked ? (
+                <Badge variant="accent">Included</Badge>
+              ) : price > 0 ? (
+                <span className="font-display text-display-sm text-white">
+                  {formatCredits(price)}
+                </span>
+              ) : (
+                <span className="font-sans text-sm text-white/40">
+                  Included
+                </span>
+              )}
             </div>
 
             {/* Description */}

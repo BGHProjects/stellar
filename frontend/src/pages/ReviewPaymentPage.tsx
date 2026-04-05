@@ -358,7 +358,7 @@ export default function ReviewPaymentPage() {
                           "text-left p-3 rounded-xl border transition-all duration-200",
                           paymentMethod === opt.id
                             ? "bg-surface-800 border-accent-500/50"
-                            : "border-white/8 hover:border-white/20",
+                            : "border-accent-600/20 hover:border-accent-600/50",
                         )}
                       >
                         <p className="font-sans text-sm text-white font-bold">

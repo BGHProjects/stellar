@@ -312,7 +312,7 @@ export default function VoyageDetailPage() {
                           "disabled:opacity-40 disabled:cursor-not-allowed",
                           isSelected
                             ? "bg-surface-800 border-accent-500/60 shadow-glow-accent"
-                            : "bg-surface-950/50 border-white/8 hover:border-white/20",
+                            : "bg-surface-950/50 border-accent-600/20 hover:border-accent-600/50",
                         )}
                       >
                         <div className="flex items-center justify-between">
@@ -418,7 +418,7 @@ export default function VoyageDetailPage() {
                               (currentLeg as { cryoIntervals?: number })
                                 ?.cryoIntervals === n
                                 ? "bg-accent-600/30 border-accent-500/60 text-white"
-                                : "bg-surface-800 border-white/8 text-white/40 hover:text-white hover:border-white/20",
+                                : "bg-surface-800 border-accent-600/20 text-white/40 hover:text-white hover:border-accent-600/50",
                             )}
                           >
                             {n}
@@ -464,7 +464,7 @@ export default function VoyageDetailPage() {
                           "disabled:opacity-30 disabled:cursor-not-allowed",
                           isSelected
                             ? "border-accent-500/60 shadow-glow-accent"
-                            : "border-white/8 hover:border-white/20",
+                            : "border-accent-600/20 hover:border-accent-600/50",
                         )}
                       >
                         {/* Cabin image placeholder */}

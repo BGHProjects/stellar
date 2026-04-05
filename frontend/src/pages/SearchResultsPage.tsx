@@ -2,7 +2,6 @@ import { PageTransition } from "@/components/common";
 import { BookingStepIndicator } from "@/components/layout";
 import { Badge, Button, Divider, OrbitalWindowStars } from "@/components/ui";
 import {
-  cardHover,
   fadeIn,
   fadeUp,
   staggerContainer,
@@ -24,7 +23,6 @@ import {
   AlertTriangle,
   ArrowRight,
   ChevronDown,
-  Clock,
   Globe,
   Ruler,
   SlidersHorizontal,
@@ -449,182 +447,114 @@ function VoyageCard({
   const [expanded, setExpanded] = useState(false);
   const routeMeta = ROUTE_TYPE_META[voyage.routeTypeId];
   const totalPax = adults + children;
-  const destTint =
-    DESTINATION_TINT[voyage.destinationId] ?? "from-surface-900/80";
   const originName = BODY_NAMES[voyage.originId] ?? voyage.originId;
   const destName = BODY_NAMES[voyage.destinationId] ?? voyage.destinationId;
 
   return (
     <motion.div variants={staggerItemUp}>
       <motion.div
-        whileHover={cardHover}
-        className="relative overflow-hidden rounded-2xl border border-white/8 hover:border-accent-600/40 transition-colors duration-300 cursor-pointer group"
+        whileHover={{ scale: 1.005, borderColor: "rgba(124,58,237,0.4)" }}
+        className="rounded-2xl border border-accent-600/20 bg-surface-950/60 cursor-pointer transition-colors duration-200"
         onClick={onSelect}
       >
-        {/* Background: destination image placeholder fading left to right */}
-        <div className="absolute inset-0 flex">
-          {/* Left content area — solid dark */}
-          <div className="w-full lg:w-[58%] shrink-0 bg-surface-950/95" />
-          {/* Right image area — placeholder with gradient overlay */}
-          <div className="hidden lg:block flex-1 relative">
-            {/* Image placeholder */}
-            <div className="absolute inset-0 img-placeholder" />
-            {/* Gradient: left edge fully opaque dark surface colour, fading right to transparent */}
-            <div
-              className={cn(
-                "absolute inset-0 bg-gradient-to-r",
-                destTint,
-                "to-transparent",
+        <div className="p-5 flex flex-col gap-4">
+          {/* Top row — ship/route meta + window rating */}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 flex-wrap">
+              <span className="font-display text-display-sm text-white capitalize">
+                {voyage.shipClassId}-class
+              </span>
+              {routeMeta && (
+                <div
+                  className={cn(
+                    "flex items-center gap-1 font-sans text-xs font-bold",
+                    routeMeta.color,
+                  )}
+                >
+                  {routeMeta.icon}
+                  <span>{routeMeta.label}</span>
+                </div>
               )}
-            />
-            {/* Left-side hard fade so text area is clean */}
-            <div
-              className="absolute inset-0 bg-gradient-to-r from-surface-950/95 via-transparent to-transparent"
-              style={{ width: "60%" }}
+              {voyage.crossesScatter && (
+                <Badge variant="warning" size="sm">
+                  Scatter
+                </Badge>
+              )}
+              {voyage.permitRequired && (
+                <Badge variant="danger" size="sm">
+                  Permit req.
+                </Badge>
+              )}
+            </div>
+            <OrbitalWindowStars
+              rating={voyage.orbitalWindowRating}
+              showLabel
+              size="sm"
             />
           </div>
-        </div>
 
-        {/* Content — sits on top of background */}
-        <div className="relative z-10 p-6 flex flex-col gap-5">
-          {/* Row 1 — ship class + tags + window rating */}
-          <div className="flex items-start justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-surface-800/80 border border-white/8 flex items-center justify-center shrink-0">
-                <svg
-                  className="w-5 h-5 text-white/30"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                >
-                  <path d="M3.5 8.5 12 3l8.5 5.5v7L12 21l-8.5-5.5v-7z" />
-                </svg>
-              </div>
-              <div>
-                <p className="font-display text-display-sm text-white capitalize leading-tight">
-                  {voyage.shipClassId}-class
-                </p>
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  {routeMeta && (
-                    <div
-                      className={cn(
-                        "flex items-center gap-1 font-sans text-xs font-bold",
-                        routeMeta.color,
-                      )}
-                    >
-                      {routeMeta.icon}
-                      <span>{routeMeta.label}</span>
-                    </div>
-                  )}
-                  {voyage.crossesScatter && (
-                    <Badge variant="warning">Scatter</Badge>
-                  )}
-                  {voyage.permitRequired && (
-                    <Badge variant="danger">Permit req.</Badge>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-1 shrink-0">
-              <OrbitalWindowStars
-                rating={voyage.orbitalWindowRating}
-                showLabel
-                size="md"
-              />
-              <span className="font-sans text-[10px] text-white/25 uppercase tracking-widest">
-                orbital window
+          {/* Journey row — horizontal origin → duration → destination */}
+          <div className="flex items-center gap-3">
+            {/* Origin */}
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <span className="font-display text-display-sm text-white">
+                {originName}
+              </span>
+              <span className="font-sans text-xs text-white/40">
+                {formatDate(voyage.departureDate)}
+              </span>
+              <span className="font-sans text-[10px] text-white/25 truncate">
+                {voyage.originId.charAt(0).toUpperCase() +
+                  voyage.originId.slice(1)}{" "}
+                Orbital Ring
               </span>
             </div>
-          </div>
 
-          {/* Row 2 — Vertical journey info + port details */}
-          <div className="flex flex-col gap-3 lg:max-w-[55%]">
-            {/* Origin */}
-            <div className="flex items-start gap-3">
-              <div className="flex flex-col items-center gap-1 pt-1">
-                <div className="w-2 h-2 rounded-full bg-accent-400" />
-                <div className="w-px flex-1 bg-white/10 min-h-[32px]" />
+            {/* Duration + distance — centre column */}
+            <div className="flex flex-col items-center gap-1 flex-1 px-2">
+              <div className="flex items-center gap-1.5 w-full">
+                <div className="h-px flex-1 bg-white/10" />
+                <ArrowRight className="w-3 h-3 text-white/20 shrink-0" />
+                <div className="h-px flex-1 bg-white/10" />
               </div>
-              <div className="flex flex-col gap-0.5 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-display text-display-sm text-white">
-                    {originName}
-                  </span>
-                  <span className="font-sans text-xs text-white/30">
-                    {formatDate(voyage.departureDate)}
-                  </span>
-                </div>
-                <span className="font-sans text-xs text-white/35">
-                  Departure ·{" "}
-                  {voyage.originId.charAt(0).toUpperCase() +
-                    voyage.originId.slice(1)}{" "}
-                  Orbital Ring
-                </span>
-              </div>
-            </div>
-
-            {/* Duration pill */}
-            <div className="flex items-center gap-2 pl-5">
-              <Clock className="w-3 h-3 text-white/20 shrink-0" />
-              <span className="font-sans text-xs text-white/40">
+              <span className="font-sans text-xs text-white/40 whitespace-nowrap">
                 {formatDuration(voyage.durationDays)}
               </span>
-              <span className="text-white/15">·</span>
-              <Ruler className="w-3 h-3 text-white/20 shrink-0" />
-              <span className="font-sans text-xs text-white/40">
+              <span className="font-sans text-[10px] text-white/25 whitespace-nowrap">
                 {voyage.distanceAU.toFixed(2)} AU
               </span>
             </div>
 
             {/* Destination */}
-            <div className="flex items-start gap-3">
-              <div className="flex flex-col items-center pt-1">
-                <div className="w-2 h-2 rounded-full bg-white/40" />
-              </div>
-              <div className="flex flex-col gap-0.5 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-display text-display-sm text-white">
-                    {destName}
-                  </span>
-                  <span className="font-sans text-xs text-white/30">
-                    {formatDate(voyage.arrivalDate)}
-                  </span>
-                </div>
-                <span className="font-sans text-xs text-white/35">
-                  Arrival ·{" "}
-                  {voyage.destinationId.charAt(0).toUpperCase() +
-                    voyage.destinationId.slice(1)}{" "}
-                  Deep Port
-                </span>
-              </div>
+            <div className="flex flex-col gap-0.5 min-w-0 text-right">
+              <span className="font-display text-display-sm text-white">
+                {destName}
+              </span>
+              <span className="font-sans text-xs text-white/40">
+                {formatDate(voyage.arrivalDate)}
+              </span>
+              <span className="font-sans text-[10px] text-white/25 truncate">
+                {voyage.destinationId.charAt(0).toUpperCase() +
+                  voyage.destinationId.slice(1)}{" "}
+                Deep Port
+              </span>
             </div>
-          </div>
-
-          {/* Row 3 — availability */}
-          <div className="font-sans text-xs text-white/25">
-            {voyage.availableBerths} berths available
           </div>
 
           <Divider />
 
-          {/* Row 4 — Price + CTA */}
-          <div className="flex items-end justify-between gap-4 flex-wrap">
-            <div>
-              <p className="label mb-1">From</p>
-              <div className="flex items-baseline gap-1.5">
-                <span className="font-display text-display-md text-white">
-                  {formatCredits(voyage.lowestAvailablePrice)}
-                </span>
-                <span className="font-sans text-xs text-white/30">
-                  / person
-                </span>
-              </div>
+          {/* Bottom row — berths + price + CTA */}
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display text-display-md text-white">
+                {formatCredits(voyage.lowestAvailablePrice)}
+              </span>
+              <span className="font-sans text-xs text-white/30">/ person</span>
               {totalPax > 1 && (
-                <p className="font-sans text-xs text-white/30 mt-0.5">
-                  est. {formatCredits(voyage.lowestAvailablePrice * totalPax)}{" "}
+                <span className="font-sans text-xs text-white/25 ml-1">
+                  · est. {formatCredits(voyage.lowestAvailablePrice * totalPax)}{" "}
                   total
-                </p>
+                </span>
               )}
             </div>
 
@@ -637,7 +567,7 @@ function VoyageCard({
                   onClick={() => setExpanded((e) => !e)}
                   className="flex items-center gap-1 font-sans text-xs text-white/30 hover:text-white/60 transition-colors"
                 >
-                  {voyage.availableRouteTypes.length} route options
+                  {voyage.availableRouteTypes.length} route types
                   <ChevronDown
                     className={cn(
                       "w-3 h-3 transition-transform duration-200",
@@ -646,7 +576,6 @@ function VoyageCard({
                   />
                 </button>
               )}
-              {/* Select button — vibrant hover/click animation */}
               <motion.button
                 whileHover={{
                   scale: 1.06,
@@ -662,7 +591,7 @@ function VoyageCard({
             </div>
           </div>
 
-          {/* Expandable route type breakdown */}
+          {/* Expandable route types */}
           <AnimatePresence>
             {expanded && (
               <motion.div
@@ -681,7 +610,7 @@ function VoyageCard({
                     return (
                       <div
                         key={rtId}
-                        className="flex flex-col gap-1.5 p-3 bg-surface-900/60 rounded-xl border border-white/5"
+                        className="flex flex-col gap-1 p-3 bg-surface-900/60 rounded-xl border border-white/5"
                       >
                         <span
                           className={cn(

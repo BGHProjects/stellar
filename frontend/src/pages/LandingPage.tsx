@@ -223,7 +223,7 @@ export default function LandingPage() {
             {/* Quick Search form */}
             {mode === "search" && (
               <motion.form
-                ref={searchRef as React.RefObject<HTMLFormElement>}
+                ref={searchRef as any}
                 key="search-form"
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -436,42 +436,44 @@ export default function LandingPage() {
                       `/search?originId=${route.originId}&destinationId=${route.destinationId}&adults=1&children=0`,
                     )
                   }
-                  className="flex flex-col overflow-hidden h-full"
+                  className="flex flex-col gap-5 p-6 h-full"
                 >
-                  <ImagePlaceholder
-                    aspectRatio="16/9"
-                    label={`${route.from} → ${route.to} route imagery`}
-                    rounded="rounded-none"
-                    className="shrink-0"
-                  />
-                  <div className="flex flex-col gap-4 p-6 flex-1">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex flex-col gap-1">
-                        <p className="label">{route.from}</p>
-                        <h3 className="font-display text-display-sm text-white">
-                          {route.to}
-                        </h3>
-                      </div>
-                      <Badge variant={route.tagVariant}>{route.tag}</Badge>
+                  {/* Route header */}
+                  <div className="flex items-start justify-between gap-3">
+                    <Badge variant={route.tagVariant}>{route.tag}</Badge>
+                    <span className="font-sans text-xs text-white/30">
+                      {route.duration}
+                    </span>
+                  </div>
+
+                  {/* Origin → Destination */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="label">{route.from}</span>
+                      <span className="font-display text-display-sm text-white">
+                        {route.from}
+                      </span>
                     </div>
-                    <p className="font-sans text-sm text-white/50 leading-relaxed flex-1">
-                      {route.description}
-                    </p>
-                    <div className="divider" />
-                    <div className="flex items-end justify-between">
-                      <div className="flex flex-col gap-0.5">
-                        <span className="label">Duration</span>
-                        <span className="font-sans text-sm text-white/70">
-                          {route.duration}
-                        </span>
-                      </div>
-                      <div className="flex flex-col items-end gap-0.5">
-                        <span className="label">From</span>
-                        <span className="font-display text-display-sm text-white">
-                          {route.fromPrice}
-                        </span>
-                      </div>
+                    <ArrowRight className="w-4 h-4 text-white/20 shrink-0 mx-1" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="label">Destination</span>
+                      <span className="font-display text-display-sm text-white">
+                        {route.to}
+                      </span>
                     </div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="font-sans text-sm text-white/45 leading-relaxed flex-1">
+                    {route.description}
+                  </p>
+
+                  {/* Price */}
+                  <div className="flex items-center justify-between pt-3 border-t border-white/6">
+                    <span className="label">From</span>
+                    <span className="font-display text-display-sm text-white">
+                      {route.fromPrice}
+                    </span>
                   </div>
                 </Card>
               </motion.div>

@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { X } from "lucide-react";
+import { createPortal } from "react-dom";
 
 // -----------------------------------------------------------------
 // AnimatedText — letter-by-letter animation for titles
@@ -182,10 +183,10 @@ export function Modal({
     xl: "max-w-4xl",
   }[size];
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Overlay */}
           <motion.div
             variants={modalOverlay}
@@ -195,8 +196,7 @@ export function Modal({
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={onClose}
           />
-
-          {/* Modal container — circle expand */}
+          {/* Modal container */}
           <motion.div
             variants={modalExpand}
             initial="hidden"
@@ -208,14 +208,12 @@ export function Modal({
               className,
             )}
           >
-            {/* Modal content — fades in after container expands */}
             <motion.div
               variants={modalContent}
               initial="hidden"
               animate="visible"
               exit="exit"
             >
-              {/* Header */}
               {title && (
                 <div className="flex items-center justify-between px-6 py-4 border-b border-white/8">
                   <h3 className="font-display text-display-sm text-white">
@@ -229,8 +227,6 @@ export function Modal({
                   </button>
                 </div>
               )}
-
-              {/* Close button if no title */}
               {!title && (
                 <button
                   onClick={onClose}
@@ -239,14 +235,13 @@ export function Modal({
                   <X className="w-5 h-5" />
                 </button>
               )}
-
-              {/* Content */}
               <div className={cn(!title && "pt-8")}>{children}</div>
             </motion.div>
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   );
 }
 

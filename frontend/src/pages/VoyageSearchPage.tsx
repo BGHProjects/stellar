@@ -15,18 +15,6 @@ const VISITABLE_BODIES = [
   { id: "calyx", name: "Calyx", sub: "Outer System", restricted: false },
   { id: "lun", name: "Lun", sub: "Calyx System", restricted: false },
   { id: "vael", name: "Vael", sub: "Calyx System", restricted: false },
-  {
-    id: "l4_station",
-    name: "L4 Station",
-    sub: "Lagrange Point",
-    restricted: false,
-  },
-  {
-    id: "l5_station",
-    name: "L5 Station",
-    sub: "Lagrange Point",
-    restricted: false,
-  },
 ];
 
 // Colour accent per body — subtle tint on selection
@@ -191,7 +179,7 @@ export default function VoyageSearchPage() {
                               BODY_ACCENT[body.id] ??
                                 "border-accent-500/40 bg-accent-500/8",
                             )
-                          : "border-white/8 bg-surface-900/40 hover:border-white/20 hover:bg-surface-800/40",
+                          : "border-accent-600/20 bg-surface-900/40 hover:border-accent-600/50 hover:bg-surface-800/40",
                       )}
                     >
                       {/* Planet dot */}
