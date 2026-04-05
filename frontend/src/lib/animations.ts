@@ -43,24 +43,24 @@ export const loomUp: Variants = {
 // The headline needs to feel like it arrives from deep space.
 // -----------------------------------------------------------------
 export const heroLoom: Variants = {
-  hidden: { opacity: 0, y: 120, scale: 0.88, filter: "blur(16px)" },
+  hidden: { opacity: 0, y: 160, scale: 0.84, filter: "blur(24px)" },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     filter: "blur(0px)",
-    transition: { duration: 2.0, ease: ease.gravity },
+    transition: { duration: 2.8, ease: ease.gravity },
   },
 };
 
 // Landing subtitle — rises after the headline
 export const heroSubtitle: Variants = {
-  hidden: { opacity: 0, y: 32, filter: "blur(6px)" },
+  hidden: { opacity: 0, y: 48, filter: "blur(6px)" },
   visible: {
     opacity: 1,
     y: 0,
     filter: "blur(0px)",
-    transition: { duration: 1.3, ease: ease.gravity, delay: 0.55 },
+    transition: { duration: 1.8, ease: ease.gravity, delay: 1.1 },
   },
 };
 
@@ -70,7 +70,7 @@ export const heroFadeUp: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.9, ease: ease.reveal },
+    transition: { duration: 1.4, ease: ease.reveal, delay: 1.6 },
   },
 };
 

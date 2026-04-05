@@ -411,18 +411,29 @@ export default function ReviewPaymentPage() {
                     </div>
                   )}
 
-                  <Button
-                    onClick={handleConfirm}
-                    disabled={!agreedToTerms || mutation.isPending}
-                    loading={mutation.isPending}
-                    size="lg"
-                    className="w-full"
-                  >
-                    {mutation.isPending ? "Confirming..." : "Confirm Voyage"}
-                    {!mutation.isPending && (
-                      <ChevronRight className="w-4 h-4" />
-                    )}
-                  </Button>
+                  <div className="flex flex-col items-center justify-between pt-4 border-t border-white/5 space-y-4">
+                    <Button
+                      onClick={handleConfirm}
+                      disabled={!agreedToTerms || mutation.isPending}
+                      loading={mutation.isPending}
+                      size="lg"
+                      className="w-full"
+                    >
+                      {mutation.isPending ? "Confirming..." : "Confirm Voyage"}
+                      {!mutation.isPending && (
+                        <ChevronRight className="w-4 h-4" />
+                      )}
+                    </Button>
+
+                    <Button
+                      onClick={() => navigate(-1)}
+                      variant="ghost"
+                      size="lg"
+                      className="w-full text-xs"
+                    >
+                      ← Back to passengers
+                    </Button>
+                  </div>
 
                   <div className="flex items-center justify-center gap-1.5 text-white/20">
                     <Shield className="w-3.5 h-3.5" />

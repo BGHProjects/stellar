@@ -1,35 +1,61 @@
+import { ImagePlaceholder, MobileGate } from "@/components/common";
+import { Badge, Button, Divider } from "@/components/ui";
+import { fadeIn, sidePanelEnter } from "@/lib/animations";
+import { getSystemConfig } from "@/lib/api";
+import { getPlanetData } from "@/lib/planetData";
+import { cn } from "@/lib/utils";
 import {
-  ImagePlaceholder,
-  MobileGate,
-  PageTransition,
-} from "@/components/common";
-import {
-  Badge,
-  Button,
-  Divider,
-  OrbitalWindowStars,
-  Spinner,
-} from "@/components/ui";
-import { fadeIn, sidePanelEnter, starMapEnter } from "@/lib/animations";
-import { getClosestApproach, getSystemConfig } from "@/lib/api";
-import {
-  position as orbitalPosition,
-  paramsFromBody,
-  today,
-} from "@/lib/orbital";
-import { getAllPlanetData, getPlanetData } from "@/lib/planetData";
-import { cn, formatDate } from "@/lib/utils";
-import { Html, Line, OrbitControls, Stars } from "@react-three/drei";
-import { Canvas, useFrame } from "@react-three/fiber";
+  Html,
+  Line,
+  OrbitControls,
+  shaderMaterial,
+  Stars,
+} from "@react-three/drei";
+import { Canvas, extend, useFrame, useThree } from "@react-three/fiber";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, ChevronRight, Globe, Info, X } from "lucide-react";
-import { Suspense, useRef, useState } from "react";
+import {
+  ArrowRight,
+  ChevronRight,
+  Clock,
+  FastForward,
+  HelpCircle,
+  Info,
+  List,
+  Pause,
+  Play,
+  X,
+} from "lucide-react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as THREE from "three";
 
-// System.json body IDs for visitable destinations
-const VISITABLE_IDS = [
+// ─────────────────────────────────────────────────────────────────
+// Constants
+// ─────────────────────────────────────────────────────────────────
+
+const AU_SCALE = 18; // 1 AU → 18 scene units
+const EPOCH_DAY = 0; // day 0 = simulation epoch
+
+// All bodies that exist in the system (including non-visitable)
+const ALL_BODY_IDS = [
+  "solara_prime",
+  "solara_minor",
+  "serrath",
+  "aethon",
+  "vareth",
+  "drath",
+  "calyx",
+  "kalos",
+  "thal",
+  "mira",
+  "lun",
+  "vael",
+  "l4_station",
+  "l5_station",
+];
+
+const VISITABLE_IDS = new Set([
   "aethon",
   "kalos",
   "thal",
@@ -37,189 +63,492 @@ const VISITABLE_IDS = [
   "calyx",
   "lun",
   "vael",
-];
+  "l4_station",
+  "l5_station",
+]);
+const STAR_IDS = new Set(["solara_prime", "solara_minor"]);
 
-// Scale factor — orbital radii are in AU, we convert to scene units
-const AU_SCALE = 18;
-
-// Body render sizes in scene units
+// Sizes in scene units
 const BODY_SIZES: Record<string, number> = {
+  solara_prime: 1.4,
+  solara_minor: 0.9,
+  serrath: 0.16,
   aethon: 0.55,
+  vareth: 0.9,
+  drath: 0.6,
+  calyx: 0.38,
   kalos: 0.22,
   thal: 0.18,
   mira: 0.16,
-  calyx: 0.35,
   lun: 0.12,
   vael: 0.1,
-  vareth: 0.8,
-  serrath: 0.14,
-  drath: 0.55,
-  solara_prime: 1.2,
-  solara_minor: 0.7,
+  l4_station: 0.08,
+  l5_station: 0.08,
 };
 
-// Body render colours
+// Colours — each body gets a distinct hue
 const BODY_COLOURS: Record<string, string> = {
-  aethon: "#4A90D9",
-  kalos: "#9B7653",
-  thal: "#B45309",
-  mira: "#BAE6FD",
-  calyx: "#BAE6FD",
-  lun: "#78716C",
-  vael: "#E2E8F0",
-  vareth: "#C2410C",
-  serrath: "#8B6355",
-  drath: "#94A3B8",
   solara_prime: "#FFF4C2",
   solara_minor: "#FFB347",
+  serrath: "#8B6355",
+  aethon: "#4A90D9",
+  vareth: "#C2410C",
+  drath: "#94A3B8",
+  calyx: "#93C5FD",
+  kalos: "#9B7653",
+  thal: "#F97316",
+  mira: "#BAE6FD",
+  lun: "#78716C",
+  vael: "#E2E8F0",
+  l4_station: "#a78bfa",
+  l5_station: "#a78bfa",
 };
 
+// Emissive intensity — stars glow, others are lit
+const EMISSIVE: Record<string, number> = {
+  solara_prime: 1.0,
+  solara_minor: 1.0,
+  default: 0.0,
+};
+
+// Human-readable names
+const BODY_NAMES: Record<string, string> = {
+  solara_prime: "Solara Prime",
+  solara_minor: "Solara Minor",
+  serrath: "Serrath",
+  aethon: "Aethon",
+  vareth: "Vareth",
+  drath: "Drath",
+  calyx: "Calyx",
+  kalos: "Kalos",
+  thal: "Thal",
+  mira: "Mira",
+  lun: "Lun",
+  vael: "Vael",
+  l4_station: "L4 Station",
+  l5_station: "L5 Station",
+};
+
+// Body type labels for the body list panel
+const BODY_TYPE: Record<string, string> = {
+  solara_prime: "Star",
+  solara_minor: "Star",
+  serrath: "Rocky Planet",
+  aethon: "Super-Earth",
+  vareth: "Gas Giant",
+  drath: "Gas Giant",
+  calyx: "Ice Planet",
+  kalos: "Moon of Vareth",
+  thal: "Moon of Vareth",
+  mira: "Moon of Vareth",
+  lun: "Moon of Calyx",
+  vael: "Moon of Calyx",
+  l4_station: "Lagrange Station",
+  l5_station: "Lagrange Station",
+};
+
+// Approximate orbital radii (AU) for sorting in the body list
+const BODY_SORT_RADIUS: Record<string, number> = {
+  solara_prime: 0,
+  solara_minor: 0.08,
+  serrath: 0.6,
+  aethon: 1.1,
+  vareth: 3.2,
+  kalos: 3.2,
+  thal: 3.2,
+  mira: 3.2,
+  calyx: 5.8,
+  lun: 5.8,
+  vael: 5.8,
+  drath: 9.4,
+  l4_station: 0.08,
+  l5_station: 0.08,
+};
+
+// Moon-level bodies — hide label until user zooms in past threshold
+const MOON_IDS = new Set([
+  "kalos",
+  "thal",
+  "mira",
+  "lun",
+  "vael",
+  "l4_station",
+  "l5_station",
+  "solara_minor",
+]);
+const LABEL_SHOW_DISTANCE = 40; // scene units — hide moon labels beyond this camera distance
+
 // ─────────────────────────────────────────────────────────────────
-// Individual orbital body mesh
+// Procedural planet shader — gives each body a simple surface texture
+// via noise-based fragment shader so they don't look like flat balls.
+// ─────────────────────────────────────────────────────────────────
+
+const PlanetShaderMaterial = shaderMaterial(
+  {
+    uColor: new THREE.Color("#4A90D9"),
+    uTime: 0.0,
+    uEmissive: 0.0,
+    uSelected: 0.0,
+    uHovered: 0.0,
+  },
+  // Vertex shader
+  `
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  void main() {
+    vNormal   = normalize(normalMatrix * normal);
+    vPosition = position;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+  `,
+  // Fragment shader — simple hash noise to create surface variation
+  `
+  uniform vec3  uColor;
+  uniform float uTime;
+  uniform float uEmissive;
+  uniform float uSelected;
+  uniform float uHovered;
+  varying vec3  vNormal;
+  varying vec3  vPosition;
+
+  float hash(vec3 p) {
+    p = fract(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+  }
+
+  float noise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(
+      mix(mix(hash(i), hash(i+vec3(1,0,0)), f.x),
+          mix(hash(i+vec3(0,1,0)), hash(i+vec3(1,1,0)), f.x), f.y),
+      mix(mix(hash(i+vec3(0,0,1)), hash(i+vec3(1,0,1)), f.x),
+          mix(hash(i+vec3(0,1,1)), hash(i+vec3(1,1,1)), f.x), f.y), f.z
+    );
+  }
+
+  void main() {
+    // Directional light from star position
+    vec3 lightDir = normalize(vec3(-1.0, 0.5, 1.0));
+    float diff = max(dot(vNormal, lightDir), 0.0);
+    float ambient = 0.15;
+
+    // Surface noise — two octaves for detail
+    vec3 rotPos = vPosition + vec3(uTime * 0.03, 0.0, 0.0);
+    float n1 = noise(rotPos * 3.0);
+    float n2 = noise(rotPos * 7.0 + 1.7);
+    float surface = n1 * 0.7 + n2 * 0.3;
+
+    // Mix base colour with slightly lighter/darker patches
+    vec3 col = mix(uColor * 0.7, uColor * 1.3, surface);
+    col = col * (ambient + diff * 0.85);
+
+    // Emissive glow for stars
+    col += uColor * uEmissive * 0.8;
+
+    // Hover: brighten overall
+    col = mix(col, col * 1.4, uHovered * 0.5);
+
+    // Selection: tint slightly cyan-white
+    col = mix(col, col + vec3(0.1, 0.12, 0.2), uSelected * 0.6);
+
+    // Rim lighting — atmospheric glow at silhouette
+    float rim = 1.0 - max(dot(vNormal, vec3(0.0, 0.0, 1.0)), 0.0);
+    rim = pow(rim, 3.0);
+    col += uColor * rim * (0.3 + uSelected * 0.4 + uHovered * 0.2);
+
+    gl_FragColor = vec4(col, 1.0);
+  }
+  `,
+);
+
+extend({ PlanetShaderMaterial });
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      planetShaderMaterial: any;
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Camera controller — smooth pan/zoom to selected body
+// ─────────────────────────────────────────────────────────────────
+
+function CameraController({
+  targetPos,
+  active,
+}: {
+  targetPos: THREE.Vector3 | null;
+  active: boolean;
+}) {
+  const { camera } = useThree();
+  const targetRef = useRef<THREE.Vector3 | null>(null);
+  const lookRef = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
+
+  useEffect(() => {
+    if (targetPos && active) {
+      targetRef.current = targetPos.clone();
+    }
+  }, [targetPos, active]);
+
+  useFrame((_, delta) => {
+    if (!targetRef.current) return;
+
+    const target = targetRef.current;
+    const offset = new THREE.Vector3(0, 6, 10); // camera offset from body
+    const desired = target.clone().add(offset);
+
+    camera.position.lerp(desired, delta * 1.8);
+    lookRef.current.lerp(target, delta * 2.5);
+    camera.lookAt(lookRef.current);
+
+    // Stop animating when close enough
+    if (camera.position.distanceTo(desired) < 0.1) {
+      targetRef.current = null;
+    }
+  });
+
+  return null;
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Individual body mesh
 // ─────────────────────────────────────────────────────────────────
 
 interface BodyMeshProps {
-  bodyConfig: ReturnType<typeof getAllPlanetData>[0] & {
-    orbitalRadius?: number;
-    period?: number;
-    eccentricity?: number;
-    startPhase?: number;
-    parent?: string;
-    id: string;
-    renderColor?: string;
-    renderRadius?: number;
-  };
-  systemBodies: Record<string, { x: number; y: number }>;
-  simDay: number;
+  id: string;
+  position: { x: number; y: number };
   selected: boolean;
+  hovered: boolean;
   onClick: () => void;
-  isVisitable: boolean;
+  onHover: (h: boolean) => void;
+  simTime: number;
+  cameraDistance: number;
 }
 
 function BodyMesh({
-  bodyConfig,
-  systemBodies,
-  simDay,
+  id,
+  position,
   selected,
+  hovered,
   onClick,
-  isVisitable,
+  onHover,
+  simTime,
+  cameraDistance,
 }: BodyMeshProps) {
+  const matRef = useRef<any>(null);
   const meshRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
+  const ringRef = useRef<THREE.Mesh>(null);
 
-  const pos = systemBodies[bodyConfig.id] ?? { x: 0, y: 0 };
-  const x = pos.x * AU_SCALE;
-  const z = pos.y * AU_SCALE;
-  const size = BODY_SIZES[bodyConfig.id] ?? 0.2;
-  const color = BODY_COLOURS[bodyConfig.id] ?? "#888888";
+  const x = position.x * AU_SCALE;
+  const z = position.y * AU_SCALE;
+  const size = BODY_SIZES[id] ?? 0.2;
+  const col = new THREE.Color(BODY_COLOURS[id] ?? "#888888");
+  const isVisitable = VISITABLE_IDS.has(id);
+  const isStar = STAR_IDS.has(id);
+  const isMoon = MOON_IDS.has(id);
+  const isStation = id.endsWith("_station");
 
-  useFrame((state) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y += 0.003;
+  // Show label based on camera distance threshold for moons
+  const showLabel = !isMoon || cameraDistance < LABEL_SHOW_DISTANCE;
+
+  useFrame((state, delta) => {
+    if (matRef.current) {
+      matRef.current.uTime += delta;
+      matRef.current.uSelected = selected ? 1.0 : 0.0;
+      matRef.current.uHovered = hovered ? 1.0 : 0.0;
+      matRef.current.uEmissive = EMISSIVE[id] ?? 0.0;
     }
-    if (glowRef.current && selected) {
-      glowRef.current.scale.setScalar(
-        1 + Math.sin(state.clock.elapsedTime * 2) * 0.08,
-      );
+    // Slow self-rotation
+    if (meshRef.current && !isStar) {
+      meshRef.current.rotation.y += delta * 0.08;
+    }
+    // Pulse selection ring
+    if (ringRef.current && selected) {
+      const s = 1 + Math.sin(state.clock.elapsedTime * 2.5) * 0.06;
+      ringRef.current.scale.setScalar(s);
     }
   });
 
   return (
-    <group position={[x, 0, z]} onClick={onClick}>
-      {/* Glow sphere (selected state) */}
-      {selected && (
-        <mesh ref={glowRef}>
-          <sphereGeometry args={[size * 2.2, 16, 16]} />
-          <meshBasicMaterial color={color} transparent opacity={0.12} />
-        </mesh>
-      )}
-
+    <group
+      position={[x, 0, z]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
+      onPointerOver={(e) => {
+        e.stopPropagation();
+        onHover(true);
+      }}
+      onPointerOut={(e) => {
+        e.stopPropagation();
+        onHover(false);
+      }}
+    >
       {/* Main body */}
       <mesh ref={meshRef}>
-        <sphereGeometry args={[size, 32, 32]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={selected ? 0.4 : 0.15}
-          roughness={0.8}
-          metalness={0.1}
+        <sphereGeometry args={[size, 48, 48]} />
+        <planetShaderMaterial
+          ref={matRef}
+          uColor={col}
+          uTime={0}
+          uEmissive={EMISSIVE[id] ?? 0}
+          uSelected={0}
+          uHovered={0}
         />
       </mesh>
 
-      {/* Selection ring */}
+      {/* Star point light */}
+      {isStar && (
+        <pointLight
+          intensity={id === "solara_prime" ? 10 : 5}
+          distance={AU_SCALE * 12}
+          color={BODY_COLOURS[id]}
+        />
+      )}
+
+      {/* Glow disc for stars */}
+      {isStar && (
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[size * 1.1, size * 2.4, 64]} />
+          <meshBasicMaterial
+            color={BODY_COLOURS[id]}
+            transparent
+            opacity={0.06}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+
+      {/* Hover ring — indigo glow circle */}
+      {hovered && !selected && (
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[size * 1.5, size * 1.7, 64]} />
+          <meshBasicMaterial
+            color="#7c3aed"
+            transparent
+            opacity={0.8}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+
+      {/* Selection ring — pulsing */}
+      {selected && (
+        <mesh ref={ringRef} rotation={[Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[size * 1.6, size * 1.85, 64]} />
+          <meshBasicMaterial
+            color="#a78bfa"
+            transparent
+            opacity={0.9}
+            side={THREE.DoubleSide}
+          />
+        </mesh>
+      )}
+
+      {/* Outer selection glow */}
       {selected && (
         <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[size * 1.6, size * 1.75, 64]} />
+          <ringGeometry args={[size * 2.0, size * 3.5, 64]} />
           <meshBasicMaterial
-            color={color}
+            color="#7c3aed"
             transparent
-            opacity={0.6}
+            opacity={0.12}
             side={THREE.DoubleSide}
           />
         </mesh>
       )}
 
-      {/* Hover indicator — always visible for visitables */}
-      {isVisitable && !selected && (
-        <mesh rotation={[Math.PI / 2, 0, 0]}>
-          <ringGeometry args={[size * 1.4, size * 1.5, 32]} />
-          <meshBasicMaterial
-            color={color}
-            transparent
-            opacity={0.2}
-            side={THREE.DoubleSide}
+      {/* Station diamond */}
+      {isStation && (
+        <mesh rotation={[Math.PI / 4, 0, Math.PI / 4]}>
+          <boxGeometry args={[size * 1.5, size * 1.5, size * 1.5]} />
+          <meshStandardMaterial
+            color={BODY_COLOURS[id]}
+            emissive={BODY_COLOURS[id]}
+            emissiveIntensity={0.4}
           />
         </mesh>
       )}
 
-      {/* Name label */}
-      <Html distanceFactor={60} style={{ pointerEvents: "none" }}>
-        <div
-          className={cn(
-            "font-display text-xs whitespace-nowrap transition-all duration-300",
-            isVisitable ? "text-white/80" : "text-white/25",
-            selected && "text-white",
-          )}
-          style={{
-            transform: "translateY(20px)",
-            textShadow: "0 1px 4px rgba(0,0,0,0.8)",
-          }}
+      {/* HTML label — hidden for moons when zoomed out */}
+      {showLabel && (
+        <Html
+          distanceFactor={55}
+          style={{ pointerEvents: "none", userSelect: "none" }}
+          occlude={false}
         >
-          {bodyConfig.name}
-        </div>
-      </Html>
+          <div
+            style={{
+              transform: "translateY(18px)",
+              textAlign: "center",
+              whiteSpace: "nowrap",
+              fontFamily: "Lexend Giga, sans-serif",
+              fontSize: isMoon || isStation ? "10px" : "12px",
+              fontWeight: 500,
+              color: selected
+                ? "#ffffff"
+                : hovered
+                  ? "#a78bfa"
+                  : isVisitable
+                    ? "rgba(255,255,255,0.75)"
+                    : "rgba(255,255,255,0.3)",
+              textShadow: "0 1px 6px rgba(0,0,0,0.9)",
+              transition: "color 0.2s",
+            }}
+          >
+            {BODY_NAMES[id] ?? id}
+            {!isVisitable && !isStar && (
+              <span
+                style={{
+                  display: "block",
+                  fontSize: "8px",
+                  color: "rgba(255,255,255,0.2)",
+                  marginTop: "1px",
+                }}
+              >
+                {BODY_TYPE[id]}
+              </span>
+            )}
+          </div>
+        </Html>
+      )}
     </group>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Orbital path ring
+// Orbital ring
 // ─────────────────────────────────────────────────────────────────
 
 function OrbitalRing({
   radius,
-  opacity = 0.08,
+  opacity = 0.18,
+  dashed = false,
 }: {
   radius: number;
   opacity?: number;
+  dashed?: boolean;
 }) {
-  const points: THREE.Vector3[] = [];
   const segments = 128;
-  for (let i = 0; i <= segments; i++) {
-    const angle = (i / segments) * Math.PI * 2;
-    points.push(
-      new THREE.Vector3(
-        Math.cos(angle) * radius * AU_SCALE,
-        0,
-        Math.sin(angle) * radius * AU_SCALE,
-      ),
+  const points = Array.from({ length: segments + 1 }, (_, i) => {
+    const a = (i / segments) * Math.PI * 2;
+    return new THREE.Vector3(
+      Math.cos(a) * radius * AU_SCALE,
+      0,
+      Math.sin(a) * radius * AU_SCALE,
     );
-  }
+  });
   return (
     <Line
       points={points}
-      color="#ffffff"
-      lineWidth={0.5}
+      color="#6366f1"
+      lineWidth={dashed ? 0.6 : 1.0}
       transparent
       opacity={opacity}
     />
@@ -233,230 +562,505 @@ function OrbitalRing({
 function RouteArc({
   from,
   to,
-  color = "#7c3aed",
+  scenic,
 }: {
-  from: [number, number];
-  to: [number, number];
-  color?: string;
+  from: { x: number; y: number };
+  to: { x: number; y: number };
+  scenic: boolean;
 }) {
-  const fx = from[0] * AU_SCALE,
-    fz = from[1] * AU_SCALE;
-  const tx = to[0] * AU_SCALE,
-    tz = to[1] * AU_SCALE;
+  const fx = from.x * AU_SCALE,
+    fz = from.y * AU_SCALE;
+  const tx = to.x * AU_SCALE,
+    tz = to.y * AU_SCALE;
   const mx = (fx + tx) / 2,
     mz = (fz + tz) / 2;
   const dist = Math.sqrt((tx - fx) ** 2 + (tz - fz) ** 2);
 
-  // Curved arc via a midpoint elevated in y
-  const points: THREE.Vector3[] = [];
   const curve = new THREE.QuadraticBezierCurve3(
     new THREE.Vector3(fx, 0, fz),
-    new THREE.Vector3(mx, dist * 0.15, mz),
+    new THREE.Vector3(mx, dist * 0.18, mz),
     new THREE.Vector3(tx, 0, tz),
   );
-  for (let i = 0; i <= 48; i++) {
-    points.push(curve.getPoint(i / 48));
-  }
+  const points = Array.from({ length: 56 }, (_, i) => curve.getPoint(i / 55));
 
   return (
     <Line
       points={points}
-      color={color}
-      lineWidth={1}
+      color={scenic ? "#f59e0b" : "#7c3aed"}
+      lineWidth={1.2}
       transparent
-      opacity={0.5}
+      opacity={0.55}
     />
   );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Scatter belt — particle field
+// ─────────────────────────────────────────────────────────────────
+
+function ScatterBelt() {
+  const meshRef = useRef<THREE.InstancedMesh>(null);
+  const PARTICLES = 500;
+  const dummy = new THREE.Object3D();
+
+  useEffect(() => {
+    if (!meshRef.current) return;
+    for (let i = 0; i < PARTICLES; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const radius = (1.8 + Math.random() * 0.8) * AU_SCALE;
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
+      const y = (Math.random() - 0.5) * 0.5;
+      const scale = 0.01 + Math.random() * 0.04;
+      dummy.position.set(x, y, z);
+      dummy.scale.setScalar(scale);
+      dummy.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+      dummy.updateMatrix();
+      meshRef.current.setMatrixAt(i, dummy.matrix);
+    }
+    meshRef.current.instanceMatrix.needsUpdate = true;
+  }, []);
+
+  return (
+    <instancedMesh ref={meshRef} args={[undefined, undefined, PARTICLES]}>
+      <icosahedronGeometry args={[1, 0]} />
+      <meshStandardMaterial color="#5a5a6a" roughness={0.9} metalness={0.1} />
+    </instancedMesh>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Compute all body positions from system config
+// ─────────────────────────────────────────────────────────────────
+
+function computePositions(
+  systemConfig: any,
+  simDay: number,
+): Record<string, { x: number; y: number }> {
+  const positions: Record<string, { x: number; y: number }> = {};
+  const bodyMap: Record<string, any> = {};
+
+  for (const body of systemConfig.bodies ?? []) {
+    bodyMap[body.id] = body;
+  }
+
+  // Add synthetic star entries if not in bodies array
+  if (!bodyMap["solara_prime"]) {
+    positions["solara_prime"] = { x: 0, y: 0 };
+  }
+  if (!bodyMap["solara_minor"] && systemConfig.stars?.solaraMinor) {
+    const s = systemConfig.stars.solaraMinor;
+    const p = {
+      orbitalRadius: s.orbitalRadius,
+      period: s.period,
+      eccentricity: s.eccentricity ?? 0,
+      startPhase: s.startPhase ?? 0,
+    };
+    const pos = {
+      x: Math.cos((p.startPhase * Math.PI) / 180) * p.orbitalRadius,
+      y: Math.sin((p.startPhase * Math.PI) / 180) * p.orbitalRadius,
+    };
+    const angle =
+      (p.startPhase * Math.PI) / 180 + ((2 * Math.PI) / p.period) * simDay;
+    const r = p.orbitalRadius * (1 - p.eccentricity * Math.cos(angle));
+    positions["solara_minor"] = {
+      x: r * Math.cos(angle),
+      y: r * Math.sin(angle),
+    };
+  } else {
+    positions["solara_prime"] = { x: 0, y: 0 };
+    positions["solara_minor"] = {
+      x: 0.08 * Math.cos(((2 * Math.PI) / 18) * simDay),
+      y: 0.08 * Math.sin(((2 * Math.PI) / 18) * simDay),
+    };
+  }
+
+  // Lagrange stations at ±60° from solara_minor
+  const minorAngle = Math.atan2(
+    positions["solara_minor"].y,
+    positions["solara_minor"].x,
+  );
+  const lagrangeR = 0.08;
+  positions["l4_station"] = {
+    x: lagrangeR * Math.cos(minorAngle + Math.PI / 3),
+    y: lagrangeR * Math.sin(minorAngle + Math.PI / 3),
+  };
+  positions["l5_station"] = {
+    x: lagrangeR * Math.cos(minorAngle - Math.PI / 3),
+    y: lagrangeR * Math.sin(minorAngle - Math.PI / 3),
+  };
+
+  for (const body of systemConfig.bodies ?? []) {
+    const p = {
+      orbitalRadius: body.orbitalRadius,
+      period: body.period,
+      eccentricity: body.eccentricity ?? 0,
+      startPhase: body.startPhase ?? 0,
+    };
+    const angle =
+      (p.startPhase * Math.PI) / 180 + ((2 * Math.PI) / p.period) * simDay;
+    const radius = p.orbitalRadius * (1 - p.eccentricity * Math.cos(angle));
+    const localX = radius * Math.cos(angle);
+    const localY = radius * Math.sin(angle);
+
+    if (body.parent && positions[body.parent]) {
+      positions[body.id] = {
+        x: positions[body.parent].x + localX,
+        y: positions[body.parent].y + localY,
+      };
+    } else {
+      positions[body.id] = { x: localX, y: localY };
+    }
+  }
+
+  return positions;
 }
 
 // ─────────────────────────────────────────────────────────────────
 // The 3D scene
 // ─────────────────────────────────────────────────────────────────
 
-interface SceneProps {
-  systemConfig: Awaited<ReturnType<typeof getSystemConfig>> | undefined;
-  simDay: number;
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-}
-
 function StarSystemScene({
   systemConfig,
   simDay,
   selectedId,
+  hoveredId,
   onSelect,
-}: SceneProps) {
-  // Calculate all body positions
-  const positions: Record<string, { x: number; y: number }> = {};
+  onHover,
+  cameraTarget,
+  animateCamera,
+}: {
+  systemConfig: any;
+  simDay: number;
+  selectedId: string | null;
+  hoveredId: string | null;
+  onSelect: (id: string) => void;
+  onHover: (id: string | null) => void;
+  cameraTarget: THREE.Vector3 | null;
+  animateCamera: boolean;
+}) {
+  const positions = computePositions(systemConfig, simDay);
 
-  if (systemConfig) {
-    const bodyMap = new Map(systemConfig.bodies.map((b) => [b.id, b]));
-    for (const body of systemConfig.bodies) {
-      const params = paramsFromBody(body);
-      if (body.parent && bodyMap.has(body.parent)) {
-        const parent = bodyMap.get(body.parent)!;
-        const parentParams = paramsFromBody(parent);
-        const pp = orbitalPosition(parentParams, simDay);
-        const mp = orbitalPosition(params, simDay);
-        positions[body.id] = { x: pp.x + mp.x, y: pp.y + mp.y };
-      } else {
-        positions[body.id] = orbitalPosition(params, simDay);
-      }
-    }
-  }
+  // Route arcs for selected body
+  const planetData = selectedId ? getPlanetData(selectedId) : null;
+  const routeArcs = planetData?.routes ?? [];
 
-  const ORBITAL_RADII = [0.6, 1.1, 3.2, 5.8, 9.4];
+  // All unique orbital radii for ring rendering — only major planets
+  const majorOrbits = [0.6, 1.1, 3.2, 5.8, 9.4];
+
+  const allBodyIds = [
+    "solara_prime",
+    "solara_minor",
+    "l4_station",
+    "l5_station",
+    ...(systemConfig.bodies ?? []).map((b: any) => b.id),
+  ];
 
   return (
     <>
-      {/* Ambient + point lights */}
-      <ambientLight intensity={0.3} />
-      <pointLight
-        position={[0, 0, 0]}
-        intensity={8}
-        color="#FFF4C2"
-        distance={AU_SCALE * 12}
-      />
-      <pointLight
-        position={[0.08 * AU_SCALE, 0, 0]}
-        intensity={4}
-        color="#FFB347"
-        distance={AU_SCALE * 10}
-      />
-
-      {/* Star field */}
+      <ambientLight intensity={0.25} />
       <Stars
-        radius={200}
+        radius={220}
         depth={80}
-        count={6000}
+        count={8000}
         factor={4}
-        saturation={0}
+        saturation={0.1}
         fade
       />
 
-      {/* Stars at origin */}
-      <mesh position={[0, 0, 0]}>
-        <sphereGeometry args={[1.2, 32, 32]} />
-        <meshBasicMaterial color="#FFF4C2" />
-      </mesh>
-
-      {/* Orbital path rings */}
-      {ORBITAL_RADII.map((r) => (
-        <OrbitalRing key={r} radius={r} opacity={r > 4 ? 0.05 : 0.08} />
+      {/* Orbital rings — major bodies only */}
+      {majorOrbits.map((r) => (
+        <OrbitalRing key={r} radius={r} opacity={r > 5 ? 0.12 : 0.22} />
       ))}
 
-      {/* The Scatter — particle band */}
-      {Array.from({ length: 300 }).map((_, i) => {
-        const angle = (i / 300) * Math.PI * 2 + i * 0.1;
-        const radius = 1.8 + Math.random() * 0.8;
-        const x = Math.cos(angle) * radius * AU_SCALE;
-        const z = Math.sin(angle) * radius * AU_SCALE;
-        return (
-          <mesh key={i} position={[x, (Math.random() - 0.5) * 0.4, z]}>
-            <sphereGeometry args={[0.015 + Math.random() * 0.03, 4, 4]} />
-            <meshBasicMaterial color="#6B6B6B" transparent opacity={0.4} />
-          </mesh>
-        );
-      })}
+      {/* Scatter belt */}
+      <ScatterBelt />
 
-      {/* Route arcs — show when a body is selected */}
+      {/* Route arcs */}
       {selectedId &&
         positions[selectedId] &&
-        systemConfig &&
-        (() => {
-          const planetData = getPlanetData(selectedId);
-          if (!planetData) return null;
-          return planetData.routes.map((route) => {
-            const destPos = positions[route.to];
-            if (!destPos) return null;
-            return (
-              <RouteArc
-                key={route.routeId}
-                from={[positions[selectedId]!.x, positions[selectedId]!.y]}
-                to={[destPos.x, destPos.y]}
-                color={route.scenic ? "#f59e0b" : "#7c3aed"}
-              />
-            );
-          });
-        })()}
+        routeArcs.map((route) => {
+          const destPos = positions[route.to];
+          if (!destPos) return null;
+          return (
+            <RouteArc
+              key={route.routeId}
+              from={positions[selectedId]!}
+              to={destPos}
+              scenic={route.scenic}
+            />
+          );
+        })}
 
       {/* Bodies */}
-      {systemConfig?.bodies.map((body) => {
-        const loreData = getPlanetData(body.id);
-        const enriched = { ...body, name: loreData?.name ?? body.name };
+      {allBodyIds.map((id) => {
+        const pos = positions[id];
+        if (!pos) return null;
         return (
           <BodyMesh
-            key={body.id}
-            bodyConfig={enriched}
-            systemBodies={positions}
-            simDay={simDay}
-            selected={selectedId === body.id}
-            onClick={() => VISITABLE_IDS.includes(body.id) && onSelect(body.id)}
-            isVisitable={VISITABLE_IDS.includes(body.id)}
+            key={id}
+            id={id}
+            position={pos}
+            selected={selectedId === id}
+            hovered={hoveredId === id}
+            onClick={() => onSelect(id)}
+            onHover={(h) => onHover(h ? id : null)}
+            simTime={simDay * 0.01}
+            cameraDistance={0} // passed from parent below
           />
         );
       })}
 
-      {/* Camera controls */}
       <OrbitControls
         enablePan
         enableZoom
         enableRotate
-        minDistance={5}
-        maxDistance={AU_SCALE * 12}
-        maxPolarAngle={Math.PI / 2.2}
+        minDistance={2}
+        maxDistance={AU_SCALE * 13}
+        minPolarAngle={0.1}
+        maxPolarAngle={Math.PI / 2.1}
         target={[0, 0, 0]}
+        zoomSpeed={0.8}
+        panSpeed={0.8}
+        rotateSpeed={0.6}
       />
+
+      <CameraController targetPos={cameraTarget} active={animateCamera} />
     </>
   );
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Side panel — planet info
+// Body List Panel — left side, lists all bodies sorted by distance
+// ─────────────────────────────────────────────────────────────────
+
+function BodyListPanel({
+  onSelect,
+  selectedId,
+}: {
+  onSelect: (id: string) => void;
+  selectedId: string | null;
+}) {
+  const sortedIds = [...ALL_BODY_IDS].sort(
+    (a, b) => (BODY_SORT_RADIUS[a] ?? 0) - (BODY_SORT_RADIUS[b] ?? 0),
+  );
+
+  // Group by system
+  const groups = [
+    {
+      label: "Stars & Inner",
+      ids: [
+        "solara_prime",
+        "solara_minor",
+        "l4_station",
+        "l5_station",
+        "serrath",
+        "aethon",
+      ],
+    },
+    { label: "Vareth System", ids: ["vareth", "kalos", "thal", "mira"] },
+    { label: "Calyx System", ids: ["calyx", "lun", "vael"] },
+    { label: "Outer System", ids: ["drath"] },
+  ];
+
+  return (
+    <motion.div
+      variants={fadeIn}
+      initial="hidden"
+      animate="visible"
+      className="absolute top-0 left-0 bottom-0 w-48 bg-black/80 border-r border-white/6 backdrop-blur-md z-10 flex flex-col overflow-hidden"
+    >
+      <div className="px-3 py-3 border-b border-white/6 flex items-center gap-2">
+        <List className="w-3.5 h-3.5 text-white/40" />
+        <span className="font-sans text-xs font-bold text-white/50 uppercase tracking-widest">
+          System Bodies
+        </span>
+      </div>
+      <div className="flex-1 overflow-y-auto scrollbar-none py-2">
+        {groups.map((group) => (
+          <div key={group.label}>
+            <div className="px-3 py-1.5">
+              <span className="font-sans text-[10px] text-white/25 uppercase tracking-widest">
+                {group.label}
+              </span>
+            </div>
+            {group.ids.map((id) => {
+              const isSelected = selectedId === id;
+              const isVisitable = VISITABLE_IDS.has(id);
+              const isStar = STAR_IDS.has(id);
+              return (
+                <button
+                  key={id}
+                  onClick={() => onSelect(id)}
+                  className={cn(
+                    "w-full flex items-center gap-2.5 px-3 py-2 text-left transition-all duration-150",
+                    isSelected
+                      ? "bg-accent-600/20 border-l-2 border-accent-400"
+                      : "hover:bg-white/4 border-l-2 border-transparent",
+                  )}
+                >
+                  <div
+                    className="w-2 h-2 rounded-full shrink-0"
+                    style={{ background: BODY_COLOURS[id] ?? "#888" }}
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span
+                      className={cn(
+                        "font-sans text-xs leading-tight truncate",
+                        isSelected
+                          ? "text-white font-bold"
+                          : isStar
+                            ? "text-yellow-200/70"
+                            : isVisitable
+                              ? "text-white/70"
+                              : "text-white/35",
+                      )}
+                    >
+                      {BODY_NAMES[id]}
+                    </span>
+                    <span className="font-sans text-[9px] text-white/20 truncate">
+                      {BODY_TYPE[id]}
+                    </span>
+                  </div>
+                  {isVisitable && !isStar && (
+                    <div className="w-1 h-1 rounded-full bg-accent-400 shrink-0 ml-auto" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Instructions panel — togglable help overlay
+// ─────────────────────────────────────────────────────────────────
+
+function HelpPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      className="absolute top-14 right-4 z-30 w-72 glass-card rounded-2xl border border-white/10 p-5 flex flex-col gap-4"
+    >
+      <div className="flex items-center justify-between">
+        <span className="font-display text-display-sm text-white">
+          How to use the Star Map
+        </span>
+        <button
+          onClick={onClose}
+          className="text-white/30 hover:text-white transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+      <div className="flex flex-col gap-3">
+        {[
+          {
+            icon: "🖱️",
+            label: "Click any body",
+            desc: "Select it and see details",
+          },
+          { icon: "🔄", label: "Click + drag", desc: "Rotate the system view" },
+          { icon: "🔍", label: "Scroll / pinch", desc: "Zoom in and out" },
+          {
+            icon: "✋",
+            label: "Right-drag / two-finger",
+            desc: "Pan around the system",
+          },
+          { icon: "🟣", label: "Indigo ring", desc: "Hovering over a body" },
+          { icon: "✦", label: "Pulsing ring", desc: "Selected body" },
+          {
+            icon: "━",
+            label: "Indigo lines",
+            desc: "Standard routes from selected body",
+          },
+          { icon: "━", label: "Amber lines", desc: "Scenic routes" },
+          {
+            icon: "📅",
+            label: "Time slider",
+            desc: "Move planets forward or backward in time",
+          },
+          {
+            icon: "⚡",
+            label: "Time speed",
+            desc: "Animate the system in motion",
+          },
+          {
+            icon: "•",
+            label: "Dot on body name",
+            desc: "This body is bookable",
+          },
+          {
+            icon: "🌑",
+            label: "Moon labels",
+            desc: "Appear when zoomed in close",
+          },
+        ].map((item) => (
+          <div key={item.label} className="flex items-start gap-3">
+            <span className="text-sm shrink-0 w-5">{item.icon}</span>
+            <div>
+              <span className="font-sans text-xs font-bold text-white/70">
+                {item.label}
+              </span>
+              <span className="font-sans text-xs text-white/35">
+                {" "}
+                — {item.desc}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Planet side panel
 // ─────────────────────────────────────────────────────────────────
 
 function PlanetSidePanel({
   bodyId,
   onClose,
-  systemConfig,
-  simDay,
 }: {
   bodyId: string;
   onClose: () => void;
-  systemConfig: Awaited<ReturnType<typeof getSystemConfig>> | undefined;
-  simDay: number;
 }) {
   const navigate = useNavigate();
   const planetData = getPlanetData(bodyId);
+  const isVisitable = VISITABLE_IDS.has(bodyId);
+  const isStar = STAR_IDS.has(bodyId);
 
-  // Find today's closest approach for each route
-  const { data: closestApproaches } = useQuery({
-    queryKey: ["closestApproach", bodyId],
-    queryFn: async () => {
-      if (!planetData) return {};
-      const results: Record<
-        string,
-        Awaited<ReturnType<typeof getClosestApproach>>
-      > = {};
-      for (const route of planetData.routes.slice(0, 2)) {
-        try {
-          results[route.to] = await getClosestApproach(
-            bodyId,
-            route.to,
-            undefined,
-            180,
-          );
-        } catch {
-          /* ignore */
-        }
-      }
-      return results;
+  const STAR_LORE: Record<string, { desc: string }> = {
+    solara_prime: {
+      desc: "A G-type main sequence star — the dominant mass of the system and its primary heat source. All orbital periods are measured relative to its position at the barycentre.",
     },
-    enabled: !!bodyId && !!planetData,
-    staleTime: 1000 * 60 * 5,
-  });
+    solara_minor: {
+      desc: "A K-type orange dwarf orbiting Solara Prime at 0.08 AU on an 18-day period. Visible from every inhabited world as a second sun, creating double shadows and amber twilights.",
+    },
+  };
 
-  if (!planetData) return null;
+  const NON_VISITABLE_LORE: Record<string, { desc: string }> = {
+    serrath: {
+      desc: "A tidally-locked rocky planet between the inner system and Aethon. Uninhabitable — one side is a lava sea, the other permanently frozen. Scenic flyby routes pass close by.",
+    },
+    vareth: {
+      desc: "A gas giant at 3.2 AU with vivid storm bands and a permanent hyperstorm. Three of its moons — Kalos, Thal, and Mira — are colonised.",
+    },
+    drath: {
+      desc: "An outer gas giant with an erratic, periodically-reversing magnetosphere. No sanctioned habitation on any of its moons due to unpredictable radiation spikes.",
+    },
+    l4_station: {
+      desc: "A deep-space installation at the L4 Lagrange point of the binary system. Serves as a refuelling depot and navigation waypoint.",
+    },
+    l5_station: {
+      desc: "The L5 mirror of the L4 station. Helion-class shuttles run between Aethon and both stations every 3 days.",
+    },
+  };
 
   return (
     <motion.div
@@ -464,18 +1068,19 @@ function PlanetSidePanel({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="absolute top-0 right-0 bottom-0 w-full sm:w-96 bg-black/90 border-l border-white/8 backdrop-blur-xl z-20 flex flex-col overflow-hidden"
+      className="absolute top-0 right-0 bottom-0 w-full sm:w-88 bg-black/92 border-l border-white/8 backdrop-blur-xl z-20 flex flex-col overflow-hidden"
     >
-      {/* Header */}
       <div className="flex items-start justify-between gap-3 p-5 border-b border-white/6">
         <div className="flex flex-col gap-1">
-          <Badge variant="surface">{planetData.type}</Badge>
+          <Badge variant="surface">{BODY_TYPE[bodyId] ?? "Body"}</Badge>
           <h2 className="font-display text-display-md text-white mt-1">
-            {planetData.name}
+            {BODY_NAMES[bodyId]}
           </h2>
-          <p className="font-sans text-xs text-white/40 italic">
-            {planetData.tagline}
-          </p>
+          {!isVisitable && (
+            <p className="font-sans text-xs text-white/30 italic">
+              Not on the travel network
+            </p>
+          )}
         </div>
         <button
           onClick={onClose}
@@ -485,155 +1090,152 @@ function PlanetSidePanel({
         </button>
       </div>
 
-      {/* Scrollable content */}
       <div className="flex-1 overflow-y-auto scrollbar-none">
-        {/* Hero image */}
-        <ImagePlaceholder
-          aspectRatio="16/9"
-          label={planetData.imageSlots.hero}
-          rounded="rounded-none"
-        />
-
-        <div className="p-5 flex flex-col gap-6">
-          {/* Description */}
-          <p className="font-sans text-sm text-white/55 leading-relaxed">
-            {planetData.description}
-          </p>
-
-          {/* Quick facts */}
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "Population", value: planetData.population },
-              { label: "Gravity", value: planetData.gravity },
-              {
-                label: "Atmosphere",
-                value: (planetData.atmosphere ?? "None").split("—")[0].trim(),
-              },
-              {
-                label: "Spaceports",
-                value: String(planetData.spaceports.length),
-              },
-            ].map((fact) => (
-              <div
-                key={fact.label}
-                className="bg-surface-900/60 rounded-xl p-3 flex flex-col gap-0.5 border border-white/5"
-              >
-                <span className="label">{fact.label}</span>
-                <span className="font-sans text-xs text-white leading-tight">
-                  {fact.value}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {planetData.id === "mira" && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-danger/10 border border-danger/20 rounded-xl">
-              <Info className="w-4 h-4 text-danger/70 shrink-0" />
-              <p className="font-sans text-xs text-danger/80">
-                Permit required for access
+        {/* For visitable bodies — rich content */}
+        {isVisitable && planetData && (
+          <>
+            <ImagePlaceholder
+              aspectRatio="16/9"
+              label={planetData.imageSlots.hero}
+              rounded="rounded-none"
+            />
+            <div className="p-5 flex flex-col gap-5">
+              <p className="font-sans text-sm text-white/55 leading-relaxed">
+                {planetData.description}
               </p>
-            </div>
-          )}
-
-          <Divider />
-
-          {/* Routes from here */}
-          <div className="flex flex-col gap-3">
-            <span className="label">Routes from {planetData.name}</span>
-            {planetData.routes.slice(0, 4).map((route) => (
-              <button
-                key={route.routeId}
-                onClick={() => {
-                  const params = new URLSearchParams({
-                    originId: bodyId,
-                    destinationId: route.to,
-                    adults: "1",
-                    children: "0",
-                  });
-                  navigate(`/search?${params}`);
-                }}
-                className="flex items-center justify-between gap-3 p-3 bg-surface-900/50 border border-white/6 hover:border-white/15 rounded-xl transition-all text-left group"
-              >
-                <div className="flex flex-col gap-0.5">
-                  <div className="flex items-center gap-1.5">
-                    <span className="font-display text-display-sm text-white">
-                      {route.toName}
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Population", value: planetData.population },
+                  { label: "Gravity", value: planetData.gravity },
+                  {
+                    label: "Atmosphere",
+                    value: (planetData.atmosphere ?? "None")
+                      .split("—")[0]
+                      .trim(),
+                  },
+                  {
+                    label: "Spaceports",
+                    value: String(planetData.spaceports.length),
+                  },
+                ].map((f) => (
+                  <div
+                    key={f.label}
+                    className="bg-surface-900/60 rounded-xl p-3 border border-white/5"
+                  >
+                    <span className="label">{f.label}</span>
+                    <span className="font-sans text-xs text-white block mt-0.5 leading-tight">
+                      {f.value}
                     </span>
-                    {route.scenic && (
-                      <Badge variant="warning" size="sm">
-                        Scenic
-                      </Badge>
-                    )}
                   </div>
-                  <span className="font-sans text-xs text-white/30 capitalize">
-                    {route.shipClass}-class · {route.frequency}
-                  </span>
+                ))}
+              </div>
+              {bodyId === "mira" && (
+                <div className="flex items-center gap-2 px-3 py-2 bg-danger/10 border border-danger/20 rounded-xl">
+                  <Info className="w-4 h-4 text-danger/70 shrink-0" />
+                  <p className="font-sans text-xs text-danger/80">
+                    Interplanetary permit required for access
+                  </p>
                 </div>
-                <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
-              </button>
-            ))}
-          </div>
-
-          {/* Closest approach callout */}
-          {closestApproaches &&
-            Object.entries(closestApproaches).length > 0 && (
-              <>
-                <Divider />
-                <div className="flex flex-col gap-3">
-                  <span className="label">Next Optimal Windows</span>
-                  {Object.entries(closestApproaches).map(([toId, approach]) => (
-                    <div
-                      key={toId}
-                      className="flex flex-col gap-1 p-3 bg-surface-900/40 border border-white/5 rounded-xl"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-sans text-xs text-white/60">
-                          To {getPlanetData(toId)?.name ?? toId}
+              )}
+              <Divider />
+              <div className="flex flex-col gap-2">
+                <span className="label">Routes from {planetData.name}</span>
+                {planetData.routes.slice(0, 4).map((route) => (
+                  <button
+                    key={route.routeId}
+                    onClick={() =>
+                      navigate(
+                        `/book?originId=${bodyId}&destinationId=${route.to}&adults=1&children=0`,
+                      )
+                    }
+                    className="flex items-center justify-between gap-3 p-3 bg-surface-900/50 border border-white/6 hover:border-accent-600/30 rounded-xl transition-all text-left group"
+                  >
+                    <div className="flex flex-col gap-0.5">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-display text-display-sm text-white">
+                          {route.toName}
                         </span>
-                        <OrbitalWindowStars
-                          rating={approach.windowRating}
-                          size="sm"
-                        />
+                        {route.scenic && (
+                          <Badge variant="warning" size="sm">
+                            Scenic
+                          </Badge>
+                        )}
                       </div>
-                      <span className="font-sans text-xs text-white/40">
-                        {formatDate(approach.date)} ·{" "}
-                        {approach.distanceAU.toFixed(2)} AU
+                      <span className="font-sans text-xs text-white/30 capitalize">
+                        {route.shipClass}-class · {route.frequency}
                       </span>
                     </div>
-                  ))}
-                </div>
-              </>
+                    <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/50 transition-colors shrink-0" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Stars */}
+        {isStar && (
+          <div className="p-5 flex flex-col gap-4">
+            <p className="font-sans text-sm text-white/55 leading-relaxed">
+              {STAR_LORE[bodyId]?.desc}
+            </p>
+            <div className="glass-card rounded-xl p-4 border border-white/5">
+              <p className="font-sans text-xs text-white/30">
+                The binary system creates double shadows, amber-tinted
+                twilights, and periods where both stars are simultaneously above
+                the horizon on Aethon's equatorial zones.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* Non-visitable, non-star */}
+        {!isVisitable && !isStar && (
+          <div className="p-5 flex flex-col gap-4">
+            <p className="font-sans text-sm text-white/55 leading-relaxed">
+              {NON_VISITABLE_LORE[bodyId]?.desc ??
+                "No travel services operate to this body."}
+            </p>
+            {bodyId === "serrath" && (
+              <button
+                onClick={() =>
+                  navigate("/book?destinationId=kalos&adults=1&children=0")
+                }
+                className="flex items-center gap-2 px-4 py-3 bg-surface-800/60 border border-white/8 hover:border-accent-600/30 rounded-xl transition-all text-left"
+              >
+                <span className="font-sans text-xs text-white/60">
+                  Scenic flyby routes pass Serrath — book an Aethon → Kalos
+                  scenic voyage to see it
+                </span>
+                <ChevronRight className="w-4 h-4 text-white/20 shrink-0" />
+              </button>
             )}
-        </div>
+          </div>
+        )}
       </div>
 
-      {/* Footer CTAs */}
-      <div className="p-4 border-t border-white/6 flex flex-col gap-2">
-        <Button
-          size="md"
-          className="w-full"
-          onClick={() => {
-            const params = new URLSearchParams({
-              destinationId: bodyId,
-              adults: "1",
-              children: "0",
-            });
-            navigate(`/search?${params}`);
-          }}
-        >
-          Book a Voyage Here
-          <ArrowRight className="w-4 h-4" />
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-full"
-          onClick={() => navigate(`/planet/${bodyId}`)}
-        >
-          <Info className="w-3.5 h-3.5" />
-          Full Planet Profile
-        </Button>
-      </div>
+      {/* Footer CTAs — only for visitable */}
+      {isVisitable && (
+        <div className="p-4 border-t border-white/6 flex flex-col gap-2">
+          <Button
+            size="md"
+            className="w-full"
+            onClick={() =>
+              navigate(`/book?destinationId=${bodyId}&adults=1&children=0`)
+            }
+          >
+            Book a Voyage Here <ArrowRight className="w-4 h-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-full"
+            onClick={() => navigate(`/planet/${bodyId}`)}
+          >
+            <Info className="w-3.5 h-3.5" /> Full Planet Profile
+          </Button>
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -643,10 +1245,18 @@ function PlanetSidePanel({
 // ─────────────────────────────────────────────────────────────────
 
 export default function ExplorePage() {
-  const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [simDay, setSimDay] = useState(() => today());
-  const [showSearch, setShowSearch] = useState(false);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [showBodyList, setShowBodyList] = useState(true);
+  const [showHelp, setShowHelp] = useState(false);
+  const [simDay, setSimDay] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [playSpeed, setPlaySpeed] = useState(5); // days per frame
+  const [cameraTarget, setCameraTarget] = useState<THREE.Vector3 | null>(null);
+  const [animateCamera, setAnimateCamera] = useState(false);
+
+  const playRef = useRef(isPlaying);
+  playRef.current = isPlaying;
 
   const { data: systemConfig } = useQuery({
     queryKey: ["systemConfig"],
@@ -654,143 +1264,255 @@ export default function ExplorePage() {
     staleTime: Infinity,
   });
 
+  // Animate time
+  useEffect(() => {
+    if (!isPlaying) return;
+    const id = setInterval(() => {
+      setSimDay((d) => d + playSpeed);
+    }, 50);
+    return () => clearInterval(id);
+  }, [isPlaying, playSpeed]);
+
   function handleSelect(id: string) {
-    setSelectedId((prev) => (prev === id ? null : id));
+    if (selectedId === id) {
+      setSelectedId(null);
+      setCameraTarget(null);
+      setAnimateCamera(false);
+      return;
+    }
+    setSelectedId(id);
+    setShowBodyList(false);
+    if (systemConfig) {
+      const positions = computePositions(systemConfig, simDay);
+      const pos = positions[id];
+      if (pos) {
+        setCameraTarget(
+          new THREE.Vector3(pos.x * AU_SCALE, 0, pos.y * AU_SCALE),
+        );
+        setAnimateCamera(true);
+        setTimeout(() => setAnimateCamera(false), 2500);
+      }
+    }
   }
+
+  function handleClose() {
+    setSelectedId(null);
+    setShowBodyList(true);
+  }
+
+  const currentDate = new Date(Date.UTC(2800, 0, 1));
+  currentDate.setDate(currentDate.getDate() + simDay);
+  const dateStr = currentDate.toISOString().split("T")[0];
 
   return (
     <MobileGate minBreakpoint="md" featureName="The Star Map">
-      <PageTransition>
-        <div className="h-screen bg-void flex flex-col pt-16 overflow-hidden">
-          {/* Top bar */}
-          <motion.div
-            variants={fadeIn}
-            initial="hidden"
-            animate="visible"
-            className="flex items-center justify-between gap-4 px-4 py-2 border-b border-white/5 bg-black/60 backdrop-blur-md z-10 shrink-0"
-          >
-            <div className="flex items-center gap-3">
-              <Globe className="w-4 h-4 text-white/40" />
-              <span className="font-display text-sm text-white/70">
-                Solara System
-              </span>
-              {selectedId && (
-                <motion.div
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: 1, x: 0 }}
-                >
-                  <span className="text-white/25 text-sm">·</span>
-                  <span className="font-sans text-sm text-accent-300 ml-2">
-                    {getPlanetData(selectedId)?.name ?? selectedId} selected
-                  </span>
-                </motion.div>
+      <div
+        className="h-screen bg-void flex flex-col pt-16 overflow-hidden"
+        style={{ cursor: hoveredId ? "pointer" : "default" }}
+      >
+        {/* Top bar */}
+        <div className="flex items-center justify-between gap-3 px-4 py-2 border-b border-white/5 bg-black/70 backdrop-blur-md z-10 shrink-0">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setShowBodyList((s) => !s);
+                if (selectedId) setSelectedId(null);
+              }}
+              className={cn(
+                "flex items-center gap-1.5 font-sans text-xs font-bold px-3 py-1.5 rounded-lg transition-all",
+                showBodyList && !selectedId
+                  ? "bg-white/10 text-white"
+                  : "text-white/40 hover:text-white/70",
               )}
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Sim day display */}
-              <div className="hidden sm:flex flex-col items-end">
-                <span className="label">System Date</span>
-                <span className="font-mono text-xs text-white/50">
-                  Day {Math.round(simDay).toLocaleString()}
-                </span>
-              </div>
-
-              {selectedId && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setSelectedId(null)}
-                >
-                  <X className="w-3.5 h-3.5" /> Clear
-                </Button>
-              )}
-
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => navigate("/")}
-              >
-                Search Voyages
-              </Button>
-            </div>
-          </motion.div>
-
-          {/* Canvas + Side panel */}
-          <div className="flex-1 relative overflow-hidden">
-            {/* R3F Canvas */}
-            <motion.div
-              variants={starMapEnter}
-              initial="hidden"
-              animate="visible"
-              className="absolute inset-0"
             >
-              <Canvas
-                camera={{
-                  position: [0, AU_SCALE * 1.8, AU_SCALE * 2.2],
-                  fov: 55,
-                }}
-                gl={{ antialias: true, alpha: false }}
-                style={{ background: "#000000" }}
+              <List className="w-3.5 h-3.5" /> Bodies
+            </button>
+            {selectedId && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex items-center gap-2"
               >
-                <Suspense fallback={null}>
-                  <StarSystemScene
-                    systemConfig={systemConfig}
-                    simDay={simDay}
-                    selectedId={selectedId}
-                    onSelect={handleSelect}
-                  />
-                </Suspense>
-              </Canvas>
-            </motion.div>
-
-            {/* Loading overlay */}
-            {!systemConfig && (
-              <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-                <div className="flex flex-col items-center gap-4">
-                  <Spinner size="lg" />
-                  <p className="font-sans text-sm text-white/40">
-                    Loading system data…
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* Instructions overlay — shown when nothing selected */}
-            <AnimatePresence>
-              {!selectedId && systemConfig && (
-                <motion.div
-                  variants={fadeIn}
-                  initial="hidden"
-                  animate="visible"
-                  exit={{ opacity: 0 }}
-                  className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 pointer-events-none"
+                <span className="text-white/25">·</span>
+                <span className="font-display text-sm text-accent-300">
+                  {BODY_NAMES[selectedId]}
+                </span>
+                <button
+                  onClick={handleClose}
+                  className="text-white/30 hover:text-white ml-1 transition-colors"
                 >
-                  <div className="glass-card rounded-2xl px-5 py-3 flex items-center gap-3">
-                    <Globe className="w-4 h-4 text-white/30" />
-                    <p className="font-sans text-sm text-white/50">
-                      Click a highlighted body to explore destinations
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              </motion.div>
+            )}
+          </div>
 
-            {/* Side panel */}
-            <AnimatePresence>
-              {selectedId && (
-                <PlanetSidePanel
-                  key={selectedId}
-                  bodyId={selectedId}
-                  onClose={() => setSelectedId(null)}
-                  systemConfig={systemConfig}
-                  simDay={simDay}
-                />
-              )}
-            </AnimatePresence>
+          {/* Time controls */}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2 bg-surface-900/60 border border-white/8 rounded-xl px-3 py-1.5">
+              <Clock className="w-3 h-3 text-white/30" />
+              <span className="font-mono text-xs text-white/50">{dateStr}</span>
+            </div>
+            <div className="hidden md:flex items-center gap-1.5">
+              <button
+                onClick={() => setPlaySpeed((s) => Math.max(1, s / 2))}
+                className="text-white/30 hover:text-white/60 transition-colors"
+                title="Slower"
+              >
+                <Clock className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setIsPlaying((p) => !p)}
+                className="w-7 h-7 rounded-full bg-surface-800 border border-white/10 flex items-center justify-center text-white/60 hover:text-white hover:border-accent-600/40 transition-all"
+              >
+                {isPlaying ? (
+                  <Pause className="w-3 h-3" />
+                ) : (
+                  <Play className="w-3 h-3" />
+                )}
+              </button>
+              <button
+                onClick={() => setPlaySpeed((s) => Math.min(50, s * 2))}
+                className="text-white/30 hover:text-white/60 transition-colors"
+                title="Faster"
+              >
+                <FastForward className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <button
+              onClick={() => setShowHelp((h) => !h)}
+              className="text-white/30 hover:text-white transition-colors"
+              title="Help"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </button>
           </div>
         </div>
-      </PageTransition>
+
+        {/* Time slider */}
+        <div className="px-4 py-2 border-b border-white/5 bg-black/40 flex items-center gap-4 shrink-0">
+          <span className="font-sans text-xs text-white/30 shrink-0 hidden sm:block">
+            Time
+          </span>
+          <input
+            type="range"
+            min={-1000}
+            max={5000}
+            step={1}
+            value={simDay}
+            onChange={(e) => {
+              setSimDay(Number(e.target.value));
+              setIsPlaying(false);
+            }}
+            className="flex-1 accent-accent-500 h-1.5"
+          />
+          <button
+            onClick={() => {
+              setSimDay(0);
+              setIsPlaying(false);
+            }}
+            className="font-sans text-xs text-white/30 hover:text-white/60 transition-colors shrink-0"
+          >
+            Reset
+          </button>
+          <span className="font-sans text-xs text-white/25 shrink-0 hidden sm:block">
+            {playSpeed}×
+          </span>
+        </div>
+
+        {/* Canvas + overlays */}
+        <div className="flex-1 relative overflow-hidden">
+          {/* Canvas */}
+          {systemConfig ? (
+            <Canvas
+              camera={{
+                position: [0, AU_SCALE * 1.6, AU_SCALE * 2.0],
+                fov: 52,
+              }}
+              gl={{ antialias: true, alpha: false }}
+              style={{ background: "#000005" }}
+            >
+              <Suspense fallback={null}>
+                <StarSystemScene
+                  systemConfig={systemConfig}
+                  simDay={simDay}
+                  selectedId={selectedId}
+                  hoveredId={hoveredId}
+                  onSelect={handleSelect}
+                  onHover={setHoveredId}
+                  cameraTarget={cameraTarget}
+                  animateCamera={animateCamera}
+                />
+              </Suspense>
+            </Canvas>
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-4">
+                <div className="w-8 h-8 rounded-full border-2 border-accent-400 border-t-transparent animate-spin" />
+                <p className="font-sans text-sm text-white/40">
+                  Loading system data…
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Body list panel */}
+          <AnimatePresence>
+            {showBodyList && !selectedId && (
+              <BodyListPanel onSelect={handleSelect} selectedId={selectedId} />
+            )}
+          </AnimatePresence>
+
+          {/* Help panel */}
+          <AnimatePresence>
+            {showHelp && <HelpPanel onClose={() => setShowHelp(false)} />}
+          </AnimatePresence>
+
+          {/* Hover tooltip */}
+          <AnimatePresence>
+            {hoveredId && !selectedId && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute bottom-6 left-1/2 -translate-x-1/2 pointer-events-none"
+              >
+                <div className="glass-card rounded-xl px-4 py-2 flex items-center gap-2 border border-white/8">
+                  <div
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: BODY_COLOURS[hoveredId] ?? "#888" }}
+                  />
+                  <span className="font-display text-sm text-white">
+                    {BODY_NAMES[hoveredId]}
+                  </span>
+                  <span className="font-sans text-xs text-white/40">
+                    {BODY_TYPE[hoveredId]}
+                  </span>
+                  {VISITABLE_IDS.has(hoveredId) && (
+                    <Badge variant="accent" size="sm">
+                      Bookable
+                    </Badge>
+                  )}
+                  <span className="font-sans text-xs text-white/25 ml-1">
+                    Click to select
+                  </span>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Planet side panel */}
+          <AnimatePresence>
+            {selectedId && (
+              <PlanetSidePanel
+                key={selectedId}
+                bodyId={selectedId}
+                onClose={handleClose}
+              />
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </MobileGate>
   );
 }

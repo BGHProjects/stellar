@@ -9,6 +9,7 @@ import ChatWidget from "@/components/common/ChatWidget";
 const LandingPage = lazy(() => import("@/pages/LandingPage"));
 const SearchResultsPage = lazy(() => import("@/pages/SearchResultsPage"));
 const VoyageDetailPage = lazy(() => import("@/pages/VoyageDetailPage"));
+const VoyageSearchPage = lazy(() => import("@/pages/VoyageSearchPage"));
 const PackagesPage = lazy(() => import("@/pages/PackagesPage"));
 const PassengerDetailsPage = lazy(() => import("@/pages/PassengerDetailsPage"));
 const ReviewPaymentPage = lazy(() => import("@/pages/ReviewPaymentPage"));
@@ -42,6 +43,7 @@ export default function App() {
 
               {/* Booking flow */}
               <Route path="/search" element={<SearchResultsPage />} />
+              <Route path="/book" element={<VoyageSearchPage />} />
               <Route path="/voyage/:id" element={<VoyageDetailPage />} />
               <Route path="/packages" element={<PackagesPage />} />
               <Route path="/passengers" element={<PassengerDetailsPage />} />

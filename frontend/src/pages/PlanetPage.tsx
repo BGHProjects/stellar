@@ -1,8 +1,4 @@
-import {
-  ImagePlaceholder,
-  PageTransition,
-  SectionReveal,
-} from "@/components/common";
+import { PageTransition, SectionReveal } from "@/components/common";
 import { Badge, Button, Card, Divider } from "@/components/ui";
 import {
   fadeIn,
@@ -493,12 +489,9 @@ export default function PlanetPage() {
                     size="lg"
                     className="w-full"
                     onClick={() => {
-                      const params = new URLSearchParams({
-                        destinationId: data.id,
-                        adults: "1",
-                        children: "0",
-                      });
-                      navigate(`/search?${params}`);
+                      navigate(
+                        `/book?destinationId=${data.id}&adults=1&children=0`,
+                      );
                     }}
                   >
                     Book a Voyage to {data.name}

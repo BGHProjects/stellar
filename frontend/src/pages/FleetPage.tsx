@@ -1,45 +1,33 @@
 import {
-  motion,
-  AnimatePresence,
-  useScroll,
-  useTransform,
-} from "framer-motion";
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+  ImagePlaceholder,
+  PageTransition,
+  SectionReveal,
+} from "@/components/common";
+import { Badge, Button, Card, Divider } from "@/components/ui";
 import {
-  ArrowRight,
-  Users,
-  Zap,
-  Clock,
-  Star,
-  Snowflake,
-  ChevronRight,
-  Check,
-  X as XIcon,
-  Globe,
-} from "lucide-react";
+  fadeIn,
+  fadeUp,
+  loomUp,
+  snapLeft,
+  staggerContainer,
+  staggerItem,
+  viewportOnce,
+} from "@/lib/animations";
 import {
   getAllShipClasses,
   getShipClassData,
   type ShipClassData,
 } from "@/lib/fleetData";
-import {
-  loomUp,
-  fadeUp,
-  staggerContainer,
-  staggerItem,
-  fadeIn,
-  viewportOnce,
-  sidePanelEnter,
-  snapLeft,
-} from "@/lib/animations";
-import {
-  PageTransition,
-  ImagePlaceholder,
-  SectionReveal,
-} from "@/components/common";
-import { Button, Badge, Card, Divider } from "@/components/ui";
 import { cn } from "@/lib/utils";
+import {
+  AnimatePresence,
+  motion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { ArrowRight, Check, X as XIcon } from "lucide-react";
+import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const SHIP_CLASSES = getAllShipClasses();
 
@@ -312,7 +300,10 @@ export default function FleetPage() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
           >
-            <ShipDetail ship={activeShip} onSearchClick={() => navigate("/")} />
+            <ShipDetail
+              ship={activeShip}
+              onSearchClick={() => navigate("/book")}
+            />
           </motion.div>
         </AnimatePresence>
 
