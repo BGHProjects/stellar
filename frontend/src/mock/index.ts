@@ -1,5 +1,5 @@
 export const MOCK_SYSTEM_CONFIG = {
-  epoch: { date: "2800-01-01" },
+  epoch: { date: "2800-01-01", dayNumber: 1 },
   bodies: [
     {
       id: "serrath",
@@ -412,6 +412,16 @@ export const MOCK_SYSTEM_CONFIG = {
     { id: "full_cryo", name: "Full Cryo", priceMultiplier: 0.55 },
     { id: "cryo_intervals", name: "Cryo Intervals", priceMultiplier: 1.35 },
   ],
+  simulationConfig: {
+    auToKm: 1,
+    defaultTimeStepDays: 1,
+    orbitRefinementPasses: 1,
+    scatterInnerRadiusAU: 1,
+    scatterOuterRadiusAU: 1,
+  },
+  stars: [],
+  lagrangeStations: [],
+  spaceports: [],
 };
 
 export const MOCK_VOYAGES = (originId: string, destinationId: string) => {

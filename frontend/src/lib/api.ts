@@ -133,7 +133,7 @@ export async function updateFaceVector(vector: number[]): Promise<any> {
 // -----------------------------------------------------------------
 
 export async function getSystemConfig(): Promise<SystemConfig> {
-  if (MOCK_MODE) return MOCK_SYSTEM_CONFIG;
+  if (MOCK_MODE) return MOCK_SYSTEM_CONFIG as any; // Don't need all the props of the exact type for mock functionality
 
   // Assemble from individual endpoints and combine into SystemConfig shape
   const [
@@ -186,7 +186,7 @@ export async function searchVoyages(
   params: VoyageSearchParams,
 ): Promise<Voyage[]> {
   if (MOCK_MODE)
-    return MOCK_VOYAGES(params.originId, params.destinationId) as Voyage[];
+    return MOCK_VOYAGES(params.originId, params.destinationId) as any[]; // Don't need all the props of the exact type for mock functionality
   const query = new URLSearchParams({
     originId: params.originId,
     destinationId: params.destinationId,
@@ -199,14 +199,14 @@ export async function searchVoyages(
 }
 
 export async function getVoyage(id: string): Promise<Voyage> {
-  if (MOCK_MODE) return getMockData("voyages.detail") as Voyage;
+  if (MOCK_MODE) return MOCK_VOYAGES("0", "0")[0] as any; // Don't need all the props of the exact type for mock functionality
   return request<Voyage>(`/voyages/${encodeURIComponent(id)}`);
 }
 
 export async function calculatePrice(
   req: PriceRequest,
 ): Promise<PriceBreakdown> {
-  if (MOCK_MODE) return getMockData("voyages.price") as PriceBreakdown;
+  if (MOCK_MODE) return MOCK_VOYAGES("0", "0")[0].priceBreakdown as any; // Don't need all the props of the exact type for mock functionality
   return request<PriceBreakdown>("/voyages/price", {
     method: "POST",
     body: JSON.stringify(req),
@@ -216,8 +216,7 @@ export async function calculatePrice(
 export async function getOrbitalPositions(
   day?: number,
 ): Promise<OrbitalPositions> {
-  if (MOCK_MODE)
-    return getMockData("voyages.orbitalPositions") as OrbitalPositions;
+  if (MOCK_MODE) return MOCK_VOYAGES("0", "0")[0] as any; // Don't need all the props of the exact type for mock functionality
   const query = day !== undefined ? `?day=${day}` : "";
   return request<OrbitalPositions>(`/voyages/orbital-positions${query}`);
 }
@@ -250,7 +249,8 @@ export async function getSchedule(
   fromDate?: string,
   count?: number,
 ): Promise<ScheduleEntry[]> {
-  if (MOCK_MODE) return getMockData("schedule") as ScheduleEntry[];
+  // if (MOCK_MODE) return getMockData("schedule") as ScheduleEntry[];
+  // TODO - allow schedule retrieval in MOCK_MODE
   const query = new URLSearchParams();
   if (fromDate) query.set("fromDate", fromDate);
   if (count) query.set("count", String(count));
@@ -264,7 +264,8 @@ export async function getSchedule(
 export async function createBooking(
   req: CreateBookingRequest,
 ): Promise<Booking> {
-  if (MOCK_MODE) return MOCK_BOOKINGS[0] as Booking;
+  // if (MOCK_MODE) return MOCK_BOOKINGS[0] as Booking;
+  // TODO - Allow booking creation in mock mode
   return request<Booking>("/bookings", {
     method: "POST",
     body: JSON.stringify(req),
@@ -272,12 +273,12 @@ export async function createBooking(
 }
 
 export async function getBooking(id: string): Promise<Booking> {
-  if (MOCK_MODE) return MOCK_BOOKINGS[0] as Booking;
+  if (MOCK_MODE) return MOCK_BOOKINGS[0] as any; // Don't need all the props of the exact type for mock functionality
   return request<Booking>(`/bookings/${id}`);
 }
 
 export async function getUserBookings(): Promise<Booking[]> {
-  if (MOCK_MODE) return MOCK_BOOKINGS as Booking[];
+  if (MOCK_MODE) return MOCK_BOOKINGS as any[]; // Don't need all the props of the exact type for mock functionality
   return request<Booking[]>("/bookings/me");
 }
 

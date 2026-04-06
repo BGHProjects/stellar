@@ -36,25 +36,6 @@ import * as THREE from "three";
 // ─────────────────────────────────────────────────────────────────
 
 const AU_SCALE = 18; // 1 AU → 18 scene units
-const EPOCH_DAY = 0; // day 0 = simulation epoch
-
-// All bodies that exist in the system (including non-visitable)
-const ALL_BODY_IDS = [
-  "solara_prime",
-  "solara_minor",
-  "serrath",
-  "aethon",
-  "vareth",
-  "drath",
-  "calyx",
-  "kalos",
-  "thal",
-  "mira",
-  "lun",
-  "vael",
-  "l4_station",
-  "l5_station",
-];
 
 const VISITABLE_IDS = new Set([
   "aethon",
@@ -146,24 +127,6 @@ const BODY_TYPE: Record<string, string> = {
   vael: "Moon of Calyx",
   l4_station: "Lagrange Station",
   l5_station: "Lagrange Station",
-};
-
-// Approximate orbital radii (AU) for sorting in the body list
-const BODY_SORT_RADIUS: Record<string, number> = {
-  solara_prime: 0,
-  solara_minor: 0.08,
-  serrath: 0.6,
-  aethon: 1.1,
-  vareth: 3.2,
-  kalos: 3.2,
-  thal: 3.2,
-  mira: 3.2,
-  calyx: 5.8,
-  lun: 5.8,
-  vael: 5.8,
-  drath: 9.4,
-  l4_station: 0.08,
-  l5_station: 0.08,
 };
 
 // Moon-level bodies — hide label until user zooms in past threshold
@@ -395,7 +358,6 @@ function BodyMesh({
   hovered,
   onClick,
   onHover,
-  simTime,
   cameraDistance,
 }: BodyMeshProps) {
   const matRef = useRef<any>(null);
@@ -705,10 +667,6 @@ function computePositions(
       eccentricity: s.eccentricity ?? 0,
       startPhase: s.startPhase ?? 0,
     };
-    const pos = {
-      x: Math.cos((p.startPhase * Math.PI) / 180) * p.orbitalRadius,
-      y: Math.sin((p.startPhase * Math.PI) / 180) * p.orbitalRadius,
-    };
     const angle =
       (p.startPhase * Math.PI) / 180 + ((2 * Math.PI) / p.period) * simDay;
     const r = p.orbitalRadius * (1 - p.eccentricity * Math.cos(angle));
@@ -788,8 +746,6 @@ function StarSystemScene({
   hoveredId,
   onSelect,
   onHover,
-  cameraTarget,
-  animateCamera,
   recenterTrigger,
   setTravelling,
 }: {
@@ -800,7 +756,6 @@ function StarSystemScene({
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   cameraTarget: THREE.Vector3 | null;
-  animateCamera: boolean;
   recenterTrigger: number;
   setTravelling: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
@@ -1383,7 +1338,6 @@ export default function ExplorePage() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [playSpeed, setPlaySpeed] = useState(5); // days per frame
   const [cameraTarget, setCameraTarget] = useState<THREE.Vector3 | null>(null);
-  const [animateCamera, setAnimateCamera] = useState(false);
   const [recenterTrigger, setRecenterTrigger] = useState(0);
   const [travelling, setTravelling] = useState(false);
 
@@ -1631,7 +1585,6 @@ export default function ExplorePage() {
                     onSelect={handleSelect}
                     onHover={setHoveredId}
                     cameraTarget={cameraTarget}
-                    animateCamera={animateCamera}
                     recenterTrigger={recenterTrigger}
                     setTravelling={setTravelling}
                   />

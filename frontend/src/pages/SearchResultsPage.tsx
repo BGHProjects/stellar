@@ -74,19 +74,6 @@ const ROUTE_TYPE_META: Record<
   },
 };
 
-// Placeholder image tints per destination — gives each card a different atmosphere
-const DESTINATION_TINT: Record<string, string> = {
-  aethon: "from-blue-900/80",
-  kalos: "from-orange-950/80",
-  thal: "from-amber-900/80",
-  mira: "from-cyan-950/80",
-  calyx: "from-slate-900/80",
-  lun: "from-stone-900/80",
-  vael: "from-slate-800/80",
-  l4_station: "from-indigo-950/80",
-  l5_station: "from-indigo-950/80",
-};
-
 const SORT_OPTIONS = [
   { value: "window_desc", label: "Best Window" },
   { value: "price_asc", label: "Price ↑" },

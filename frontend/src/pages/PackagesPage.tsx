@@ -58,7 +58,7 @@ const ALWAYS_INCLUDED = new Set<string>(["ship_library"]);
 
 export default function PackagesPage() {
   const navigate = useNavigate();
-  const { legs, updateLeg, setCurrentStep } = useBookingStore();
+  const { legs, updateLeg } = useBookingStore();
 
   const legIndex = legs.length - 1;
   const currentLeg = legs[legIndex];
@@ -74,7 +74,6 @@ export default function PackagesPage() {
 
   // Info modal state
   const [modalItem, setModalItem] = useState<AddOnItem | null>(null);
-  const [modalCategory, setModalCategory] = useState("");
 
   const { data: systemConfig, isLoading } = useQuery({
     queryKey: ["systemConfig"],
@@ -193,7 +192,7 @@ export default function PackagesPage() {
                 const meta = CATEGORY_META[categoryId];
                 if (!meta) return null;
 
-                const visibleItems = items.filter((item) => {
+                const visibleItems = items.filter(() => {
                   // Show all for journey protection and expedition extras
                   // For amenity categories: show available + show locked-out items greyed
                   return true;
@@ -243,7 +242,6 @@ export default function PackagesPage() {
                             onToggle={() => toggle(item.id)}
                             onInfo={() => {
                               setModalItem(item);
-                              setModalCategory(categoryId);
                             }}
                           />
                         );
