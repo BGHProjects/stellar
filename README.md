@@ -2,6 +2,10 @@
 
 An interplanetary voyage booking application set in the fictional Solara binary star system. Built as a full-stack portfolio project demonstrating a polyglot microservice architecture, orbital mechanics simulation, 3D rendering, agentic AI, and biometric authentication.
 
+You can view a deployment with reduced functionality [here](https://stellar-frontend-ten.vercel.app/).
+<br />
+You can view a Docusaurus wiki breaking down the technical implementation, the fictional star system, and how a voyage works on the app [here](https://stellar-docs-one.vercel.app/).
+
 ---
 
 ## What It Is
