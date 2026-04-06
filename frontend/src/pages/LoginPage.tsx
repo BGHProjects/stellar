@@ -15,6 +15,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle, ArrowRight, Eye, EyeOff, Scan, Star } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import * as faceapi from "face-api.js";
 
 type LoginMode = "password" | "face";
 
@@ -50,6 +51,14 @@ export default function LoginPage() {
     setFaceStatus("idle");
   }
 
+  useEffect(() => {
+    Promise.all([
+      faceapi.nets.ssdMobilenetv1.loadFromUri("/models"),
+      faceapi.nets.faceLandmark68Net.loadFromUri("/models"),
+      faceapi.nets.faceRecognitionNet.loadFromUri("/models"),
+    ]).catch((err) => console.error("Failed to load face-api models:", err));
+  }, []);
+
   async function startFaceScan() {
     setFaceStatus("scanning");
     try {
@@ -59,11 +68,63 @@ export default function LoginPage() {
         videoRef.current.srcObject = stream;
         videoRef.current.play();
       }
-      // In a real implementation, face-api.js would detect landmarks here
-      // and send the vector to /api/vision/authenticate
-      // For now we show the UI flow
-    } catch {
+
+      // Give the video a moment to render a frame before detecting
+      await new Promise((r) => setTimeout(r, 500));
+
+      const detection = await faceapi
+        .detectSingleFace(videoRef.current!)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (!detection) {
+        setFaceStatus("failed");
+        stopCamera();
+        return;
+      }
+
+      const vector = Array.from(detection.descriptor);
+
+      // Send to gateway — gateway proxies to vision service
+      const GATEWAY_URL =
+        import.meta.env.VITE_API_URL ?? "http://localhost:8080";
+      const res = await fetch(`${GATEWAY_URL}/api/vision/authenticate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, vector }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.authenticated) {
+        setFaceStatus("failed");
+        stopCamera();
+        return;
+      }
+
+      // Vision service confirmed the face — now get a JWT from the gateway
+      const loginRes = await fetch(`${GATEWAY_URL}/api/auth/face-login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      const loginData = await loginRes.json();
+
+      if (!loginRes.ok) {
+        setFaceStatus("failed");
+        stopCamera();
+        return;
+      }
+
+      stopCamera();
+      setFaceStatus("success");
+      setAuth(loginData.user, loginData.accessToken, loginData.refreshToken);
+      setTimeout(() => navigate(from, { replace: true }), 800);
+    } catch (err) {
+      console.error("Face scan error:", err);
       setFaceStatus("failed");
+      stopCamera();
     }
   }
 

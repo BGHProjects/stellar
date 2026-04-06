@@ -89,7 +89,7 @@ The service starts on port `8001` by default.
 | -------------------- | --------------------------- | -------- | -------------------------------------------- |
 | `PORT`               | `8001`                      | No       | Port to listen on                            |
 | `ANTHROPIC_API_KEY`  | —                           | **Yes**  | Anthropic API key                            |
-| `ANTHROPIC_MODEL`    | `claude-3-5-haiku-20241022` | No       | Model to use                                 |
+| `ANTHROPIC_MODEL`    | `claude-haiku-4-5-20251001` | No       | Model to use                                 |
 | `MAX_TOKENS`         | `1024`                      | No       | Max tokens per response                      |
 | `SYSTEM_CONFIG_PATH` | `../../config/system.json`  | No       | Path to system config                        |
 | `GATEWAY_URL`        | `http://localhost:8080`     | No       | Go gateway base URL (for voyage search tool) |

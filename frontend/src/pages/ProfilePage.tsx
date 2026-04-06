@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import * as faceapi from "face-api.js";
 
 // Loyalty tier display config
 const TIER_CONFIG: Record<
@@ -705,12 +706,28 @@ function FaceEnrolmentSection({
       await new Promise((r) => setTimeout(r, 2000));
       setStatus("processing");
       await new Promise((r) => setTimeout(r, 1000));
-      // Simulated vector — in production this comes from face-api.js
-      const mockVector = Array.from(
-        { length: 128 },
-        () => Math.random() * 2 - 1,
-      );
-      await updateFaceVector(mockVector);
+
+      // Load models once
+      await faceapi.nets.ssdMobilenetv1.loadFromUri("/models");
+      await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
+      await faceapi.nets.faceRecognitionNet.loadFromUri("/models");
+
+      // Extract descriptor from the live video element
+      const detection = await faceapi
+        .detectSingleFace(videoRef.current!)
+        .withFaceLandmarks()
+        .withFaceDescriptor();
+
+      if (!detection) {
+        setStatus("error");
+        setErrorMsg(
+          "No face detected. Make sure your face is clearly visible.",
+        );
+        return;
+      }
+
+      const vector = Array.from(detection.descriptor); // Float32Array → number[]
+      await updateFaceVector(vector);
     },
     onSuccess: () => {
       stopCamera();

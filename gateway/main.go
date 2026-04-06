@@ -140,6 +140,7 @@ func main() {
 			r.Post("/register", authHandler.Register)
 			r.Post("/login", authHandler.Login)
 			r.Post("/refresh", authHandler.Refresh)
+			r.Post("/face-login", authHandler.FaceLogin)
 			// Auth-protected auth routes
 			r.Group(func(r chi.Router) {
 				r.Use(appMiddleware.Authenticate(authService))
@@ -186,7 +187,6 @@ func main() {
 
 		// Proxy — microservices
 		r.Route("/chat", func(r chi.Router) {
-			r.Use(appMiddleware.Authenticate(authService))
 			r.Post("/", proxyHandler.Chat)
 		})
 

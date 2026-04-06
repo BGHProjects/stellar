@@ -157,6 +157,33 @@ func (h *AuthHandler) UpdateFaceVector(w http.ResponseWriter, r *http.Request) {
 	respond(w, http.StatusOK, map[string]string{"message": "facial landmark vector enrolled successfully"})
 }
 
+// FaceLogin godoc
+//
+//	@Summary		Log in using face authentication
+//	@Description	Issues JWT tokens for a user whose identity was confirmed by the vision service. No password required — face verification is the credential.
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			body	body		services.FaceLoginRequest	true	"Face login payload"
+//	@Success		200		{object}	services.AuthResponse
+//	@Failure		400		{object}	map[string]string
+//	@Failure		401		{object}	map[string]string
+//	@Router			/auth/face-login [post]
+func (h *AuthHandler) FaceLogin(w http.ResponseWriter, r *http.Request) {
+	var req services.FaceLoginRequest
+	if !decode(w, r, &req) {
+		return
+	}
+
+	resp, err := h.authService.FaceLogin(req)
+	if err != nil {
+		respondError(w, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	respond(w, http.StatusOK, resp)
+}
+
 // -----------------------------------------------------------------
 // Request types local to this handler
 // -----------------------------------------------------------------

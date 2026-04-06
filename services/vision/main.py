@@ -20,7 +20,7 @@ from typing import Annotated
 import httpx
 import numpy as np
 from dotenv import load_dotenv
-from litestar import Litestar, get, post
+from litestar import Litestar, get, post, Request
 from litestar.datastructures import State
 from litestar.exceptions import HTTPException
 from litestar.params import Body
@@ -152,7 +152,7 @@ async def health() -> dict:
 @post("/enrol")
 async def enrol(
     data: Annotated[EnrolRequest, Body()],
-    request,
+    request: Request,
 ) -> EnrolResponse:
     """
     Store a facial landmark vector for a user.

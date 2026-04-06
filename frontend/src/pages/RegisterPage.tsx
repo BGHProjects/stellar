@@ -472,14 +472,10 @@ export default function RegisterPage() {
                   <motion.div
                     key="personal"
                     variants={staggerContainer}
-                    initial={{ opacity: 0, x: 24 }}
-                    animate={{
-                      opacity: 1,
-                      x: 0,
-                      transition: { duration: 0.3 },
-                    }}
+                    initial="hidden"
+                    animate="visible"
                     exit={{ opacity: 0, x: -24, transition: { duration: 0.2 } }}
-                    className="flex flex-col gap-5"
+                    className="flex flex-col gap-5 "
                   >
                     <motion.div
                       variants={staggerItem}
@@ -512,7 +508,6 @@ export default function RegisterPage() {
                         onChange={(e) => update("dateOfBirth", e.target.value)}
                         error={errors.dateOfBirth}
                         hint="Used to calculate passenger age for booking purposes"
-                        className="[color-scheme:dark]"
                       />
                     </motion.div>
 

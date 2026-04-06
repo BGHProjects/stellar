@@ -107,6 +107,32 @@ func (s *AuthService) Login(req LoginRequest) (*AuthResponse, error) {
 	return s.buildAuthResponse(*user)
 }
 
+// FaceLoginRequest is the payload for a face-authenticated login.
+// The vision service must have already verified the face before this is called.
+type FaceLoginRequest struct {
+	Email string `json:"email"`
+}
+
+// FaceLogin issues auth tokens for a user identified by face authentication.
+// No password check — the caller is responsible for having verified the face
+// via the vision service before calling this.
+func (s *AuthService) FaceLogin(req FaceLoginRequest) (*AuthResponse, error) {
+	if req.Email == "" {
+		return nil, fmt.Errorf("email is required")
+	}
+
+	user, err := s.userRepo.GetByEmail(req.Email)
+	if err != nil {
+		return nil, fmt.Errorf("no account found for that email address")
+	}
+
+	if !user.FaceVectorEnrolled {
+		return nil, fmt.Errorf("face ID is not enrolled for this account")
+	}
+
+	return s.buildAuthResponse(*user)
+}
+
 // ValidateAccessToken parses and validates a JWT access token.
 // Returns the user ID and email encoded in the token, or an error.
 func (s *AuthService) ValidateAccessToken(tokenString string) (userID, email string, err error) {

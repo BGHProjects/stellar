@@ -1,4 +1,4 @@
-import { ImagePlaceholder, MobileGate } from "@/components/common";
+import { MobileGate } from "@/components/common";
 import { Badge, Button, Divider } from "@/components/ui";
 import { sidePanelEnter } from "@/lib/animations";
 import { getSystemConfig } from "@/lib/api";
@@ -1164,7 +1164,7 @@ function PlanetSidePanel({
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="absolute top-0 right-0 bottom-0 w-80 bg-black/92 border-l border-white/8 backdrop-blur-xl z-20 flex flex-col overflow-hidden"
+      className="absolute top-0 left-0 bottom-0 w-80 bg-black/92 border-r border-white/8 backdrop-blur-xl z-20 flex flex-col overflow-hidden"
     >
       <div className="flex items-start justify-between gap-3 p-5 border-b border-white/6">
         <div className="flex flex-col gap-1">

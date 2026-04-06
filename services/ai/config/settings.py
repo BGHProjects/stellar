@@ -7,7 +7,6 @@ All other modules import from here — no module reads env vars directly.
 import json
 import os
 from pathlib import Path
-
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -16,7 +15,7 @@ load_dotenv()
 class Config:
     PORT:               int  = int(os.getenv("PORT", "8001"))
     ANTHROPIC_API_KEY:  str  = os.getenv("ANTHROPIC_API_KEY", "")
-    ANTHROPIC_MODEL:    str  = os.getenv("ANTHROPIC_MODEL", "claude-3-5-haiku-20241022")
+    ANTHROPIC_MODEL:    str  = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
     MAX_TOKENS:         int  = int(os.getenv("MAX_TOKENS", "1024"))
     SYSTEM_CONFIG_PATH: str  = os.getenv("SYSTEM_CONFIG_PATH", "../../config/system.json")
     GATEWAY_URL:        str  = os.getenv("GATEWAY_URL", "http://localhost:8080")
