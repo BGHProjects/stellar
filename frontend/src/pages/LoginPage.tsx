@@ -224,7 +224,11 @@ export default function LoginPage() {
           >
             <Link to="/" className="flex items-center gap-2 group">
               <div className="w-7 h-7 rounded-full bg-accent-600/20 border border-accent-500/30 flex items-center justify-center">
-                <Star className="w-3.5 h-3.5 text-accent-300 fill-accent-300/30" />
+                <img
+                  src="/images/logo.png"
+                  alt="Stellar Logo"
+                  className="w-3.5 h-3.5"
+                />
               </div>
               <span className="font-display text-sm text-white/60 group-hover:text-white transition-colors">
                 Stellar

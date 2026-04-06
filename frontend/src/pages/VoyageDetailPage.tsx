@@ -467,11 +467,10 @@ export default function VoyageDetailPage() {
                             : "border-accent-600/20 hover:border-accent-600/50",
                         )}
                       >
-                        {/* Cabin image placeholder */}
-                        <ImagePlaceholder
-                          aspectRatio="16/9"
-                          label={`${cabin.name} class cabin interior`}
-                          rounded="rounded-none"
+                        <img
+                          src={`/images/cabins/${cabin.id}.jpg`}
+                          alt={cabin.name}
+                          className="w-full h-full"
                         />
 
                         <div

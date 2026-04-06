@@ -7,7 +7,11 @@ const LandingPageFooter = () => {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 rounded-full bg-gradient-to-br from-accent-300 to-accent-600 flex items-center justify-center">
-            <Star className="w-3 h-3 text-white fill-white" />
+            <img
+              src="/images/logo.png"
+              alt="Stellar Logo"
+              className="w-3 h-3"
+            />
           </div>
           <span className="font-display text-sm text-white">Stellar</span>
         </div>

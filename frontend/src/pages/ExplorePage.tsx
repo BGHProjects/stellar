@@ -1200,7 +1200,7 @@ function PlanetSidePanel({
                         `/book?originId=${bodyId}&destinationId=${route.to}&adults=1&children=0`,
                       )
                     }
-                    className="flex items-center justify-between gap-3 p-3 bg-surface-900/50 border border-white/6 hover:border-accent-600/30 rounded-xl transition-all text-left group"
+                    className="flex items-center justify-between gap-3 p-3 bg-surface-900/50 border border-accent-600/30 hover:border-white  rounded-xl transition-all text-left group"
                   >
                     <div className="flex flex-col gap-0.5">
                       <div className="flex items-center gap-1.5">

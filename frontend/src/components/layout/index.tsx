@@ -27,7 +27,11 @@ export function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-stellar-400 to-stellar-600 flex items-center justify-center shadow-glow-stellar">
-              <Star className="w-3.5 h-3.5 text-white fill-white" />
+              <img
+                src="/images/logo.png"
+                alt="Stellar Logo"
+                className="w-6 h-6"
+              />
             </div>
             <span className="text-lg font-semibold tracking-tight text-white group-hover:text-stellar-300 transition-colors">
               Stellar

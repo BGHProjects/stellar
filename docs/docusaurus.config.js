@@ -5,7 +5,7 @@ import { themes as prismThemes } from "prism-react-renderer";
 const config = {
   title: "Stellar Docs",
   tagline: "Interplanetary voyage booking — technical and lore documentation",
-  favicon: "img/favicon.ico",
+  favicon: "img/logo.png",
 
   url: "http://localhost:3000",
   baseUrl: "/",
@@ -51,7 +51,7 @@ const config = {
         title: "Stellar",
         logo: {
           alt: "Stellar logo",
-          src: "img/logo.svg",
+          src: "img/logo.png",
         },
         items: [
           {

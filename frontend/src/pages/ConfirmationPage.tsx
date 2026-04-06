@@ -111,7 +111,11 @@ export default function ConfirmationPage() {
                 }}
                 className="w-20 h-20 rounded-full bg-accent-600/20 border border-accent-500/40 flex items-center justify-center mb-2 shadow-glow-accent"
               >
-                <Star className="w-9 h-9 text-accent-300 fill-accent-300/30" />
+                <img
+                  src="/images/logo.png"
+                  alt="Stellar Logo"
+                  className="w-9 h-9"
+                />
               </motion.div>
             </motion.div>
 
@@ -281,7 +285,11 @@ function BoardingPass({
         <div className="flex items-start justify-between gap-4">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 rounded-full bg-accent-500/20 border border-accent-500/30 flex items-center justify-center">
-              <Star className="w-3 h-3 text-accent-300 fill-accent-300/50" />
+              <img
+                src="/images/logo.png"
+                alt="Stellar Logo"
+                className="w-3 h-3"
+              />
             </div>
             <span className="font-display text-sm text-white/60 tracking-widest uppercase">
               Stellar

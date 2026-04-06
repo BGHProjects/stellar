@@ -140,7 +140,11 @@ export default function ChatWidget() {
               whileHover={{ rotate: 15 }}
               transition={{ type: "spring", stiffness: 400 }}
             >
-              <Star className="w-5 h-5 text-white fill-white/30" />
+              <img
+                src="/images/logo.png"
+                alt="Stellar Logo"
+                className="w-5 h-5"
+              />
             </motion.div>
             {/* Tooltip */}
             <span className="absolute right-16 bg-black/90 text-white text-xs font-sans px-3 py-1.5 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none border border-white/10">
@@ -189,7 +193,11 @@ export default function ChatWidget() {
               <div className="flex items-center justify-between px-5 py-4 border-b border-white/8 shrink-0">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-accent-600/30 border border-accent-500/40 flex items-center justify-center">
-                    <Star className="w-4 h-4 text-accent-300 fill-accent-300/30" />
+                    <img
+                      src="/images/logo.png"
+                      alt="Stellar Logo"
+                      className="w-4 h-4"
+                    />
                   </div>
                   <div>
                     <p className="font-display text-sm text-white">
