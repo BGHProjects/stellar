@@ -192,12 +192,6 @@ export default function PackagesPage() {
                 const meta = CATEGORY_META[categoryId];
                 if (!meta) return null;
 
-                const visibleItems = items.filter(() => {
-                  // Show all for journey protection and expedition extras
-                  // For amenity categories: show available + show locked-out items greyed
-                  return true;
-                });
-
                 return (
                   <motion.section
                     key={categoryId}
@@ -224,7 +218,7 @@ export default function PackagesPage() {
 
                     {/* Vertical list of add-on rows */}
                     <div className="flex flex-col gap-2">
-                      {visibleItems.map((item) => {
+                      {items.map((item) => {
                         const available = isAvailable(item, categoryId);
                         const isLocked =
                           ALWAYS_INCLUDED.has(item.id) || getPrice(item) === 0;
@@ -494,11 +488,16 @@ function AddOnInfoModal({
       {item && (
         <div className="flex flex-col gap-0 pb-6">
           {/* Large image placeholder */}
-          <ImagePlaceholder
+          <img
+            src={`/images/addons/${item.id}.jpg`}
+            alt={item.name}
+            // className="w-full h-full"
+          />
+          {/* <ImagePlaceholder
             aspectRatio="16/9"
             label={`${item.name} — package imagery`}
             rounded="rounded-none"
-          />
+          /> */}
 
           <div className="flex flex-col gap-4 px-6 pt-5">
             {/* Name + price */}

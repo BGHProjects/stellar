@@ -235,7 +235,7 @@ export function Modal({
                   <X className="w-5 h-5" />
                 </button>
               )}
-              <div className={cn(!title && "pt-8")}>{children}</div>
+              <div className={cn(title && "pt-8")}>{children}</div>
             </motion.div>
           </motion.div>
         </div>
