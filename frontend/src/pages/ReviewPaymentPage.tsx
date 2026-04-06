@@ -49,8 +49,6 @@ export default function ReviewPaymentPage() {
     passengers,
     searchParams,
     loyaltyPointsToRedeem,
-    isVoyageBond,
-    setIsVoyageBond,
     setCurrentStep,
     setCompletedBookingIds,
   } = useBookingStore();

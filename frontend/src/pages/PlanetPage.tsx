@@ -364,7 +364,7 @@ export default function PlanetPage() {
                   viewport={viewportOnce}
                   className="flex flex-col gap-4"
                 >
-                  {data.spaceports.map((port, i) => (
+                  {data.spaceports.map((port) => (
                     <motion.div key={port.id} variants={staggerItem}>
                       <Card className="overflow-hidden">
                         <img

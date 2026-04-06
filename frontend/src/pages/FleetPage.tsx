@@ -20,7 +20,6 @@ export default function FleetPage() {
   return (
     <PageTransition>
       <div className="min-h-screen bg-void pt-16">
-        {/* ── PAGE HEADER ─────────────────────────────────────────── */}
         <FleetPageHeader />
 
         <FleetPageShipClassSelectorTabs
