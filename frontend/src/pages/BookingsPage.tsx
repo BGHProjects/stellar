@@ -667,7 +667,7 @@ function BookingDetailModal({
               {booking.addOns.map((addOn) => (
                 <div
                   key={addOn.addOnId}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-surface-900/60 rounded-xl border border-white/6"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-surface-900/60 rounded-xl glass-card"
                 >
                   <div className="w-1.5 h-1.5 rounded-full bg-accent-400 shrink-0" />
                   <span className="font-sans text-sm text-white/70">

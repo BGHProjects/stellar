@@ -115,14 +115,17 @@ export default function ConfirmationPage() {
               </motion.div>
             </motion.div>
 
-            <motion.div variants={loomUp} className="flex flex-col gap-3">
+            <motion.div
+              variants={loomUp}
+              className="flex flex-col gap-3 justify-center items-center "
+            >
               <p className="label tracking-widest text-accent-300">
                 Voyage Confirmed
               </p>
               <h1 className="font-display text-display-xl text-white">
                 DEPARTURE SECURED
               </h1>
-              <p className="font-sans text-white/40 max-w-md leading-relaxed">
+              <p className="font-sans text-white/40 max-w-md leading-relaxed mt-6">
                 Your voyage has been confirmed.
                 {user && ` A confirmation has been sent to ${user.email}.`} Your
                 boarding pass{displayLegs.length > 1 ? "es are" : " is"} below.
@@ -221,7 +224,7 @@ export default function ConfirmationPage() {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// BoardingPass — the beautiful artefact
+// BoardingPass
 // ─────────────────────────────────────────────────────────────────
 
 interface BoardingPassProps {
@@ -259,13 +262,10 @@ function BoardingPass({
     <motion.div
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
-      className="relative overflow-hidden rounded-2xl"
+      className="relative overflow-hidden rounded-2xl border border-white"
     >
       {/* Background — dark surface with subtle pattern */}
-      <div className="absolute inset-0 bg-surface-900 border border-white/8" />
-
-      {/* Accent stripe top */}
-      <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-accent-600 via-accent-400 to-accent-600/50" />
+      <div className="absolute inset-0 bg-surface-900" />
 
       {/* Decorative circuit-board pattern */}
       <div
@@ -339,9 +339,7 @@ function BoardingPass({
 
         {/* Divider with perforation effect */}
         <div className="relative flex items-center gap-2">
-          <div className="w-4 h-4 rounded-full bg-void -ml-6 border-r border-white/8" />
           <div className="flex-1 border-t border-dashed border-white/10" />
-          <div className="w-4 h-4 rounded-full bg-void -mr-6 border-l border-white/8" />
         </div>
 
         {/* Details row */}
