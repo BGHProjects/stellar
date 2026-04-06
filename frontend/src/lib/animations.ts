@@ -53,17 +53,6 @@ export const heroLoom: Variants = {
   },
 };
 
-// Landing subtitle — rises after the headline
-export const heroSubtitle: Variants = {
-  hidden: { opacity: 0, y: 48, filter: "blur(6px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 1.8, ease: ease.gravity, delay: 1.1 },
-  },
-};
-
 // Landing UI controls (toggle, form, etc.) — delayed weighted fade
 export const heroFadeUp: Variants = {
   hidden: { opacity: 0, y: 24 },
