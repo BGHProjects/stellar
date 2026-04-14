@@ -94,7 +94,7 @@ const FLEET_DATA: Record<string, ShipClassData> = {
     nickname: "The Workhorse",
     tagline: "The backbone of the network.",
     description:
-      "The most common vessel in the Stellar fleet. The Tethys class handles medium routes and moon system connections with reliable comfort and a frequency that keeps the system's commercial arteries flowing. If you've travelled in the Solara system, you've almost certainly been aboard a Tethys.",
+      "The most common vessel in the Stellar fleet. The Tethys class handles medium routes and moon system connections with reliable comfort and a frequency that keeps the system's commercial arteries flowing. If you've travelled in the Taunor system, you've almost certainly been aboard a Tethys.",
     lore: "More people have crossed the Scatter aboard a Tethys-class vessel than any other ship in the fleet. There are currently 31 active units and the class has been in continuous production since 2754 — with updates and variants but the same fundamental design philosophy: a ship that can do almost anything reasonably well, at a price that makes regular interplanetary travel commercially viable for the middle of the market. Tethys vessels are optimised for Gravity Assist routing — their fuel systems are designed around the assumption of planetary slingshot trajectories, which makes them significantly more cost-effective on the longer routes than a ship that has to burn propellant for the whole journey. The cryo decks accommodate full and interval cryostasis, making them viable for journeys up to 90 days.",
     manufacturer: "Meridian Shipworks Consortium",
     introduced: "2754",
@@ -196,7 +196,7 @@ const FLEET_DATA: Record<string, ShipClassData> = {
     description:
       "The flagship class of the Stellar fleet. The Solaris is built for the longest routes in the system — voyages of 90 to 200 days between the inner worlds and the outer reaches. A city in space. Two cryo decks, three waking class decks, a forward observation dome, and rotating habitat rings for continuous artificial gravity.",
     lore: "A Solaris-class vessel underway to Calyx carries more people than some of the smaller colonies it passes en route. The ship is large enough to have its own internal geography — passengers develop preferred routes between decks, favourite corners of the observation dome, established relationships with stewards. Long-haul passengers who travel Solaris-class frequently report that the ship becomes a kind of home during the voyage, and some have noted that the hardest part of arriving is leaving it. The rotating habitat rings — a design feature borrowed from early deep-space station architecture — provide 0.85g of artificial gravity throughout the waking decks, making long-duration comfort possible in a way that smaller vessels cannot replicate. The forward observation dome is the social heart of every conscious voyage: a transparent hemisphere at the ship's prow where the void is unobstructed in every direction above the horizon.",
-    manufacturer: "Solara Heavy Industries (Aethon Orbital Ring)",
+    manufacturer: "Taunor Heavy Industries (Aethon Orbital Ring)",
     introduced: "2748",
     inService: 6,
     length: "1,240 metres",

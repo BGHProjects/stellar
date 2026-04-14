@@ -19,8 +19,8 @@
 
   "stars": [
     {
-      "id": "solara_prime",
-      "name": "Solara Prime",
+      "id": "taunor_prime",
+      "name": "Taunor Prime",
       "type": "G",
       "description": "The primary star of the system. A G-type main sequence star with a warm golden-white light. Fixed at the system barycentre for simulation purposes.",
       "orbitalRadius": 0,
@@ -30,11 +30,11 @@
       "renderRadius": 0.12
     },
     {
-      "id": "solara_minor",
-      "name": "Solara Minor",
+      "id": "taunor_minor",
+      "name": "Taunor Minor",
       "type": "K",
-      "description": "A K-type orange dwarf orbiting Solara Prime at close range. From any planet in the system both stars are visible, creating double shadows and amber-tinted twilights.",
-      "parent": "solara_prime",
+      "description": "A K-type orange dwarf orbiting Taunor Prime at close range. From any planet in the system both stars are visible, creating double shadows and amber-tinted twilights.",
+      "parent": "taunor_prime",
       "orbitalRadius": 0.08,
       "period": 18,
       "eccentricity": 0.01,
@@ -48,9 +48,9 @@
     {
       "id": "l4_station",
       "name": "L4 Lagrange Station",
-      "description": "A permanent deep-space installation at the gravitational equilibrium point 60 degrees ahead of Solara Minor on its orbital path. Used as a refuelling depot, navigation waypoint, and emergency shelter.",
+      "description": "A permanent deep-space installation at the gravitational equilibrium point 60 degrees ahead of Taunor Minor on its orbital path. Used as a refuelling depot, navigation waypoint, and emergency shelter.",
       "lagrangePoint": "L4",
-      "referenceBody": "solara_minor",
+      "referenceBody": "taunor_minor",
       "angularOffsetDegrees": 60,
       "visitable": true,
       "spaceports": ["l4_dock"],
@@ -60,9 +60,9 @@
     {
       "id": "l5_station",
       "name": "L5 Lagrange Station",
-      "description": "A permanent deep-space installation at the gravitational equilibrium point 60 degrees behind Solara Minor. Mirror installation to L4.",
+      "description": "A permanent deep-space installation at the gravitational equilibrium point 60 degrees behind Taunor Minor. Mirror installation to L4.",
       "lagrangePoint": "L5",
-      "referenceBody": "solara_minor",
+      "referenceBody": "taunor_minor",
       "angularOffsetDegrees": -60,
       "visitable": true,
       "spaceports": ["l5_dock"],
@@ -76,7 +76,7 @@
       "id": "serrath",
       "name": "Serrath",
       "type": "rocky_planet",
-      "parent": "solara_prime",
+      "parent": "taunor_prime",
       "description": "An uninhabitable rocky planet between Aethon and the inner system. Near-zero rotation, collapsed magnetosphere, and a violent terminator line between its permanently molten and permanently frozen hemispheres. A Scenic Voyage waypoint — not a destination.",
       "orbitalRadius": 0.6,
       "period": 145,
@@ -96,8 +96,8 @@
       "id": "aethon",
       "name": "Aethon",
       "type": "super_earth",
-      "parent": "solara_prime",
-      "description": "The political and commercial heart of the Solara system. A super-Earth with stronger gravity, thicker atmosphere, and deep blue skies that shift to purple at sunset. The most densely urbanised world in the system and the hub of interplanetary governance.",
+      "parent": "taunor_prime",
+      "description": "The political and commercial heart of the Taunor system. A super-Earth with stronger gravity, thicker atmosphere, and deep blue skies that shift to purple at sunset. The most densely urbanised world in the system and the hub of interplanetary governance.",
       "orbitalRadius": 1.1,
       "period": 380,
       "eccentricity": 0.03,
@@ -174,7 +174,7 @@
       "id": "vareth",
       "name": "Vareth",
       "type": "gas_giant",
-      "parent": "solara_prime",
+      "parent": "taunor_prime",
       "description": "A gas giant with atmospheric composition combining Jupiter's scale and Venus's violence. Vivid storm bands of crimson, amber, violet, and yellow-green. A permanent hyperstorm at the southern pole. The planet itself is unvisitable — atmospheric pressure and temperature would destroy any vessel.",
       "orbitalRadius": 3.2,
       "period": 890,
@@ -188,15 +188,15 @@
         "kalos",
         "thal",
         "mira",
-        "vareth_moon_4",
-        "vareth_moon_5",
-        "vareth_moon_6",
-        "vareth_moon_7",
-        "vareth_moon_8",
-        "vareth_moon_9",
-        "vareth_moon_10",
-        "vareth_moon_11",
-        "vareth_moon_12"
+        "gigas",
+        "zsolt",
+        "navem",
+        "marrus",
+        "svitha",
+        "ninas",
+        "somn",
+        "iowyn",
+        "bracketh"
       ],
       "renderColor": "#C2410C",
       "renderRadius": 0.055,
@@ -258,8 +258,8 @@
       "renderFeatures": ["ice_surface", "subsurface_glow"]
     },
     {
-      "id": "vareth_moon_4",
-      "name": "Vareth IV",
+      "id": "gigas",
+      "name": "Gigas",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body in the outer Vareth moon family. Uncolonised.",
@@ -275,8 +275,8 @@
       "renderRadius": 0.004
     },
     {
-      "id": "vareth_moon_5",
-      "name": "Vareth V",
+      "id": "zsolt",
+      "name": "Zsolt",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -292,8 +292,8 @@
       "renderRadius": 0.003
     },
     {
-      "id": "vareth_moon_6",
-      "name": "Vareth VI",
+      "id": "navem",
+      "name": "Navem",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -309,8 +309,8 @@
       "renderRadius": 0.003
     },
     {
-      "id": "vareth_moon_7",
-      "name": "Vareth VII",
+      "id": "marrus",
+      "name": "Marrus",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -326,8 +326,8 @@
       "renderRadius": 0.003
     },
     {
-      "id": "vareth_moon_8",
-      "name": "Vareth VIII",
+      "id": "svitha",
+      "name": "Svitha",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -343,8 +343,8 @@
       "renderRadius": 0.002
     },
     {
-      "id": "vareth_moon_9",
-      "name": "Vareth IX",
+      "id": "ninas",
+      "name": "Ninas",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -360,8 +360,8 @@
       "renderRadius": 0.002
     },
     {
-      "id": "vareth_moon_10",
-      "name": "Vareth X",
+      "id": "somn",
+      "name": "Somn",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -377,8 +377,8 @@
       "renderRadius": 0.002
     },
     {
-      "id": "vareth_moon_11",
-      "name": "Vareth XI",
+      "id": "iowyn",
+      "name": "Iowyn",
       "type": "moon",
       "parent": "vareth",
       "description": "An irregular captured body. Uncolonised.",
@@ -394,8 +394,8 @@
       "renderRadius": 0.002
     },
     {
-      "id": "vareth_moon_12",
-      "name": "Vareth XII",
+      "id": "bracketh",
+      "name": "Bracketh",
       "type": "moon",
       "parent": "vareth",
       "description": "The outermost and most irregular of Vareth's captured moons. Uncolonised.",
@@ -414,7 +414,7 @@
       "id": "calyx",
       "name": "Calyx",
       "type": "ice_planet",
-      "parent": "solara_prime",
+      "parent": "taunor_prime",
       "description": "A small, dense ice planet in the outer system beyond the Scatter. Extraordinarily cold and mineral-rich. Colonists live almost entirely underground or in pressurised surface domes. Underground city grids are visible as geometric light patterns through the ice sheet at night.",
       "orbitalRadius": 5.8,
       "period": 2400,
@@ -471,7 +471,7 @@
       "id": "drath",
       "name": "Drath",
       "type": "gas_giant",
-      "parent": "solara_prime",
+      "parent": "taunor_prime",
       "description": "A cold, muted blue-grey gas giant at the outer edge of the system. Its erratic, periodically reversing magnetosphere makes all nearby bodies lethally irradiated during polarity events. No habitation has ever been sanctioned. Visible in the star map as a slow, brooding presence at the system's edge.",
       "orbitalRadius": 9.4,
       "period": 6100,

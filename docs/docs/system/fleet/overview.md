@@ -6,7 +6,7 @@ sidebar_position: 1
 
 # The Fleet
 
-Stellar operates four vessel classes across the Solara network. Unlike commercial airlines — where the same 737 might fly any route — each ship class has a defined operational profile. The Helion is built for speed on short inner-system hops; the Solaris is built for comfort on voyages measured in months.
+Stellar operates four vessel classes across the Taunor network. Unlike commercial airlines — where the same 737 might fly any route — each ship class has a defined operational profile. The Helion is built for speed on short inner-system hops; the Solaris is built for comfort on voyages measured in months.
 
 Multiple vessels of each class are flying simultaneously. You book a flight number on a class, not a specific named ship.
 

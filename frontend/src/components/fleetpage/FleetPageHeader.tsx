@@ -20,7 +20,7 @@ const FleetPageHeader = () => {
         >
           Ships of the
           <br />
-          <span className="text-gradient">Solara Network</span>
+          <span className="text-gradient">Taunor Network</span>
         </motion.h1>
         <motion.p
           variants={fadeUp}

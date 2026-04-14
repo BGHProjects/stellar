@@ -13,7 +13,7 @@ Calyx is a small, dense ice planet in the outer system beyond the Scatter — th
 ## Calyx
 
 **Type:** Ice planet  
-**Position:** 5.8 AU from Solara Prime  
+**Position:** 5.8 AU from Taunor Prime  
 **Status:** Colonised — 3 spaceports  
 **Population:** ~1.8 million  
 **Gravity:** 0.8g  

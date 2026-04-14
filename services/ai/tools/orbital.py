@@ -1,5 +1,5 @@
 """
-Orbital mechanics for the Solara system — Python implementation.
+Orbital mechanics for the Taunor system — Python implementation.
 
 Mirrors gateway/orbital/orbital.go and frontend/src/lib/orbital.ts.
 All three implementations read from the same system.json config values,

@@ -1,6 +1,6 @@
 # Stellar AI Chatbot Service
 
-A FastAPI microservice providing an agentic chatbot for the Stellar voyage booking system. The chatbot can answer natural language questions about the Solara system, calculate orbital windows, find optimal travel times, and search for available voyages — all powered by live calculations from `system.json`.
+A FastAPI microservice providing an agentic chatbot for the Stellar voyage booking system. The chatbot can answer natural language questions about the Taunor system, calculate orbital windows, find optimal travel times, and search for available voyages — all powered by live calculations from `system.json`.
 
 ## Stack
 

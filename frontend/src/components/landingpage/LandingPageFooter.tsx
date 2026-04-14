@@ -16,7 +16,7 @@ const LandingPageFooter = () => {
           <span className="font-display text-sm text-white">Stellar</span>
         </div>
         <p className="font-sans text-xs text-white/20 text-center">
-          Interplanetary voyage booking for the Solara system. All journeys
+          Interplanetary voyage booking for the Taunor system. All journeys
           subject to orbital window availability.
         </p>
         <div className="flex gap-6">

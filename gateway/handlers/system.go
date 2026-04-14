@@ -21,7 +21,7 @@ func NewSystemHandler(sysCfg *config.SystemConfig) *SystemHandler {
 // GetBodies godoc
 //
 //	@Summary		Get all orbital bodies
-//	@Description	Returns all stars, planets, and moons in the Solara system including their orbital parameters, render properties, and visitation status. Used by the frontend 3D renderer and the explore mode star map.
+//	@Description	Returns all stars, planets, and moons in the Taunor system including their orbital parameters, render properties, and visitation status. Used by the frontend 3D renderer and the explore mode star map.
 //	@Tags			system
 //	@Produce		json
 //	@Success		200	{object}	systemBodiesResponse

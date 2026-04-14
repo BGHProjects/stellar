@@ -6,17 +6,17 @@ sidebar_position: 2
 
 # The Binary Stars
 
-The Solara system orbits two stars. This shapes everything — the lighting, the seasons, the culture.
+The Taunor system orbits two stars. This shapes everything — the lighting, the seasons, the culture.
 
-## Solara Prime
+## Taunor Prime
 
 A G-type main sequence star, slightly warmer and more orange-hued than Sol. Fixed at the system barycentre for simulation purposes. All orbital periods and radii are measured relative to its position.
 
 **Render colour:** `#FFF4C2` (warm golden-white)
 
-## Solara Minor
+## Taunor Minor
 
-A K-type orange dwarf orbiting Solara Prime at 0.08 AU on an 18-day period. It is visible from every inhabited body in the system as a second sun — sometimes close to Solara Prime in the sky, sometimes widely separated, depending on orbital phase.
+A K-type orange dwarf orbiting Taunor Prime at 0.08 AU on an 18-day period. It is visible from every inhabited body in the system as a second sun — sometimes close to Taunor Prime in the sky, sometimes widely separated, depending on orbital phase.
 
 **Render colour:** `#FFB347` (amber-orange)
 
@@ -26,7 +26,7 @@ A K-type orange dwarf orbiting Solara Prime at 0.08 AU on an 18-day period. It i
 
 **The Pale Season** — on Aethon's equatorial zones, there are periods when both stars are simultaneously above the horizon for 40+ hours continuously. Businesses run through it; higher-latitude residents consider it a reason never to move south.
 
-**Amber twilights** — as Solara Minor sets independently of Solara Prime, it creates twilight periods with a distinctive orange-amber cast that is unique to the system.
+**Amber twilights** — as Taunor Minor sets independently of Taunor Prime, it creates twilight periods with a distinctive orange-amber cast that is unique to the system.
 
 ---
 

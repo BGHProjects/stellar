@@ -24,11 +24,11 @@ const PlanetSidePanel = ({
   const isStar = STAR_IDS.has(bodyId);
 
   const STAR_LORE: Record<string, { desc: string }> = {
-    solara_prime: {
+    taunor_prime: {
       desc: "A G-type main sequence star — the dominant mass of the system and its primary heat source. All orbital periods are measured relative to its position at the barycentre.",
     },
-    solara_minor: {
-      desc: "A K-type orange dwarf orbiting Solara Prime at 0.08 AU on an 18-day period. Visible from every inhabited world as a second sun, creating double shadows and amber twilights.",
+    taunor_minor: {
+      desc: "A K-type orange dwarf orbiting Taunor Prime at 0.08 AU on an 18-day period. Visible from every inhabited world as a second sun, creating double shadows and amber twilights.",
     },
   };
 

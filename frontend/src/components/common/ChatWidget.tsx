@@ -13,7 +13,7 @@ const GATEWAY_URL = import.meta.env.VITE_API_URL ?? "http://localhost:8080";
 const MOCK_MODE = import.meta.env.VITE_MOCK_MODE === "true";
 
 const MOCK_RESPONSES = [
-  "I'm the Stellar voyage assistant. In the full deployment I can answer questions about routes, orbital windows, journey durations, and help you find the best time to travel anywhere in the Solara system.",
+  "I'm the Stellar voyage assistant. In the full deployment I can answer questions about routes, orbital windows, journey durations, and help you find the best time to travel anywhere in the Taunor system.",
   "For example, I could tell you the current distance between Aethon and Calyx, find the next 5-star orbital window for a specific route, or explain the difference between Gravity Assist and Scenic routes.",
   "The chatbot is powered by Claude with live orbital calculation tools — it can run real-time calculations from system.json to answer questions about the system.",
 ];
@@ -34,7 +34,7 @@ export default function ChatWidget() {
     {
       role: "assistant",
       content:
-        "Hello — I'm your Stellar voyage assistant. I can answer questions about routes, orbital windows, journey times, destinations, and anything else about the Solara system. What would you like to know?",
+        "Hello — I'm your Stellar voyage assistant. I can answer questions about routes, orbital windows, journey times, destinations, and anything else about the Taunor system. What would you like to know?",
     },
   ]);
 
@@ -288,7 +288,7 @@ export default function ChatWidget() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Ask anything about the Solara system…"
+                    placeholder="Ask anything about the Taunor system…"
                     disabled={loading}
                     className="flex-1 bg-transparent font-sans text-sm text-white placeholder-white/25 outline-none disabled:opacity-50"
                   />

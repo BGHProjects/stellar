@@ -341,7 +341,7 @@ export const MOCK_SYSTEM_CONFIG = {
         id: "ship_library",
         name: "Ship Library & Archive",
         description:
-          "Digital archive of Solara system history, culture and science.",
+          "Digital archive of Taunor system history, culture and science.",
         priceCredits: 0,
         amenityOnly: true,
       },

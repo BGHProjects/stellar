@@ -6,7 +6,7 @@ sidebar_position: 2
 
 # The Config System
 
-`config/system.json` is the single source of truth for everything in the Solara system. Every service reads from it at startup. Nothing is hardcoded.
+`config/system.json` is the single source of truth for everything in the Taunor system. Every service reads from it at startup. Nothing is hardcoded.
 
 ## What Lives in system.json
 
@@ -14,7 +14,7 @@ sidebar_position: 2
 | ------------------ | ---------------------------------------------------------------------- |
 | `epoch`            | Simulation start date and day number                                   |
 | `simulation`       | AU conversion factor, orbit refinement passes, Scatter radii           |
-| `stars`            | Solara Prime and Solara Minor orbital and render parameters            |
+| `stars`            | Taunor Prime and Taunor Minor orbital and render parameters            |
 | `lagrangeStations` | L4 and L5 station positions and spaceport IDs                          |
 | `bodies`           | All planets and moons — orbital params, render data, visitation status |
 | `spaceports`       | All spaceports with parent body and type                               |

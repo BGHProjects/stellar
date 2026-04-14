@@ -13,7 +13,7 @@ Two additional bodies exist in the system — visible in the 3D star map, observ
 ## Serrath
 
 **Type:** Rocky planet  
-**Position:** 0.6 AU from Solara Prime — inner system, between the binary stars and Aethon  
+**Position:** 0.6 AU from Taunor Prime — inner system, between the binary stars and Aethon  
 **Status:** Uninhabitable  
 **Orbital Period:** 145 days
 
@@ -29,14 +29,14 @@ Serrath sits in what would technically be a habitable zone, but a cascade of geo
 
 ### As a Destination
 
-Serrath is not a landing destination — there is no spaceport and no safe landing site. However, Lunara-class scenic voyages run a deliberate close-approach flyby every 30 days. Passing within visual range of Serrath's terminator line at safe distance is considered one of the defining sights of a Solara system voyage.
+Serrath is not a landing destination — there is no spaceport and no safe landing site. However, Lunara-class scenic voyages run a deliberate close-approach flyby every 30 days. Passing within visual range of Serrath's terminator line at safe distance is considered one of the defining sights of a Taunor system voyage.
 
 ---
 
 ## Drath
 
 **Type:** Gas giant  
-**Position:** 9.4 AU from Solara Prime — outer edge of the system  
+**Position:** 9.4 AU from Taunor Prime — outer edge of the system  
 **Status:** Uninhabitable — no sanctioned habitation of any body in its system  
 **Orbital Period:** 6,100 days (~16.7 standard years)
 

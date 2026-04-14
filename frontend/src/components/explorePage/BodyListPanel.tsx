@@ -28,8 +28,8 @@ const BodyListPanel = ({
     {
       label: "Stars & Inner",
       ids: [
-        "solara_prime",
-        "solara_minor",
+        "taunor_prime",
+        "taunor_minor",
         "l4_station",
         "l5_station",
         "serrath",

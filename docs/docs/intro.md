@@ -7,12 +7,12 @@ sidebar_position: 1
 
 # Stellar Documentation
 
-Welcome to the Stellar documentation site. Stellar is a full-stack portfolio project — an interplanetary voyage booking application set in the fictional Solara binary star system.
+Welcome to the Stellar documentation site. Stellar is a full-stack portfolio project — an interplanetary voyage booking application set in the fictional Taunor binary star system.
 
 Use the navigation on the left to explore:
 
 - **Technical Docs** — architecture, services, frontend implementation, and testing
-- **The Solara System** — planets, moons, the fleet, and the route network
+- **The Taunor System** — planets, moons, the fleet, and the route network
 - **Voyages** — how bookings work, orbital windows, scheduling, and all booking options
 
 ---
@@ -32,7 +32,7 @@ Use the navigation on the left to explore:
 
 | Topic                    | Where to go                              |
 | ------------------------ | ---------------------------------------- |
-| The star system overview | [The Solara System](/system/overview)    |
+| The star system overview | [The Taunor System](/system/overview)    |
 | Where you can travel     | [Planets & Moons](/system/bodies/aethon) |
 | The ships                | [The Fleet](/system/fleet/overview)      |
 | All scheduled routes     | [Route Map](/system/route-map)           |

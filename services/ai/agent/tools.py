@@ -63,7 +63,7 @@ TOOL_SCHEMAS = [
     {
         "name": "get_orbital_positions",
         "description": (
-            "Get the current 2D orbital positions (in AU) of all bodies in the Solara system "
+            "Get the current 2D orbital positions (in AU) of all bodies in the Taunor system "
             "at a given simulation day. Returns x,y coordinates for each body."
         ),
         "input_schema": {
@@ -151,7 +151,7 @@ TOOL_SCHEMAS = [
     {
         "name": "get_body_info",
         "description": (
-            "Get factual information about a planet, moon, or other body in the Solara system — "
+            "Get factual information about a planet, moon, or other body in the Taunor system — "
             "orbital parameters, visitation status, spaceports, and description."
         ),
         "input_schema": {
@@ -185,7 +185,7 @@ TOOL_SCHEMAS = [
     {
         "name": "get_system_overview",
         "description": (
-            "Get a high-level overview of the Solara system: all visitable bodies, "
+            "Get a high-level overview of the Taunor system: all visitable bodies, "
             "all scheduled routes, and all ship classes."
         ),
         "input_schema": {

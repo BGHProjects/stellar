@@ -1,4 +1,4 @@
-// Package orbital implements the Solara system's orbital mechanics.
+// Package orbital implements the Taunor system's orbital mechanics.
 //
 // All calculations use the simplified circular-orbit-with-eccentricity model
 // defined in system.json. Positions are calculated as pure functions of time
@@ -9,7 +9,7 @@
 // config values, so the frontend renderer and backend pricing logic always
 // agree on where every body is.
 //
-// Coordinate system: 2D orbital plane, origin at system barycentre (Solara Prime).
+// Coordinate system: 2D orbital plane, origin at system barycentre (Taunor Prime).
 // Units: AU (astronomical units) for distance, days for time.
 package orbital
 

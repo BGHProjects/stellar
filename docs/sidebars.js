@@ -45,7 +45,7 @@ const sidebars = {
   systemSidebar: [
     {
       type: "category",
-      label: "The Solara System",
+      label: "The Taunor System",
       items: [
         "system/overview",
         "system/binary-stars",

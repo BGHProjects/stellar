@@ -51,7 +51,7 @@ const LandingPageDestinations = ({ navigate }: ILandingPageDestinations) => {
                   <Badge variant="accent">6 Spaceports</Badge>
                 </div>
                 <p className="font-sans text-sm text-white/50">
-                  The political and commercial heart of the Solara system. The
+                  The political and commercial heart of the Taunor system. The
                   most advanced world, the busiest spaceport network.
                 </p>
               </div>

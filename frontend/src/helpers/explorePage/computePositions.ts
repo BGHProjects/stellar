@@ -14,11 +14,11 @@ const computePositions = (
   }
 
   // Add synthetic star entries if not in bodies array
-  if (!bodyMap["solara_prime"]) {
-    positions["solara_prime"] = { x: 0, y: 0 };
+  if (!bodyMap["taunor_prime"]) {
+    positions["taunor_prime"] = { x: 0, y: 0 };
   }
-  if (!bodyMap["solara_minor"] && systemConfig.stars?.solaraMinor) {
-    const s = systemConfig.stars.solaraMinor;
+  if (!bodyMap["taunor_minor"] && systemConfig.stars?.taunorMinor) {
+    const s = systemConfig.stars.taunorMinor;
     const p = {
       orbitalRadius: s.orbitalRadius,
       period: s.period,
@@ -28,24 +28,24 @@ const computePositions = (
     const angle =
       (p.startPhase * Math.PI) / 180 + ((2 * Math.PI) / p.period) * simDay;
     const r = p.orbitalRadius * (1 - p.eccentricity * Math.cos(angle));
-    positions["solara_minor"] = {
+    positions["taunor_minor"] = {
       x: r * Math.cos(angle),
       y: r * Math.sin(angle),
     };
   } else {
-    positions["solara_prime"] = { x: 0, y: 0 };
+    positions["taunor_prime"] = { x: 0, y: 0 };
     // 0.08 AU is accurate but visually they overlap at scene scale — offset by 0.35 AU visually
     const minorAngle = ((2 * Math.PI) / 18) * simDay;
-    positions["solara_minor"] = {
+    positions["taunor_minor"] = {
       x: 0.35 * Math.cos(minorAngle),
       y: 0.35 * Math.sin(minorAngle),
     };
   }
 
-  // Lagrange stations at ±60° from solara_minor
+  // Lagrange stations at ±60° from taunor_minor
   const minorAngle = Math.atan2(
-    positions["solara_minor"].y,
-    positions["solara_minor"].x,
+    positions["taunor_minor"].y,
+    positions["taunor_minor"].x,
   );
   const lagrangeR = 0.08;
   positions["l4_station"] = {

@@ -1,6 +1,6 @@
 # Stellar Docs
 
-The Docusaurus documentation site for the Stellar interplanetary voyage booking system. Contains both technical documentation for developers and lore documentation for the Solara system.
+The Docusaurus documentation site for the Stellar interplanetary voyage booking system. Contains both technical documentation for developers and lore documentation for the Taunor system.
 
 ## Running Locally
 

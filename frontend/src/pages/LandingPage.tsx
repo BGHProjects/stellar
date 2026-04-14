@@ -246,7 +246,7 @@ export default function LandingPage() {
                 className="w-full flex flex-col items-center gap-4"
               >
                 <p className="font-sans text-sm text-white/40 text-center max-w-md">
-                  Navigate the Solara system in real time. Click any planet to
+                  Navigate the Taunor system in real time. Click any planet to
                   see routes, distances, and available voyages.
                 </p>
                 <div className="flex gap-3">

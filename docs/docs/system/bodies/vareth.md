@@ -6,7 +6,7 @@ sidebar_position: 2
 
 # Vareth System
 
-Vareth is a gas giant — uninhabitable, spectacular, and the gravitational anchor of three colonised moons. It sits at 3.2 AU from Solara Prime, on the near side of the Scatter.
+Vareth is a gas giant — uninhabitable, spectacular, and the gravitational anchor of three colonised moons. It sits at 3.2 AU from Taunor Prime, on the near side of the Scatter.
 
 ## Vareth
 
@@ -110,7 +110,7 @@ When Vareth's magnetosphere interacts with Thal's volcanic emissions, the result
 
 ### Overview
 
-An ice moon with a confirmed subsurface ocean and native microbial life. The most scientifically significant body in the system. The discovery of microbial organisms in Mira's subsurface ocean — simple, chemosynthetic, thriving in the mineral-rich thermal plumes — changed the Solara system's understanding of itself. These organisms evolved here, independently of all other life in the system.
+An ice moon with a confirmed subsurface ocean and native microbial life. The most scientifically significant body in the system. The discovery of microbial organisms in Mira's subsurface ocean — simple, chemosynthetic, thriving in the mineral-rich thermal plumes — changed the Taunor system's understanding of itself. These organisms evolved here, independently of all other life in the system.
 
 Access is strictly controlled by interplanetary treaty. Visitors are permitted only to the orbital station — no surface landings except for authorised research vessels operating under strict biosafety protocols.
 

@@ -1,19 +1,19 @@
 ---
 id: overview
-title: The Solara System
+title: The Taunor System
 sidebar_position: 1
 ---
 
-# The Solara System
+# The Taunor System
 
-The Solara system is a binary star system containing three colonised planetary systems, a debris field called the Scatter, and two uninhabitable outer bodies. It is the setting for all Stellar voyage bookings.
+The Taunor system is a binary star system containing three colonised planetary systems, a debris field called the Scatter, and two uninhabitable outer bodies. It is the setting for all Stellar voyage bookings.
 
 ## At a Glance
 
 | Body                      | Type                     | Visitable              | Spaceports           |
 | ------------------------- | ------------------------ | ---------------------- | -------------------- |
-| Solara Prime              | G-type star              | No                     | —                    |
-| Solara Minor              | K-type orange dwarf      | No                     | —                    |
+| Taunor Prime              | G-type star              | No                     | —                    |
+| Taunor Minor              | K-type orange dwarf      | No                     | —                    |
 | L4 / L5 Lagrange Stations | Deep-space installations | Waypoint only          | 2                    |
 | Serrath                   | Rocky planet             | No (scenic flyby only) | —                    |
 | **Aethon**                | Super-Earth              | **Yes**                | **6**                |
@@ -32,9 +32,9 @@ The Solara system is a binary star system containing three colonised planetary s
 
 ## The Binary Stars
 
-**Solara Prime** is a G-type main sequence star — warm, golden-white, slightly more orange-hued than Sol. It is the dominant mass and is treated as the system barycentre for simulation purposes.
+**Taunor Prime** is a G-type main sequence star — warm, golden-white, slightly more orange-hued than Sol. It is the dominant mass and is treated as the system barycentre for simulation purposes.
 
-**Solara Minor** is a K-type orange dwarf orbiting Solara Prime at 0.08 AU on an 18-day period. From any planet in the system, both stars are visible at different points in the sky, creating double shadows, amber-tinted twilights, and periods where both are simultaneously above the horizon.
+**Taunor Minor** is a K-type orange dwarf orbiting Taunor Prime at 0.08 AU on an 18-day period. From any planet in the system, both stars are visible at different points in the sky, creating double shadows, amber-tinted twilights, and periods where both are simultaneously above the horizon.
 
 ## The Lagrange Stations
 

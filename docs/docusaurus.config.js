@@ -64,7 +64,7 @@ const config = {
             type: "docSidebar",
             sidebarId: "systemSidebar",
             position: "left",
-            label: "The Solara System",
+            label: "The Taunor System",
           },
           {
             type: "docSidebar",

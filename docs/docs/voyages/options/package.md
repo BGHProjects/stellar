@@ -58,7 +58,7 @@ Available to: Conscious Voyage and Cryo Intervals passengers.
 | Add-On                    | Notes                                                                           |
 | ------------------------- | ------------------------------------------------------------------------------- |
 | Immersive Reality Suite   | Bookable sessions in a full-environment simulation room                         |
-| Ship Library & Archive    | Digital archive of Solara system history, culture, and science                  |
+| Ship Library & Archive    | Digital archive of Taunor system history, culture, and science                  |
 | Live Performance Schedule | Musicians, speakers, theatrical performances. Available on select voyages only. |
 
 The Live Performance schedule is voyage-specific — it only appears in the booking flow if the selected voyage has a scheduled performance programme.
@@ -80,4 +80,4 @@ Available to all passengers, all cryo options.
 
 The Spacewalk is available on Tethys, Lunara, and Solaris class vessels. It is segment-restricted — not available near high-radiation zones, the Vareth magnetosphere, or active debris fields. The booking flow checks the voyage segment and enables the add-on accordingly.
 
-The Spacewalk is one of the most premium optional experiences in the booking flow — not because of price, but because it has no terrestrial equivalent. Walking the exterior of a ship in deep space, with nothing between you and the void, is an experience that a very small number of humans in the fictional history of the Solara system have had access to. Stellar offers it as an add-on.
+The Spacewalk is one of the most premium optional experiences in the booking flow — not because of price, but because it has no terrestrial equivalent. Walking the exterior of a ship in deep space, with nothing between you and the void, is an experience that a very small number of humans in the fictional history of the Taunor system have had access to. Stellar offers it as an add-on.

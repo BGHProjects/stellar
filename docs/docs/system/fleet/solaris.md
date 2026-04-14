@@ -7,7 +7,7 @@ sidebar_position: 5
 # Solaris-class
 
 **Nickname:** The Deep Voyager  
-**Manufacturer:** Solara Heavy Industries (Aethon Orbital Ring)  
+**Manufacturer:** Taunor Heavy Industries (Aethon Orbital Ring)  
 **Introduced:** 2748  
 **In Service:** 6 active vessels  
 **Cruise Speed:** 0.025 AU/day

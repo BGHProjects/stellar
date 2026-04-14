@@ -11,12 +11,12 @@ export const VISITABLE_IDS = new Set([
   "l4_station",
   "l5_station",
 ]);
-export const STAR_IDS = new Set(["solara_prime", "solara_minor"]);
+export const STAR_IDS = new Set(["taunor_prime", "taunor_minor"]);
 
 // Sizes in scene units
 export const BODY_SIZES: Record<string, number> = {
-  solara_prime: 1.4,
-  solara_minor: 0.9,
+  taunor_prime: 1.4,
+  taunor_minor: 0.9,
   serrath: 0.16,
   aethon: 0.55,
   vareth: 0.9,
@@ -33,8 +33,8 @@ export const BODY_SIZES: Record<string, number> = {
 
 // Colours — each body gets a distinct hue
 export const BODY_COLOURS: Record<string, string> = {
-  solara_prime: "#FFF4C2",
-  solara_minor: "#FFB347",
+  taunor_prime: "#FFF4C2",
+  taunor_minor: "#FFB347",
   serrath: "#8B6355",
   aethon: "#4A90D9",
   vareth: "#C2410C",
@@ -51,15 +51,15 @@ export const BODY_COLOURS: Record<string, string> = {
 
 // Emissive intensity — stars glow, others are lit
 export const EMISSIVE: Record<string, number> = {
-  solara_prime: 1.0,
-  solara_minor: 1.0,
+  taunor_prime: 1.0,
+  taunor_minor: 1.0,
   default: 0.0,
 };
 
 // Human-readable names
 export const BODY_NAMES: Record<string, string> = {
-  solara_prime: "Solara Prime",
-  solara_minor: "Solara Minor",
+  taunor_prime: "Taunor Prime",
+  taunor_minor: "Taunor Minor",
   serrath: "Serrath",
   aethon: "Aethon",
   vareth: "Vareth",
@@ -76,8 +76,8 @@ export const BODY_NAMES: Record<string, string> = {
 
 // Body type labels for the body list panel
 export const BODY_TYPE: Record<string, string> = {
-  solara_prime: "Star",
-  solara_minor: "Star",
+  taunor_prime: "Star",
+  taunor_minor: "Star",
   serrath: "Rocky Planet",
   aethon: "Super-Earth",
   vareth: "Gas Giant",
@@ -101,6 +101,6 @@ export const MOON_IDS = new Set([
   "vael",
   "l4_station",
   "l5_station",
-  "solara_minor",
+  "taunor_minor",
 ]);
 export const LABEL_SHOW_DISTANCE = 40; // scene units — hide moon labels beyond this camera distance

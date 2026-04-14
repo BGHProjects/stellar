@@ -6,7 +6,7 @@ sidebar_position: 3
 
 # Orbital Calculations
 
-The `gateway/orbital/orbital.go` package implements the Solara system's orbital mechanics. The same formula is implemented in TypeScript (`frontend/src/lib/orbital.ts`), and Python (`services/ai/tools/orbital.py`, `services/routing/solver/optimiser.py`). All four read from `system.json`, so they always agree.
+The `gateway/orbital/orbital.go` package implements the Taunor system's orbital mechanics. The same formula is implemented in TypeScript (`frontend/src/lib/orbital.ts`), and Python (`services/ai/tools/orbital.py`, `services/routing/solver/optimiser.py`). All four read from `system.json`, so they always agree.
 
 ## The Formula
 

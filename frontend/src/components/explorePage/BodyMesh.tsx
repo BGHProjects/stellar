@@ -104,7 +104,7 @@ const BodyMesh = ({
       {/* Star point light */}
       {isStar && (
         <pointLight
-          intensity={id === "solara_prime" ? 10 : 5}
+          intensity={id === "taunor_prime" ? 10 : 5}
           distance={AU_SCALE * 12}
           color={BODY_COLOURS[id]}
         />

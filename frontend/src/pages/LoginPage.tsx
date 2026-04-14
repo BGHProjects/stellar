@@ -207,7 +207,7 @@ export default function LoginPage() {
                 <span className="text-gradient-accent">is not empty.</span>
               </p>
               <p className="font-sans text-sm text-white/30">
-                Welcome back to the Solara system.
+                Welcome back to the Taunor system.
               </p>
             </motion.div>
           </div>

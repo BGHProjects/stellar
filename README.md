@@ -1,6 +1,6 @@
 # Stellar
 
-An interplanetary voyage booking application set in the fictional Solara binary star system. Built as a full-stack portfolio project demonstrating a polyglot microservice architecture, orbital mechanics simulation, 3D rendering, agentic AI, and biometric authentication.
+An interplanetary voyage booking application set in the fictional Taunor binary star system. Built as a full-stack portfolio project demonstrating a polyglot microservice architecture, orbital mechanics simulation, 3D rendering, agentic AI, and biometric authentication.
 
 You can view a deployment with reduced functionality [here](https://stellar-frontend-ten.vercel.app/).
 <br />
@@ -79,7 +79,7 @@ See [`config/system.json`](./config/system.json) for the full specification.
 
 **Orbital mechanics** — planetary positions are calculated at runtime using the same formula implemented in Go (gateway), TypeScript (frontend renderer), and Python (AI and routing services). Journey durations and prices change based on where the planets actually are on the day of departure.
 
-**3D star map** — React Three Fibre renders the full Solara system with orbiting bodies, the Scatter debris field, and route arcs. Interactive — click any visitable body to see routes, distances, and optimal departure windows.
+**3D star map** — React Three Fibre renders the full Taunor system with orbiting bodies, the Scatter debris field, and route arcs. Interactive — click any visitable body to see routes, distances, and optimal departure windows.
 
 **Booking flow** — six-page cruise-style booking: search → voyage detail → packages → passengers → review → confirmation. Supports multi-leg journeys, three cryostasis modes, four cabin classes, and a full add-on catalogue.
 

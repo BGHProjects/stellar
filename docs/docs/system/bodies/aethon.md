@@ -7,14 +7,14 @@ sidebar_position: 1
 # Aethon
 
 **Type:** Super-Earth  
-**Position:** Inner system — 1.1 AU from Solara Prime  
+**Position:** Inner system — 1.1 AU from Taunor Prime  
 **Status:** Fully colonised — political and commercial heart of the system  
 **Population:** ~4.2 billion  
 **Spaceports:** 6
 
 ## Overview
 
-The most massive habitable world in the system — roughly 1.4 Earth masses, slightly stronger gravity, thicker atmosphere with a deep blue sky that takes on purple hues at the edges during sunsets. Aethon was the first world in the Solara system to achieve industrialisation and the first to reach orbit. Its head start compounds with every generation — the most sophisticated financial systems, the most advanced manufacturing, and the densest academic infrastructure in the system all reside here.
+The most massive habitable world in the system — roughly 1.4 Earth masses, slightly stronger gravity, thicker atmosphere with a deep blue sky that takes on purple hues at the edges during sunsets. Aethon was the first world in the Taunor system to achieve industrialisation and the first to reach orbit. Its head start compounds with every generation — the most sophisticated financial systems, the most advanced manufacturing, and the densest academic infrastructure in the system all reside here.
 
 The planet's stronger gravity (1.4g) has shaped its architecture toward the horizontal: megacity sprawl that spreads laterally across continents rather than reaching skyward, interrupted only by the massive tether infrastructure of the Orbital Ring above.
 

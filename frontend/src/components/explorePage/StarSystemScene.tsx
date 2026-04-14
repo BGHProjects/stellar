@@ -44,8 +44,8 @@ const StarSystemScene = ({
   const majorOrbits = [0.6, 1.1, 3.2, 5.8, 9.4];
 
   const allBodyIds = [
-    "solara_prime",
-    "solara_minor",
+    "taunor_prime",
+    "taunor_minor",
     "l4_station",
     "l5_station",
     ...(systemConfig.bodies ?? []).map((b: any) => b.id),

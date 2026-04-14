@@ -256,7 +256,7 @@ export default function BookingsPage() {
                 </p>
                 <p className="font-sans text-sm text-white/40 max-w-xs">
                   {activeTab === "upcoming"
-                    ? "Your next voyage is waiting to be booked. Where in the Solara system will you go?"
+                    ? "Your next voyage is waiting to be booked. Where in the Taunor system will you go?"
                     : "Nothing to show here."}
                 </p>
               </div>

@@ -1,4 +1,4 @@
-// Orbital mechanics calculations for the Solara system.
+// Orbital mechanics calculations for the Taunor system.
 // This is the TypeScript mirror of gateway/orbital/orbital.go.
 // Both implementations read from the same system.json config values,
 // so the 3D renderer and backend pricing always agree on positions.
