@@ -240,5 +240,115 @@
     "permitRequired": false,
     "createdAt": "2026-04-06T06:43:24.4930576Z",
     "updatedAt": "2026-04-06T06:43:24.4930576Z"
+  },
+  {
+    "id": "6a08b72a-901b-44af-b26a-87aa983ccacb",
+    "userId": "d06f7a4b-076d-4ace-b86d-8e081f2f9558",
+    "groupId": "e1310fbd-f6e1-4130-8254-9502136ab76b",
+    "legNumber": 1,
+    "routeId": "aethon_thal",
+    "routeTypeId": "direct",
+    "shipClassId": "tethys",
+    "departureDay": -106728,
+    "arrivalDay": -106707.8292568707,
+    "departureDate": "2507-10-16T00:00:00Z",
+    "arrivalDate": "2507-11-05T05:00:00Z",
+    "originId": "aethon",
+    "destinationId": "thal",
+    "departurePortId": "",
+    "arrivalPortId": "",
+    "cryoOptionId": "cryo_intervals",
+    "cabinClassId": "apex",
+    "passengers": [
+      {
+        "id": "b6a6a453-ea62-4d43-a2c4-ffe103274b23",
+        "bookingId": "",
+        "firstName": "Test2",
+        "lastName": "Test",
+        "dateOfBirth": "1990-12-12",
+        "isChild": false
+      }
+    ],
+    "addOns": [
+      {
+        "addOnId": "ship_library",
+        "category": "entertainment",
+        "quantity": 1,
+        "unitPrice": 60,
+        "totalPrice": 60
+      },
+      {
+        "addOnId": "chefs_table",
+        "category": "dining",
+        "quantity": 1,
+        "unitPrice": 0,
+        "totalPrice": 0
+      },
+      {
+        "addOnId": "private_cabin_dining",
+        "category": "dining",
+        "quantity": 1,
+        "unitPrice": 0,
+        "totalPrice": 0
+      },
+      {
+        "addOnId": "observatory_sessions",
+        "category": "recreation",
+        "quantity": 1,
+        "unitPrice": 95,
+        "totalPrice": 95
+      },
+      {
+        "addOnId": "immersive_reality",
+        "category": "entertainment",
+        "quantity": 1,
+        "unitPrice": 150,
+        "totalPrice": 150
+      },
+      {
+        "addOnId": "live_performance",
+        "category": "entertainment",
+        "quantity": 1,
+        "unitPrice": 0,
+        "totalPrice": 0
+      },
+      {
+        "addOnId": "premium_cargo",
+        "category": "expeditionExtras",
+        "quantity": 1,
+        "unitPrice": 0,
+        "totalPrice": 0
+      },
+      {
+        "addOnId": "radiation_shield",
+        "category": "journeyProtection",
+        "quantity": 1,
+        "unitPrice": 280,
+        "totalPrice": 280
+      }
+    ],
+    "priceBreakdown": {
+      "baseFare": 1400,
+      "routeTypeAdjustment": 420.00000000000006,
+      "cabinClassAdjustment": 3080.0000000000005,
+      "cryoAdjustment": 490.0000000000001,
+      "orbitalWindowAdjustment": 195.99999999999986,
+      "addOnsTotal": 705,
+      "childDiscounts": -0,
+      "loyaltyDiscount": -0,
+      "portFees": 70,
+      "total": 6361
+    },
+    "totalPrice": 6361,
+    "loyaltyPointsApplied": 0,
+    "loyaltyPointsEarned": 6361,
+    "isVoyageBond": false,
+    "depositPaid": 0,
+    "balanceDue": 6361,
+    "status": "confirmed",
+    "orbitalWindowRating": 2,
+    "permitRequired": false,
+    "createdAt": "2026-04-16T10:30:25.1768073Z",
+    "updatedAt": "2026-04-16T10:30:25.1768073Z"
   }
 ]

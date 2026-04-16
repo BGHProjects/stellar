@@ -1,7 +1,7 @@
 import { modalOverlay } from "@/lib/animations";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Send, Star, X } from "lucide-react";
+import { Loader2, Send, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 interface Message {
@@ -52,7 +52,7 @@ export default function ChatWidget() {
     if (open) setTimeout(() => inputRef.current?.focus(), 300);
   }, [open]);
 
-  async function sendMessage(text?: string) {
+  const sendMessage = async (text?: string) => {
     const content = (text ?? input).trim();
     if (!content || loading) return;
 
@@ -112,14 +112,28 @@ export default function ChatWidget() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
-  function handleKeyDown(e: React.KeyboardEvent) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
-  }
+  };
+
+  // Makes text between **s be purple
+  const formatResponse = (text: string) => {
+    const parts = text.split(/\*\*(.+?)\*\*/g);
+    return parts.map((part, i) =>
+      i % 2 === 1 ? (
+        <span key={i} className="text-accent-400">
+          {part}
+        </span>
+      ) : (
+        part
+      ),
+    );
+  };
 
   return (
     <>
@@ -237,7 +251,7 @@ export default function ChatWidget() {
                           : "bg-surface-800/80 text-white/80 border border-white/6 rounded-bl-sm",
                       )}
                     >
-                      {msg.content}
+                      {formatResponse(msg.content)}
                     </div>
                   </motion.div>
                 ))}
